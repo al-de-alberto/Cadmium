@@ -1,0 +1,94 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Asistencia - CADMIUM{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>CADMIUM</h2>
+            <p>Panel de Administración</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'panel' %}" class="nav-item {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'usuarios' %}" class="nav-item {% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}">
+                <span class="nav-icon">👥</span>
+                <span>Usuarios</span>
+            </a>
+            <a href="{% url 'inventario' %}" class="nav-item {% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">
+                <span class="nav-icon">📦</span>
+                <span>Inventario</span>
+            </a>
+            <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Asistencia</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <p><strong>{{ user.username }}</strong></p>
+                <p class="user-role">{{ user.get_rol_display }}</p>
+            </div>
+            <a href="{% url 'logout' %}" class="btn btn-logout">Cerrar Sesión</a>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Gestión de Asistencia</h1>
+            <div class="header-actions">
+                <a href="{% url 'panel' %}" class="btn btn-secondary">← Volver</a>
+            </div>
+        </header>
+        
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Hora Entrada</th>
+                        <th>Hora Salida</th>
+                        <th>Fecha Registro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asistencia in asistencias %}
+                    <tr>
+                        <td><strong>{{ asistencia.usuario.username }}</strong></td>
+                        <td>{{ asistencia.fecha|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if asistencia.estado == 'presente' %}
+                                <span class="badge badge-success">Presente</span>
+                            {% elif asistencia.estado == 'ausente' %}
+                                <span class="badge badge-danger">Ausente</span>
+                            {% elif asistencia.estado == 'tarde' %}
+                                <span class="badge badge-warning">Tarde</span>
+                            {% else %}
+                                <span class="badge badge-info">Justificado</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ asistencia.hora_entrada|default:"-" }}</td>
+                        <td>{{ asistencia.hora_salida|default:"-" }}</td>
+                        <td>{{ asistencia.fecha_registro|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No hay registros de asistencia</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+
+

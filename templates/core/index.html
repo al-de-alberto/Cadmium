@@ -1,0 +1,453 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Inicio - CADMIUM{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Navbar Styles */
+    .navbar {
+        background-color: var(--sidebar-bg);
+        color: white;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .navbar-logo {
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-color);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+    }
+
+    .navbar-nav {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .nav-link {
+        color: white;
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .nav-link:hover {
+        background-color: var(--sidebar-hover);
+    }
+
+    .btn-contactanos {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-contactanos:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Hero Section with Carousel */
+    .hero-section {
+        position: relative;
+        width: 100%;
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .carousel-container {
+        position: relative;
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .carousel {
+        position: relative;
+        width: 100%;
+        height: 500px;
+    }
+
+    .carousel-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .carousel-item {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.6s ease-in-out;
+    }
+
+    .carousel-item.active {
+        opacity: 1;
+        z-index: 2;
+    }
+
+    .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .carousel-controls {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .carousel-controls:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .carousel-prev {
+        left: 20px;
+    }
+
+    .carousel-next {
+        right: 20px;
+    }
+
+    .carousel-indicators {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 10;
+    }
+
+    .carousel-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.5);
+        border: 2px solid white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .carousel-indicator.active {
+        background-color: white;
+    }
+
+    /* App Icon Section */
+    .app-icon-section {
+        text-align: center;
+        margin: 60px auto;
+        max-width: 1200px;
+        padding: 0 20px;
+    }
+
+    .app-icon {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto 20px;
+        background-color: var(--primary-color);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: white;
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+    }
+
+    /* News and Events Section */
+    .news-section {
+        background-color: var(--bg-color);
+        padding: 60px 20px;
+        margin-top: 60px;
+    }
+
+    .news-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        color: var(--text-primary);
+        margin-bottom: 40px;
+        font-weight: 700;
+    }
+
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    .news-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .news-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .news-card h3 {
+        color: var(--primary-color);
+        margin-bottom: 12px;
+        font-size: 1.25rem;
+    }
+
+    .news-card p {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .news-date {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-top: 12px;
+        font-style: italic;
+    }
+
+    /* Footer Section */
+    .footer {
+        background-color: var(--sidebar-bg);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .reglamento-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 30px;
+        background-color: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .reglamento-link:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .footer p {
+        margin-top: 20px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.875rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .navbar {
+            flex-direction: column;
+            gap: 15px;
+            padding: 1rem;
+        }
+
+        .navbar-nav {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .carousel {
+            height: 300px;
+        }
+
+        .news-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{% url 'index' %}" class="navbar-brand">
+        <div class="navbar-logo">C</div>
+        <span>CADMIUM</span>
+    </a>
+    <div class="navbar-nav">
+        <a href="{% url 'login' %}" class="nav-link">Iniciar Sesión</a>
+        <a href="{% url 'contactanos' %}" class="btn-contactanos">Contáctanos</a>
+    </div>
+</nav>
+
+<!-- Hero Section with Carousel -->
+<div class="hero-section">
+    <div class="carousel-container">
+        <div class="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="{% static 'images/carousel1.jpg' %}" alt="Imagen 1" onerror="this.style.backgroundColor='#e2e8f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.alt='Imagen 1 - Placeholder'; this.innerHTML='<span style=\"color:#64748b;font-size:2rem;\">Imagen 1</span>'">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'images/carousel2.jpg' %}" alt="Imagen 2" onerror="this.style.backgroundColor='#e2e8f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.alt='Imagen 2 - Placeholder'; this.innerHTML='<span style=\"color:#64748b;font-size:2rem;\">Imagen 2</span>'">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'images/carousel3.jpg' %}" alt="Imagen 3" onerror="this.style.backgroundColor='#e2e8f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.alt='Imagen 3 - Placeholder'; this.innerHTML='<span style=\"color:#64748b;font-size:2rem;\">Imagen 3</span>'">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'images/carousel4.jpg' %}" alt="Imagen 4" onerror="this.style.backgroundColor='#e2e8f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.alt='Imagen 4 - Placeholder'; this.innerHTML='<span style=\"color:#64748b;font-size:2rem;\">Imagen 4</span>'">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'images/carousel5.jpg' %}" alt="Imagen 5" onerror="this.style.backgroundColor='#e2e8f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.alt='Imagen 5 - Placeholder'; this.innerHTML='<span style=\"color:#64748b;font-size:2rem;\">Imagen 5</span>'">
+                </div>
+            </div>
+            <button class="carousel-controls carousel-prev" onclick="changeSlide(-1)">&#10094;</button>
+            <button class="carousel-controls carousel-next" onclick="changeSlide(1)">&#10095;</button>
+            <div class="carousel-indicators">
+                <span class="carousel-indicator active" onclick="currentSlide(1)"></span>
+                <span class="carousel-indicator" onclick="currentSlide(2)"></span>
+                <span class="carousel-indicator" onclick="currentSlide(3)"></span>
+                <span class="carousel-indicator" onclick="currentSlide(4)"></span>
+                <span class="carousel-indicator" onclick="currentSlide(5)"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- App Icon Section -->
+<div class="app-icon-section">
+    <div class="app-icon">
+        <img src="{% static 'images/logo.png' %}" alt="Logo CADMIUM" onerror="this.style.display='none'; this.parentElement.innerHTML='C';" style="width: 100%; height: 100%; object-fit: contain;">
+    </div>
+    <h2 style="color: var(--text-primary); font-size: 2rem; margin-top: 20px;">Sistema de Gestión CADMIUM</h2>
+    <p style="color: var(--text-secondary); font-size: 1.1rem; margin-top: 10px;">PopUp Nescafe</p>
+</div>
+
+<!-- News and Events Section -->
+<div class="news-section">
+    <div class="news-container">
+        <h2 class="section-title">Noticias y Eventos Importantes</h2>
+        <div class="news-grid">
+            <div class="news-card">
+                <h3>Evento PopUp Nescafe</h3>
+                <p>Mantente al día con las últimas noticias y eventos importantes del PopUp Nescafe. Aquí encontrarás información relevante sobre actividades, anuncios y comunicados.</p>
+                <div class="news-date">Fecha: Próximamente</div>
+            </div>
+            <div class="news-card">
+                <h3>Noticias y Actualizaciones</h3>
+                <p>Información actualizada sobre el funcionamiento del sistema y las actividades del PopUp Nescafe. Consulta regularmente para estar informado.</p>
+                <div class="news-date">Fecha: Próximamente</div>
+            </div>
+            <div class="news-card">
+                <h3>Eventos Importantes</h3>
+                <p>No te pierdas los eventos importantes del PopUp Nescafe. Aquí encontrarás toda la información sobre fechas, horarios y detalles de cada evento.</p>
+                <div class="news-date">Fecha: Próximamente</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <a href="#" class="reglamento-link" onclick="return false;">Reglamento Interno</a>
+        <p>&copy; 2024 CADMIUM - PopUp Nescafe. Todos los derechos reservados.</p>
+    </div>
+</footer>
+
+<script>
+    let currentSlideIndex = 0;
+    const slides = document.querySelectorAll('.carousel-item');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+        // Asegurar que el índice esté en el rango válido
+        if (index >= totalSlides) {
+            currentSlideIndex = 0;
+        } else if (index < 0) {
+            currentSlideIndex = totalSlides - 1;
+        } else {
+            currentSlideIndex = index;
+        }
+
+        // Ocultar todas las slides
+        slides.forEach(slide => slide.classList.remove('active'));
+        indicators.forEach(indicator => indicator.classList.remove('active'));
+
+        // Mostrar la slide actual
+        slides[currentSlideIndex].classList.add('active');
+        indicators[currentSlideIndex].classList.add('active');
+    }
+
+    function changeSlide(direction) {
+        showSlide(currentSlideIndex + direction);
+    }
+
+    function currentSlide(index) {
+        showSlide(index - 1);
+    }
+
+    // Auto-play del carrusel cada 5 segundos
+    setInterval(() => {
+        changeSlide(1);
+    }, 5000);
+</script>
+{% endblock %}
+

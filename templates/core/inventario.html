@@ -1,0 +1,82 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Inventario - CADMIUM{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>CADMIUM</h2>
+            <p>Panel de Administración</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'panel' %}" class="nav-item {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'usuarios' %}" class="nav-item {% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}">
+                <span class="nav-icon">👥</span>
+                <span>Usuarios</span>
+            </a>
+            <a href="{% url 'inventario' %}" class="nav-item {% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">
+                <span class="nav-icon">📦</span>
+                <span>Inventario</span>
+            </a>
+            <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Asistencia</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <p><strong>{{ user.username }}</strong></p>
+                <p class="user-role">{{ user.get_rol_display }}</p>
+            </div>
+            <a href="{% url 'logout' %}" class="btn btn-logout">Cerrar Sesión</a>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Gestión de Inventario</h1>
+            <div class="header-actions">
+                <a href="{% url 'panel' %}" class="btn btn-secondary">← Volver</a>
+            </div>
+        </header>
+        
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Última Actualización</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in inventarios %}
+                    <tr>
+                        <td><strong>{{ item.nombre }}</strong></td>
+                        <td>{{ item.categoria|default:"-" }}</td>
+                        <td><span class="badge badge-info">{{ item.cantidad }}</span></td>
+                        <td>${{ item.precio_unitario|floatformat:2 }}</td>
+                        <td>{{ item.fecha_actualizacion|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay items en el inventario</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+
+

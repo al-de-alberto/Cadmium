@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Usuarios - CADMIUM{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>CADMIUM</h2>
+            <p>Panel de Administración</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'panel' %}" class="nav-item {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'usuarios' %}" class="nav-item {% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}">
+                <span class="nav-icon">👥</span>
+                <span>Usuarios</span>
+            </a>
+            <a href="{% url 'inventario' %}" class="nav-item {% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">
+                <span class="nav-icon">📦</span>
+                <span>Inventario</span>
+            </a>
+            <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Asistencia</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <p><strong>{{ user.username }}</strong></p>
+                <p class="user-role">{{ user.get_rol_display }}</p>
+            </div>
+            <a href="{% url 'logout' %}" class="btn btn-logout">Cerrar Sesión</a>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Gestión de Usuarios</h1>
+            <div class="header-actions">
+                <a href="{% url 'panel' %}" class="btn btn-secondary">← Volver</a>
+            </div>
+        </header>
+        
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td><strong>{{ usuario.username }}</strong></td>
+                        <td>{{ usuario.email|default:"-" }}</td>
+                        <td><span class="badge badge-{{ usuario.rol }}">{{ usuario.get_rol_display }}</span></td>
+                        <td>
+                            {% if usuario.activo %}
+                                <span class="badge badge-success">Activo</span>
+                            {% else %}
+                                <span class="badge badge-danger">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ usuario.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay usuarios registrados</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+
+
