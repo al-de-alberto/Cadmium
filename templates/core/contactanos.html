@@ -1,7 +1,7 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Contáctanos - CADMIUM{% endblock %}
+{% block title %}Contáctanos - Cadmium{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -209,11 +209,26 @@
 <nav class="navbar">
     <a href="{% url 'index' %}" class="navbar-brand">
         <div class="navbar-logo">C</div>
-        <span>CADMIUM</span>
+        <div>
+            <span>Cadmium</span>
+            <span class="tagline">Crea tu mundo</span>
+        </div>
     </a>
     <div class="navbar-nav">
-        <a href="{% url 'login' %}" class="nav-link">Iniciar Sesión</a>
-        <a href="{% url 'contactanos' %}" class="btn-contactanos">Contáctanos</a>
+        <div class="dropdown">
+            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
+                <span class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </a>
+            <div class="dropdown-menu">
+                <a href="{% url 'login' %}" class="dropdown-item">Iniciar Sesión</a>
+                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
+                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a>
+            </div>
+        </div>
     </div>
 </nav>
 
@@ -246,5 +261,24 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Función para el menú desplegable
+    function toggleDropdown(event) {
+        event.preventDefault();
+        const dropdown = event.currentTarget.closest('.dropdown');
+        dropdown.classList.toggle('active');
+    }
+
+    // Cerrar el menú al hacer clic fuera
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+</script>
 {% endblock %}
 

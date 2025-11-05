@@ -1,13 +1,49 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Login - CADMIUM{% endblock %}
+{% block title %}Login - Cadmium{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 50%, var(--primary-dark) 100%);
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="login-container">
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{% url 'index' %}" class="navbar-brand">
+        <div class="navbar-logo">C</div>
+        <div>
+            <span>Cadmium</span>
+            <span class="tagline">Crea tu mundo</span>
+        </div>
+    </a>
+    <div class="navbar-nav">
+        <div class="dropdown">
+            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
+                <span class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </a>
+            <div class="dropdown-menu">
+                <a href="{% url 'login' %}" class="dropdown-item">Iniciar Sesión</a>
+                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
+                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="login-container" style="margin-top: 0; padding-top: 80px; min-height: 100vh;">
     <div class="login-card">
         <div class="login-header">
-            <h1>CADMIUM</h1>
-            <p>Sistema de Gestión</p>
+            <h1>Cadmium</h1>
         </div>
         
         {% if messages %}
@@ -18,23 +54,97 @@
             {% endfor %}
         {% endif %}
         
-        <form method="POST" class="login-form">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="username">Usuario</label>
-                <input type="text" id="username" name="username" required autofocus>
+        <!-- Paso 1: Selección de tipo de cuenta -->
+        <div id="step1" class="login-step" {% if account_type %}style="display: none;"{% endif %}>
+            <h2 style="text-align: center; margin-bottom: 30px; color: var(--text-primary);">Selecciona tu tipo de cuenta</h2>
+            <div class="account-type-buttons">
+                <button type="button" class="account-type-btn" onclick="selectAccountType('gerencia')">
+                    <div class="account-icon">👔</div>
+                    <h3>Gerencia</h3>
+                    <p>Acceso administrativo completo</p>
+                </button>
+                <button type="button" class="account-type-btn" onclick="selectAccountType('empleado')">
+                    <div class="account-icon">👤</div>
+                    <h3>Empleado</h3>
+                    <p>Acceso de usuario estándar</p>
+                </button>
             </div>
-            
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-        </form>
+        </div>
+        
+        <!-- Paso 2: Formulario de credenciales -->
+        <div id="step2" class="login-step" {% if not account_type %}style="display: none;"{% endif %}>
+            <h2 style="text-align: center; margin-bottom: 20px; color: var(--text-primary);">
+                <span id="account-type-label">Iniciar Sesión{% if account_type == 'gerencia' %} - Gerencia{% elif account_type == 'empleado' %} - Empleado{% endif %}</span>
+            </h2>
+            <form method="POST" class="login-form" id="login-form">
+                {% csrf_token %}
+                <input type="hidden" id="account-type" name="account_type" value="{% if account_type %}{{ account_type }}{% endif %}">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" name="username" required autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                <button type="button" class="btn btn-secondary" onclick="goBack()" style="margin-top: 10px; width: 100%;">Volver Atrás</button>
+            </form>
+        </div>
     </div>
 </div>
+
+<script>
+    let selectedAccountType = '{% if account_type %}{{ account_type }}{% endif %}';
+    
+    // Inicializar si hay un tipo de cuenta desde el backend
+    if (selectedAccountType) {
+        const accountTypeInput = document.getElementById('account-type');
+        if (accountTypeInput) {
+            accountTypeInput.value = selectedAccountType;
+        }
+    }
+    
+    function selectAccountType(type) {
+        selectedAccountType = type;
+        document.getElementById('account-type').value = type;
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+        
+        const label = type === 'gerencia' ? 'Iniciar Sesión - Gerencia' : 'Iniciar Sesión - Empleado';
+        document.getElementById('account-type-label').textContent = label;
+        document.getElementById('username').focus();
+    }
+    
+    function goBack() {
+        document.getElementById('step1').style.display = 'block';
+        document.getElementById('step2').style.display = 'none';
+        selectedAccountType = '';
+        document.getElementById('account-type').value = '';
+        document.getElementById('login-form').reset();
+    }
+
+    // Función para el menú desplegable
+    function toggleDropdown(event) {
+        event.preventDefault();
+        const dropdown = event.currentTarget.closest('.dropdown');
+        dropdown.classList.toggle('active');
+    }
+
+    // Cerrar el menú al hacer clic fuera
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+</script>
 {% endblock %}
+
 
 
 

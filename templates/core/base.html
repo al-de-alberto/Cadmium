@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CADMIUM{% endblock %}</title>
+    <title>{% block title %}Cadmium{% endblock %}</title>
     {% load static %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
@@ -13,6 +15,7 @@
     {% block extra_js %}{% endblock %}
 </body>
 </html>
+
 
 
 

@@ -72,3 +72,4 @@ class Asistencia(models.Model):
 
 
 
+

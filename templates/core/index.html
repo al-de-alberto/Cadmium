@@ -1,7 +1,7 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Inicio - CADMIUM{% endblock %}
+{% block title %}Inicio - Cadmium{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -275,23 +275,6 @@
         margin: 0 auto;
     }
 
-    .reglamento-link {
-        display: inline-block;
-        margin-top: 20px;
-        padding: 12px 30px;
-        background-color: var(--primary-color);
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .reglamento-link:hover {
-        background-color: var(--primary-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-    }
 
     .footer p {
         margin-top: 20px;
@@ -328,11 +311,26 @@
 <nav class="navbar">
     <a href="{% url 'index' %}" class="navbar-brand">
         <div class="navbar-logo">C</div>
-        <span>CADMIUM</span>
+        <div>
+            <span>Cadmium</span>
+            <span class="tagline">Crea tu mundo</span>
+        </div>
     </a>
     <div class="navbar-nav">
-        <a href="{% url 'login' %}" class="nav-link">Iniciar Sesión</a>
-        <a href="{% url 'contactanos' %}" class="btn-contactanos">Contáctanos</a>
+        <div class="dropdown">
+            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
+                <span class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </a>
+            <div class="dropdown-menu">
+                <a href="{% url 'login' %}" class="dropdown-item">Iniciar Sesión</a>
+                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
+                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a>
+            </div>
+        </div>
     </div>
 </nav>
 
@@ -373,9 +371,9 @@
 <!-- App Icon Section -->
 <div class="app-icon-section">
     <div class="app-icon">
-        <img src="{% static 'images/logo.png' %}" alt="Logo CADMIUM" onerror="this.style.display='none'; this.parentElement.innerHTML='C';" style="width: 100%; height: 100%; object-fit: contain;">
+        <img src="{% static 'images/logo.png' %}" alt="Logo Cadmium" onerror="this.style.display='none'; this.parentElement.innerHTML='C';" style="width: 100%; height: 100%; object-fit: contain;">
     </div>
-    <h2 style="color: var(--text-primary); font-size: 2rem; margin-top: 20px;">Sistema de Gestión CADMIUM</h2>
+    <h2 style="color: var(--text-primary); font-size: 2rem; margin-top: 20px;">Cadmium</h2>
     <p style="color: var(--text-secondary); font-size: 1.1rem; margin-top: 10px;">PopUp Nescafe</p>
 </div>
 
@@ -385,18 +383,13 @@
         <h2 class="section-title">Noticias y Eventos Importantes</h2>
         <div class="news-grid">
             <div class="news-card">
-                <h3>Evento PopUp Nescafe</h3>
+                <h3>Eventos PopUp</h3>
                 <p>Mantente al día con las últimas noticias y eventos importantes del PopUp Nescafe. Aquí encontrarás información relevante sobre actividades, anuncios y comunicados.</p>
                 <div class="news-date">Fecha: Próximamente</div>
             </div>
             <div class="news-card">
                 <h3>Noticias y Actualizaciones</h3>
                 <p>Información actualizada sobre el funcionamiento del sistema y las actividades del PopUp Nescafe. Consulta regularmente para estar informado.</p>
-                <div class="news-date">Fecha: Próximamente</div>
-            </div>
-            <div class="news-card">
-                <h3>Eventos Importantes</h3>
-                <p>No te pierdas los eventos importantes del PopUp Nescafe. Aquí encontrarás toda la información sobre fechas, horarios y detalles de cada evento.</p>
                 <div class="news-date">Fecha: Próximamente</div>
             </div>
         </div>
@@ -406,8 +399,8 @@
 <!-- Footer -->
 <footer class="footer">
     <div class="footer-content">
-        <a href="#" class="reglamento-link" onclick="return false;">Reglamento Interno</a>
-        <p>&copy; 2024 CADMIUM - PopUp Nescafe. Todos los derechos reservados.</p>
+        <p>&copy; 2025 Cadmium. Todos los derechos reservados.</p>
+        <p style="margin-top: 5px;">Desarrollado por: Tania Vilches, Annais Gálvez, Alberto San Juan</p>
     </div>
 </footer>
 
@@ -448,6 +441,23 @@
     setInterval(() => {
         changeSlide(1);
     }, 5000);
+
+    // Función para el menú desplegable
+    function toggleDropdown(event) {
+        event.preventDefault();
+        const dropdown = event.currentTarget.closest('.dropdown');
+        dropdown.classList.toggle('active');
+    }
+
+    // Cerrar el menú al hacer clic fuera
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
 </script>
 {% endblock %}
 

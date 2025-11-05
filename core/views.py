@@ -12,15 +12,37 @@ def login_view(request):
         return redirect('panel')
     
     if request.method == 'POST':
+        account_type = request.POST.get('account_type')
         username = request.POST.get('username')
         password = request.POST.get('password')
         
+        # Validar que se haya seleccionado un tipo de cuenta
+        if not account_type:
+            messages.error(request, 'Por favor selecciona un tipo de cuenta')
+            return render(request, 'core/login.html')
+        
+        # Validar que se hayan proporcionado credenciales
+        if not username or not password:
+            messages.error(request, 'Por favor completa todos los campos')
+            return render(request, 'core/login.html', {'account_type': account_type})
+        
+        # Autenticar usuario
         user = authenticate(request, username=username, password=password)
+        
         if user is not None:
-            login(request, user)
-            return redirect('panel')
+            # Validar que el tipo de cuenta seleccionado coincida con el rol del usuario
+            expected_rol = 'admin' if account_type == 'gerencia' else 'usuario'
+            
+            if user.rol == expected_rol or (account_type == 'gerencia' and user.is_superuser):
+                login(request, user)
+                return redirect('panel')
+            else:
+                # El tipo de cuenta no coincide con el rol del usuario
+                messages.error(request, 'Usuario o Contraseña Incorrecto')
+                return render(request, 'core/login.html', {'account_type': account_type})
         else:
-            messages.error(request, 'Usuario o contraseña incorrectos')
+            messages.error(request, 'Usuario o Contraseña Incorrecto')
+            return render(request, 'core/login.html', {'account_type': account_type})
     
     return render(request, 'core/login.html')
 
