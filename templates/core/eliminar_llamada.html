@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Usuarios - Cadmium{% endblock %}
+{% block title %}Eliminar Llamada - Cadmium{% endblock %}
 
 {% block content %}
 <!-- Navbar -->
@@ -68,10 +68,9 @@
     
     <main class="main-content">
         <header class="content-header">
-            <h1>Gestión de Usuarios</h1>
+            <h1>Eliminar Llamada</h1>
             <div class="header-actions">
-                <a href="{% url 'crear_usuario' %}" class="btn btn-primary">+ Crear Usuario</a>
-                <a href="{% url 'panel' %}" class="btn btn-secondary">← Volver</a>
+                <a href="{% url 'operaciones' %}" class="btn btn-secondary">← Volver a Operaciones</a>
             </div>
         </header>
         
@@ -84,102 +83,92 @@
             {% endfor %}
         {% endif %}
         
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Nombre Completo</th>
-                        <th>RUT</th>
-                        <th>Email</th>
-                        <th>Rol</th>
-                        <th>Estado</th>
-                        <th>Fecha Creación</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for usuario in usuarios %}
-                    <tr>
-                        <td><strong>{{ usuario.get_nombre_completo }}</strong></td>
-                        <td>{{ usuario.rut|default:"-" }}</td>
-                        <td>{{ usuario.correo_institucional|default:usuario.email|default:"-" }}</td>
-                        <td><span class="badge badge-{{ usuario.rol }}">{{ usuario.get_rol_display }}</span></td>
-                        <td>
-                            {% if usuario.activo %}
-                                <span class="badge badge-success">Activo</span>
-                            {% else %}
-                                <span class="badge badge-danger">Inactivo</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ usuario.fecha_creacion|date:"d/m/Y H:i" }}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <a href="{% url 'editar_usuario' usuario.id %}" class="btn-action btn-edit" title="Modificar">
-                                    <span class="icon-edit">↻</span>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center">No hay usuarios registrados</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="card">
+            <div class="card-header">
+                <h2 style="margin: 0; font-size: 1.5rem; color: var(--danger-color);">⚠️ Confirmar Eliminación</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>¿Estás seguro que deseas eliminar el registro de llamada #{{ llamada.contador_llamada }}?</strong>
+                    <p style="margin-top: 10px;">Esta opción no se puede deshacer.</p>
+                </div>
+                
+                <div style="background: var(--bg-color); padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3 style="margin-top: 0; color: var(--text-primary);">Detalles del registro:</h3>
+                    <p><strong>Motivo:</strong> {{ llamada.motivo }}</p>
+                    <p><strong>Fecha:</strong> {{ llamada.fecha|date:"d/m/Y" }}</p>
+                    <p><strong>Técnico:</strong> {{ llamada.tecnico_contactado }}</p>
+                    <p><strong>Descripción:</strong> {{ llamada.descripcion|truncatewords:20 }}</p>
+                </div>
+                
+                <form method="post" style="margin-top: 20px;">
+                    {% csrf_token %}
+                    <div class="form-actions-create">
+                        <a href="{% url 'operaciones' %}" class="btn btn-cancel">Cancelar</a>
+                        <button type="submit" class="btn btn-delete-confirm">Eliminar Registro</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </main>
 </div>
 
 <style>
-.action-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    align-items: center;
-}
-
-.btn-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-size: 18px;
+.btn-delete-confirm {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #E53935 100%);
+    color: white;
     border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(198, 40, 40, 0.3);
+    font-family: 'Poppins', sans-serif;
 }
 
-.btn-edit {
-    background: linear-gradient(135deg, var(--warning-color) 0%, #FFD700 100%);
-    color: var(--text-primary);
-    box-shadow: 0 2px 6px rgba(245, 203, 92, 0.3);
-}
-
-.btn-edit:hover {
-    background: linear-gradient(135deg, #FFD700 0%, var(--warning-color) 100%);
+.btn-delete-confirm:hover {
+    background: linear-gradient(135deg, #E53935 0%, var(--danger-color) 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(245, 203, 92, 0.5);
+    box-shadow: 0 6px 16px rgba(198, 40, 40, 0.4);
 }
 
-.icon-edit {
+.btn-cancel {
+    padding: 12px 24px;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
     display: inline-block;
-    font-size: 18px;
-    line-height: 1;
 }
 
-.data-table th:last-child,
-.data-table td:last-child {
-    text-align: center;
-    width: 100px;
+.btn-cancel:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.15);
+}
+
+.form-actions-create {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.alert-warning {
+    background-color: rgba(245, 203, 92, 0.1);
+    color: #B8860B;
+    border: 1px solid rgba(245, 203, 92, 0.3);
+    padding: 15px;
+    border-radius: 8px;
 }
 </style>
 {% endblock %}
-
-
-
-
 

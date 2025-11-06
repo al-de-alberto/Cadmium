@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Inventario - Cadmium{% endblock %}
+{% block title %}Eliminar Asistencia - Cadmium{% endblock %}
 
 {% block content %}
 <!-- Navbar -->
@@ -68,44 +68,62 @@
     
     <main class="main-content">
         <header class="content-header">
-            <h1>Gestión de Inventario</h1>
+            <h1>Eliminar Asistencia</h1>
             <div class="header-actions">
-                <a href="{% url 'panel' %}" class="btn btn-secondary">← Volver</a>
+                <a href="{% url 'asistencia' %}" class="btn btn-secondary">← Volver</a>
             </div>
         </header>
         
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unitario</th>
-                        <th>Última Actualización</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in inventarios %}
-                    <tr>
-                        <td><strong>{{ item.nombre }}</strong></td>
-                        <td>{{ item.categoria|default:"-" }}</td>
-                        <td><span class="badge badge-info">{{ item.cantidad }}</span></td>
-                        <td>${{ item.precio_unitario|floatformat:2 }}</td>
-                        <td>{{ item.fecha_actualizacion|date:"d/m/Y H:i" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center">No hay items en el inventario</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 style="margin: 0; font-size: 1.5rem; color: var(--danger-color);">⚠️ Confirmar Eliminación</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>¿Estás seguro que deseas eliminar el registro de asistencia?</strong>
+                    <p style="margin-top: 10px;">Esta opción no se puede deshacer.</p>
+                </div>
+                
+                <form method="post" style="margin-top: 20px;">
+                    {% csrf_token %}
+                    <div class="form-actions-create">
+                        <a href="{% url 'asistencia' %}" class="btn btn-cancel">Cancelar</a>
+                        <button type="submit" class="btn btn-delete-confirm">Eliminar Registro</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </main>
 </div>
+
+<style>
+.btn-delete-confirm {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #E53935 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(198, 40, 40, 0.3);
+}
+
+.btn-delete-confirm:hover {
+    background: linear-gradient(135deg, #E53935 0%, var(--danger-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(198, 40, 40, 0.4);
+}
+</style>
 {% endblock %}
-
-
-
 

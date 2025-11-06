@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Inventario - Cadmium{% endblock %}
+{% block title %}Delivery - Cadmium{% endblock %}
 
 {% block content %}
 <!-- Navbar -->
@@ -68,44 +68,22 @@
     
     <main class="main-content">
         <header class="content-header">
-            <h1>Gestión de Inventario</h1>
+            <h1>Delivery</h1>
             <div class="header-actions">
                 <a href="{% url 'panel' %}" class="btn btn-secondary">← Volver</a>
             </div>
         </header>
         
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Categoría</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unitario</th>
-                        <th>Última Actualización</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in inventarios %}
-                    <tr>
-                        <td><strong>{{ item.nombre }}</strong></td>
-                        <td>{{ item.categoria|default:"-" }}</td>
-                        <td><span class="badge badge-info">{{ item.cantidad }}</span></td>
-                        <td>${{ item.precio_unitario|floatformat:2 }}</td>
-                        <td>{{ item.fecha_actualizacion|date:"d/m/Y H:i" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center">No hay items en el inventario</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="card">
+            <div class="card-body" style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 4rem; margin-bottom: 20px;">🚚</div>
+                <h2 style="color: var(--text-primary); margin-bottom: 15px;">Módulo en Desarrollo</h2>
+                <p style="color: var(--text-secondary); font-size: 1.1rem;">
+                    La sección de Delivery está en desarrollo y estará disponible próximamente.
+                </p>
+            </div>
         </div>
     </main>
 </div>
 {% endblock %}
-
-
-
 

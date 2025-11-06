@@ -17,7 +17,8 @@ class Command(BaseCommand):
                 rol='admin',
                 is_staff=True,
                 is_superuser=True,
-                activo=True
+                activo=True,
+                cambio_password_requerido=False  # Los administradores no necesitan cambiar contraseña
             )
             self.stdout.write(
                 self.style.SUCCESS(f'Usuario administrador "Gerencia" creado exitosamente')

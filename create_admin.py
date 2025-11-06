@@ -14,7 +14,8 @@ if not Usuario.objects.filter(username='Gerencia').exists():
         rol='admin',
         is_staff=True,
         is_superuser=True,
-        activo=True
+        activo=True,
+        cambio_password_requerido=False  # Los administradores no necesitan cambiar contraseña
     )
     print(f'Usuario administrador "Gerencia" creado exitosamente')
 else:

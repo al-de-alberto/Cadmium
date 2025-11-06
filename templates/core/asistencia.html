@@ -13,7 +13,7 @@
         </div>
     </a>
     <div class="navbar-nav">
-        <span class="nav-link">Bienvenido, {{ user.username }}</span>
+        <span class="nav-link welcome-name">Bienvenido/a {{ user.nombre|default:user.username }}</span>
         <a href="{% url 'logout' %}" class="btn-contactanos">Cerrar Sesión</a>
     </div>
 </nav>
@@ -40,9 +40,21 @@
                 <span class="nav-icon">📦</span>
                 <span>Inventario</span>
             </a>
+            <a href="{% url 'ventas_pedidos' %}" class="nav-item {% if request.resolver_match.url_name == 'ventas_pedidos' %}active{% endif %}">
+                <span class="nav-icon">💰</span>
+                <span>Ventas y Pedidos</span>
+            </a>
             <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
                 <span class="nav-icon">📅</span>
                 <span>Asistencia</span>
+            </a>
+            <a href="{% url 'deliverys' %}" class="nav-item {% if request.resolver_match.url_name == 'deliverys' %}active{% endif %}">
+                <span class="nav-icon">🚚</span>
+                <span>Delivery</span>
+            </a>
+            <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                <span class="nav-icon">⚙️</span>
+                <span>Operaciones</span>
             </a>
         </nav>
         
@@ -51,7 +63,6 @@
                 <p><strong>{{ user.username }}</strong></p>
                 <p class="user-role">{{ user.get_rol_display }}</p>
             </div>
-            <a href="{% url 'logout' %}" class="btn btn-logout">Cerrar Sesión</a>
         </div>
     </aside>
     
@@ -63,37 +74,98 @@
             </div>
         </header>
         
+        <!-- Filtros de búsqueda -->
+        <div class="filters-container">
+            <form method="get" class="filters-form">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="busqueda" class="filter-label">🔍 Buscar por nombre:</label>
+                        <input 
+                            type="text" 
+                            id="busqueda" 
+                            name="busqueda" 
+                            value="{{ busqueda }}" 
+                            placeholder="Buscar:"
+                            class="filter-input"
+                        >
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filtro_fecha" class="filter-label">📅 Filtrar por fecha:</label>
+                        <select id="filtro_fecha" name="filtro_fecha" class="filter-select">
+                            <option value="todos" {% if filtro_fecha == 'todos' or not filtro_fecha %}selected{% endif %}>Todos</option>
+                            <option value="hoy" {% if filtro_fecha == 'hoy' %}selected{% endif %}>Hoy</option>
+                            <option value="semana" {% if filtro_fecha == 'semana' %}selected{% endif %}>Última semana</option>
+                            <option value="mes" {% if filtro_fecha == 'mes' %}selected{% endif %}>Último mes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="filtro_turno" class="filter-label">🕐 Filtrar por turno:</label>
+                        <select id="filtro_turno" name="filtro_turno" class="filter-select">
+                            <option value="" {% if not filtro_turno %}selected{% endif %}>Todos los turnos</option>
+                            <option value="apertura" {% if filtro_turno == 'apertura' %}selected{% endif %}>Apertura (09:00 - 13:00)</option>
+                            <option value="tarde" {% if filtro_turno == 'tarde' %}selected{% endif %}>Tarde (13:00 - 17:00)</option>
+                            <option value="cierre" {% if filtro_turno == 'cierre' %}selected{% endif %}>Cierre (17:00 - 21:00)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Mantener el orden en los parámetros ocultos -->
+                {% if orden %}
+                    <input type="hidden" name="orden" value="{{ orden }}">
+                {% endif %}
+                
+                <div class="filter-actions">
+                    <button type="submit" class="btn-filter">Aplicar Filtros</button>
+                    {% if busqueda or filtro_fecha or filtro_turno or orden != 'desc' %}
+                        <a href="{% url 'asistencia' %}" class="btn-filter-clear">Limpiar Filtros</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+        
         <div class="table-container">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Usuario</th>
-                        <th>Fecha</th>
-                        <th>Estado</th>
+                        <th>Nombre</th>
+                        <th class="sortable-header">
+                            <a href="?{% if busqueda %}busqueda={{ busqueda }}&{% endif %}{% if filtro_fecha %}filtro_fecha={{ filtro_fecha }}&{% endif %}{% if filtro_turno %}filtro_turno={{ filtro_turno }}&{% endif %}orden={% if orden == 'asc' %}desc{% else %}asc{% endif %}" class="sort-link">
+                                Fecha
+                                <span class="sort-icon">
+                                    {% if orden == 'asc' %}
+                                        ↑
+                                    {% else %}
+                                        ↓
+                                    {% endif %}
+                                </span>
+                            </a>
+                        </th>
                         <th>Hora Entrada</th>
                         <th>Hora Salida</th>
                         <th>Fecha Registro</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for asistencia in asistencias %}
                     <tr>
-                        <td><strong>{{ asistencia.usuario.username }}</strong></td>
+                        <td><strong>{{ asistencia.usuario.nombre|default:asistencia.usuario.username }}</strong></td>
                         <td>{{ asistencia.fecha|date:"d/m/Y" }}</td>
-                        <td>
-                            {% if asistencia.estado == 'presente' %}
-                                <span class="badge badge-success">Presente</span>
-                            {% elif asistencia.estado == 'ausente' %}
-                                <span class="badge badge-danger">Ausente</span>
-                            {% elif asistencia.estado == 'tarde' %}
-                                <span class="badge badge-warning">Tarde</span>
-                            {% else %}
-                                <span class="badge badge-info">Justificado</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ asistencia.hora_entrada|default:"-" }}</td>
-                        <td>{{ asistencia.hora_salida|default:"-" }}</td>
+                        <td>{{ asistencia.hora_entrada|time:"H:i"|default:"-" }}</td>
+                        <td>{{ asistencia.hora_salida|time:"H:i"|default:"-" }}</td>
                         <td>{{ asistencia.fecha_registro|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'editar_asistencia' asistencia.id %}" class="btn-action btn-edit" title="Modificar">
+                                    <span class="icon-edit">↻</span>
+                                </a>
+                                <a href="{% url 'eliminar_asistencia' asistencia.id %}" class="btn-action btn-delete" title="Eliminar">
+                                    <span class="icon-delete">🗑️</span>
+                                </a>
+                            </div>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -103,8 +175,369 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Estadísticas de Asistencia -->
+        {% if usuario_mayor_asistencia or usuario_menor_asistencia %}
+        <div class="stats-asistencia-container">
+            <h2 style="margin-bottom: 20px; color: var(--text-primary); font-family: 'Playfair Display', Georgia, serif;">Estadísticas de Asistencia</h2>
+            <div class="stats-asistencia-grid">
+                {% if usuario_mayor_asistencia %}
+                <div class="stat-asistencia-card stat-mayor">
+                    <div class="stat-icon-large">🏆</div>
+                    <div class="stat-content">
+                        <h3>Mayor Asistencia</h3>
+                        <p class="stat-nombre">{{ usuario_mayor_asistencia.nombre|default:usuario_mayor_asistencia.username }}</p>
+                        <p class="stat-count">{{ usuario_mayor_asistencia.total_asistencias }} registro{{ usuario_mayor_asistencia.total_asistencias|pluralize }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if usuario_menor_asistencia %}
+                <div class="stat-asistencia-card stat-menor">
+                    <div class="stat-icon-large">📊</div>
+                    <div class="stat-content">
+                        <h3>Menor Asistencia</h3>
+                        <p class="stat-nombre">{{ usuario_menor_asistencia.nombre|default:usuario_menor_asistencia.username }}</p>
+                        <p class="stat-count">{{ usuario_menor_asistencia.total_asistencias }} registro{{ usuario_menor_asistencia.total_asistencias|pluralize }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
     </main>
 </div>
+
+<style>
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #FFD700 100%);
+    color: var(--text-primary);
+    box-shadow: 0 2px 6px rgba(245, 203, 92, 0.3);
+}
+
+.btn-edit:hover {
+    background: linear-gradient(135deg, #FFD700 0%, var(--warning-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(245, 203, 92, 0.5);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #E53935 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(198, 40, 40, 0.3);
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #E53935 0%, var(--danger-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(198, 40, 40, 0.5);
+}
+
+.icon-edit,
+.icon-delete {
+    display: inline-block;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.data-table th:last-child,
+.data-table td:last-child {
+    text-align: center;
+    width: 120px;
+}
+
+.filters-container {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.1);
+}
+
+.filters-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1.5fr;
+    gap: 20px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    background: var(--bg-color);
+    color: var(--text-primary);
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.1);
+    background: white;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.1);
+    background: white;
+}
+
+.sortable-header {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sort-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.sort-link:hover {
+    background: rgba(0, 168, 150, 0.1);
+    color: var(--success-color);
+}
+
+.sort-icon {
+    font-size: 1.2rem;
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-filter {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--success-color) 0%, #00C5A4 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 168, 150, 0.3);
+}
+
+.btn-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 168, 150, 0.4);
+}
+
+.btn-filter-clear {
+    padding: 12px 24px;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-filter-clear:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.15);
+}
+
+@media (max-width: 768px) {
+    .filters-form {
+        gap: 15px;
+    }
+    
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-actions {
+        flex-direction: column;
+    }
+    
+    .btn-filter,
+    .btn-filter-clear {
+        width: 100%;
+    }
+}
+
+/* Estadísticas de Asistencia */
+.stats-asistencia-container {
+    margin-top: 30px;
+    padding: 25px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.1);
+}
+
+.stats-asistencia-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.stat-asistencia-card {
+    background: linear-gradient(135deg, var(--bg-color) 0%, var(--card-bg) 100%);
+    border-radius: 12px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 8px rgba(46, 42, 39, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid var(--border-color);
+}
+
+.stat-asistencia-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(46, 42, 39, 0.2);
+}
+
+.stat-mayor {
+    border-left: 4px solid var(--success-color);
+}
+
+.stat-mayor:hover {
+    border-color: var(--success-color);
+    box-shadow: 0 4px 16px rgba(0, 168, 150, 0.3);
+}
+
+.stat-menor {
+    border-left: 4px solid var(--secondary-color);
+}
+
+.stat-menor:hover {
+    border-color: var(--secondary-color);
+    box-shadow: 0 4px 16px rgba(176, 137, 104, 0.3);
+}
+
+.stat-icon-large {
+    font-size: 3rem;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.2);
+}
+
+.stat-mayor .stat-icon-large {
+    background: linear-gradient(135deg, var(--success-color) 0%, #00C5A4 100%);
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+}
+
+.stat-nombre {
+    margin: 0 0 8px 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: 'Playfair Display', Georgia, serif;
+}
+
+.stat-count {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .stats-asistencia-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-asistencia-card {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
 {% endblock %}
 
 

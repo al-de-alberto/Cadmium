@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Usuarios - Cadmium{% endblock %}
+{% block title %}Editar Asistencia - Cadmium{% endblock %}
 
 {% block content %}
 <!-- Navbar -->
@@ -68,10 +68,9 @@
     
     <main class="main-content">
         <header class="content-header">
-            <h1>Gestión de Usuarios</h1>
+            <h1>Editar Asistencia</h1>
             <div class="header-actions">
-                <a href="{% url 'crear_usuario' %}" class="btn btn-primary">+ Crear Usuario</a>
-                <a href="{% url 'panel' %}" class="btn btn-secondary">← Volver</a>
+                <a href="{% url 'asistencia' %}" class="btn btn-secondary">← Volver</a>
             </div>
         </header>
         
@@ -84,102 +83,62 @@
             {% endfor %}
         {% endif %}
         
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Nombre Completo</th>
-                        <th>RUT</th>
-                        <th>Email</th>
-                        <th>Rol</th>
-                        <th>Estado</th>
-                        <th>Fecha Creación</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for usuario in usuarios %}
-                    <tr>
-                        <td><strong>{{ usuario.get_nombre_completo }}</strong></td>
-                        <td>{{ usuario.rut|default:"-" }}</td>
-                        <td>{{ usuario.correo_institucional|default:usuario.email|default:"-" }}</td>
-                        <td><span class="badge badge-{{ usuario.rol }}">{{ usuario.get_rol_display }}</span></td>
-                        <td>
-                            {% if usuario.activo %}
-                                <span class="badge badge-success">Activo</span>
-                            {% else %}
-                                <span class="badge badge-danger">Inactivo</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ usuario.fecha_creacion|date:"d/m/Y H:i" }}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <a href="{% url 'editar_usuario' usuario.id %}" class="btn-action btn-edit" title="Modificar">
-                                    <span class="icon-edit">↻</span>
-                                </a>
+        <div class="card">
+            <div class="card-header">
+                <h2 style="margin: 0; font-size: 1.5rem;">Editar Registro de Asistencia</h2>
+                <p style="margin: 5px 0 0 0; opacity: 0.8;">Usuario: <strong>{{ asistencia.usuario.nombre|default:asistencia.usuario.username }}</strong></p>
+            </div>
+            <div class="card-body">
+                <form method="post" class="create-user-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-section">
+                        <div class="form-row">
+                            <div class="form-group-create">
+                                <label for="{{ form.fecha.id_for_label }}">{{ form.fecha.label }} <span class="required-star">*</span></label>
+                                {{ form.fecha }}
+                                {% if form.fecha.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.fecha.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center">No hay usuarios registrados</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.turno.id_for_label }}">{{ form.turno.label }} <span class="required-star">*</span></label>
+                                {{ form.turno }}
+                                {% if form.turno.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.turno.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-hint">El horario se actualizará automáticamente según el turno seleccionado</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-info-box">
+                        <div class="info-icon">ℹ️</div>
+                        <div class="info-content">
+                            <strong>Información:</strong><br>
+                            • Apertura: 09:00 - 13:00<br>
+                            • Tarde: 13:00 - 17:00<br>
+                            • Cierre: 17:00 - 21:00
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions-create">
+                        <a href="{% url 'asistencia' %}" class="btn btn-cancel">Cancelar</a>
+                        <button type="submit" class="btn btn-submit">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </main>
 </div>
-
-<style>
-.action-buttons {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    align-items: center;
-}
-
-.btn-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-size: 18px;
-    border: none;
-    cursor: pointer;
-}
-
-.btn-edit {
-    background: linear-gradient(135deg, var(--warning-color) 0%, #FFD700 100%);
-    color: var(--text-primary);
-    box-shadow: 0 2px 6px rgba(245, 203, 92, 0.3);
-}
-
-.btn-edit:hover {
-    background: linear-gradient(135deg, #FFD700 0%, var(--warning-color) 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(245, 203, 92, 0.5);
-}
-
-.icon-edit {
-    display: inline-block;
-    font-size: 18px;
-    line-height: 1;
-}
-
-.data-table th:last-child,
-.data-table td:last-child {
-    text-align: center;
-    width: 100px;
-}
-</style>
 {% endblock %}
-
-
-
-
 

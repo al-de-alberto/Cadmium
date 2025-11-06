@@ -13,7 +13,7 @@
         </div>
     </a>
     <div class="navbar-nav">
-        <span class="nav-link">Bienvenido, {{ user.username }}</span>
+        <span class="nav-link welcome-name">Bienvenido/a {{ user.nombre|default:user.username }}</span>
         <a href="{% url 'logout' %}" class="btn-contactanos">Cerrar Sesión</a>
     </div>
 </nav>
@@ -40,9 +40,21 @@
                 <span class="nav-icon">📦</span>
                 <span>Inventario</span>
             </a>
+            <a href="{% url 'ventas_pedidos' %}" class="nav-item {% if request.resolver_match.url_name == 'ventas_pedidos' %}active{% endif %}">
+                <span class="nav-icon">💰</span>
+                <span>Ventas y Pedidos</span>
+            </a>
             <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
                 <span class="nav-icon">📅</span>
                 <span>Asistencia</span>
+            </a>
+            <a href="{% url 'deliverys' %}" class="nav-item {% if request.resolver_match.url_name == 'deliverys' %}active{% endif %}">
+                <span class="nav-icon">🚚</span>
+                <span>Delivery</span>
+            </a>
+            <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                <span class="nav-icon">⚙️</span>
+                <span>Operaciones</span>
             </a>
         </nav>
         
@@ -51,7 +63,6 @@
                 <p><strong>{{ user.username }}</strong></p>
                 <p class="user-role">{{ user.get_rol_display }}</p>
             </div>
-            <a href="{% url 'logout' %}" class="btn btn-logout">Cerrar Sesión</a>
         </div>
     </aside>
     
@@ -59,69 +70,54 @@
         <header class="content-header">
             <h1>Dashboard</h1>
             <div class="header-actions">
-                <span class="welcome-text">Bienvenido, {{ user.username }}</span>
+                <span class="welcome-text">Usuarios registrados: {{ stats.total_usuarios }}</span>
             </div>
         </header>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">👥</div>
-                <div class="stat-content">
-                    <h3>Total Usuarios</h3>
-                    <p class="stat-number">{{ stats.total_usuarios }}</p>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">📦</div>
-                <div class="stat-content">
-                    <h3>Total Inventario</h3>
-                    <p class="stat-number">{{ stats.total_inventario }}</p>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">📅</div>
-                <div class="stat-content">
-                    <h3>Total Asistencias</h3>
-                    <p class="stat-number">{{ stats.total_asistencias }}</p>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">✓</div>
-                <div class="stat-content">
-                    <h3>Asistencias Hoy</h3>
-                    <p class="stat-number">{{ stats.asistencias_hoy }}</p>
-                </div>
-            </div>
-        </div>
         
         <div class="quick-actions">
             <h2>Accesos Rápidos</h2>
             <div class="actions-grid">
                 <a href="{% url 'usuarios' %}" class="action-card">
                     <span class="action-icon">👥</span>
-                    <h3>Gestionar Usuarios</h3>
+                    <h3>Usuarios</h3>
                     <p>Administrar usuarios del sistema</p>
                 </a>
                 
                 <a href="{% url 'inventario' %}" class="action-card">
                     <span class="action-icon">📦</span>
-                    <h3>Gestionar Inventario</h3>
+                    <h3>Inventario</h3>
                     <p>Control de inventario</p>
+                </a>
+                
+                <a href="{% url 'ventas_pedidos' %}" class="action-card">
+                    <span class="action-icon">💰</span>
+                    <h3>Ventas y Pedidos</h3>
+                    <p>Gestión de ventas y pedidos</p>
                 </a>
                 
                 <a href="{% url 'asistencia' %}" class="action-card">
                     <span class="action-icon">📅</span>
-                    <h3>Gestionar Asistencia</h3>
+                    <h3>Asistencia</h3>
                     <p>Registro de asistencias</p>
+                </a>
+                
+                <a href="{% url 'deliverys' %}" class="action-card">
+                    <span class="action-icon">🚚</span>
+                    <h3>Delivery</h3>
+                    <p>Gestión de entregas</p>
+                </a>
+                
+                <a href="{% url 'operaciones' %}" class="action-card">
+                    <span class="action-icon">⚙️</span>
+                    <h3>Operaciones</h3>
+                    <p>Gestión de operaciones</p>
                 </a>
             </div>
         </div>
     </main>
 </div>
 {% endblock %}
+
 
 
 

@@ -1,0 +1,453 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Registrar Llamada - Cadmium{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{% url 'index' %}" class="navbar-brand">
+        <div class="navbar-logo">C</div>
+        <div>
+            <span>Cadmium</span>
+            <span class="tagline">Crea tu mundo</span>
+        </div>
+    </a>
+    <div class="navbar-nav">
+        <span class="nav-link welcome-name">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+        <a href="{% url 'logout' %}" class="btn-contactanos">Cerrar Sesión</a>
+    </div>
+</nav>
+
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'index' %}" style="text-decoration: none; color: inherit;">
+                <h2>Cadmium</h2>
+            </a>
+            <p>Panel de Administración</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'panel' %}" class="nav-item {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'usuarios' %}" class="nav-item {% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}">
+                <span class="nav-icon">👥</span>
+                <span>Usuarios</span>
+            </a>
+            <a href="{% url 'inventario' %}" class="nav-item {% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">
+                <span class="nav-icon">📦</span>
+                <span>Inventario</span>
+            </a>
+            <a href="{% url 'ventas_pedidos' %}" class="nav-item {% if request.resolver_match.url_name == 'ventas_pedidos' %}active{% endif %}">
+                <span class="nav-icon">💰</span>
+                <span>Ventas y Pedidos</span>
+            </a>
+            <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Asistencia</span>
+            </a>
+            <a href="{% url 'deliverys' %}" class="nav-item {% if request.resolver_match.url_name == 'deliverys' %}active{% endif %}">
+                <span class="nav-icon">🚚</span>
+                <span>Delivery</span>
+            </a>
+            <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                <span class="nav-icon">⚙️</span>
+                <span>Operaciones</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <p><strong>{{ user.username }}</strong></p>
+                <p class="user-role">{{ user.get_rol_display }}</p>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Registrar Llamada al Técnico</h1>
+            <div class="header-actions">
+                <a href="{% url 'operaciones' %}" class="btn btn-secondary">← Volver a Operaciones</a>
+            </div>
+        </header>
+        
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="create-user-container">
+            <div class="create-user-card">
+                <div class="card-header-create">
+                    <h2>Nuevo Registro de Llamada</h2>
+                    <p>Complete los campos para registrar una nueva llamada al técnico</p>
+                </div>
+                
+                <div class="card-body-create">
+                    <form method="post" class="user-form-create">
+                        {% csrf_token %}
+                        
+                        <div class="form-section">
+                            <h3 class="section-title">Información de la Llamada</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group-create">
+                                    <label for="{{ form.motivo.id_for_label }}">
+                                        {{ form.motivo.label }}
+                                        <span class="required">*</span>
+                                    </label>
+                                    {{ form.motivo }}
+                                    {% if form.motivo.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.motivo.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group-create">
+                                    <label for="{{ form.fecha.id_for_label }}">
+                                        {{ form.fecha.label }}
+                                        <span class="required">*</span>
+                                    </label>
+                                    {{ form.fecha }}
+                                    {% if form.fecha.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.fecha.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.tecnico_contactado.id_for_label }}">
+                                    {{ form.tecnico_contactado.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.tecnico_contactado }}
+                                {% if form.tecnico_contactado.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.tecnico_contactado.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.descripcion.id_for_label }}">
+                                    {{ form.descripcion.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.descripcion }}
+                                {% if form.descripcion.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.descripcion.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.observaciones.id_for_label }}">
+                                    {{ form.observaciones.label }}
+                                </label>
+                                {{ form.observaciones }}
+                                {% if form.observaciones.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.observaciones.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-info-box">
+                            <div class="info-icon">ℹ️</div>
+                            <div class="info-content">
+                                <strong>Información:</strong><br>
+                                • El contador de llamada se asignará automáticamente al guardar el registro.
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions-create">
+                            <button type="button" class="btn btn-cancel" onclick="window.location.href='{% url 'operaciones' %}'">Cancelar</button>
+                            <button type="submit" class="btn btn-submit">Registrar Llamada</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+.create-user-container {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.create-user-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(46, 42, 39, 0.15);
+    overflow: hidden;
+}
+
+.card-header-create {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 30px 40px;
+    text-align: center;
+}
+
+.card-header-create h2 {
+    margin: 0 0 10px 0;
+    font-size: 2rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+}
+
+.card-header-create p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.card-body-create {
+    padding: 40px;
+}
+
+.user-form-create {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    color: var(--primary-color);
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.form-group-create {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.form-group-create label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.required {
+    color: var(--danger-color);
+    font-weight: bold;
+}
+
+.form-group-create input[type="text"],
+.form-group-create input[type="email"],
+.form-group-create input[type="date"],
+.form-group-create select,
+.form-group-create textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    box-sizing: border-box;
+}
+
+.form-group-create textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-group-create input[type="text"]:focus,
+.form-group-create input[type="email"]:focus,
+.form-group-create input[type="date"]:focus,
+.form-group-create select:focus,
+.form-group-create textarea:focus {
+    outline: none;
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 4px rgba(0, 168, 150, 0.15);
+    background: white;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 4px rgba(0, 168, 150, 0.15);
+    background: white;
+}
+
+.form-error {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-info-box {
+    background: rgba(0, 168, 150, 0.1);
+    border-left: 4px solid var(--success-color);
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.info-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.info-content {
+    flex: 1;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.form-actions-create {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    padding: 14px 28px;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-cancel:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.15);
+}
+
+.btn-submit {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--success-color) 0%, #00C5A4 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 168, 150, 0.3);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 168, 150, 0.5);
+    background: linear-gradient(135deg, #00C5A4 0%, var(--success-color) 100%);
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.alert-success {
+    background-color: rgba(0, 168, 150, 0.1);
+    color: var(--success-color);
+    border: 1px solid rgba(0, 168, 150, 0.3);
+}
+
+.alert-error {
+    background-color: rgba(198, 40, 40, 0.1);
+    color: var(--danger-color);
+    border: 1px solid rgba(198, 40, 40, 0.3);
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .card-body-create {
+        padding: 25px;
+    }
+    
+    .form-actions-create {
+        flex-direction: column;
+    }
+    
+    .btn-cancel,
+    .btn-submit {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+

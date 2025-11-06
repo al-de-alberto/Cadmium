@@ -1,0 +1,207 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Editar Usuario - Cadmium{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{% url 'index' %}" class="navbar-brand">
+        <div class="navbar-logo">C</div>
+        <div>
+            <span>Cadmium</span>
+            <span class="tagline">Crea tu mundo</span>
+        </div>
+    </a>
+    <div class="navbar-nav">
+        <span class="nav-link welcome-name">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+        <a href="{% url 'logout' %}" class="btn-contactanos">Cerrar Sesión</a>
+    </div>
+</nav>
+
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'index' %}" style="text-decoration: none; color: inherit;">
+                <h2>Cadmium</h2>
+            </a>
+            <p>Panel de Administración</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'panel' %}" class="nav-item {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'usuarios' %}" class="nav-item {% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}">
+                <span class="nav-icon">👥</span>
+                <span>Usuarios</span>
+            </a>
+            <a href="{% url 'inventario' %}" class="nav-item {% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">
+                <span class="nav-icon">📦</span>
+                <span>Inventario</span>
+            </a>
+            <a href="{% url 'ventas_pedidos' %}" class="nav-item {% if request.resolver_match.url_name == 'ventas_pedidos' %}active{% endif %}">
+                <span class="nav-icon">💰</span>
+                <span>Ventas y Pedidos</span>
+            </a>
+            <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Asistencia</span>
+            </a>
+            <a href="{% url 'deliverys' %}" class="nav-item {% if request.resolver_match.url_name == 'deliverys' %}active{% endif %}">
+                <span class="nav-icon">🚚</span>
+                <span>Delivery</span>
+            </a>
+            <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                <span class="nav-icon">⚙️</span>
+                <span>Operaciones</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <p><strong>{{ user.username }}</strong></p>
+                <p class="user-role">{{ user.get_rol_display }}</p>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Editar Usuario</h1>
+            <div class="header-actions">
+                <a href="{% url 'usuarios' %}" class="btn btn-secondary">← Volver a Usuarios</a>
+            </div>
+        </header>
+        
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 style="margin: 0; font-size: 1.5rem;">Datos del Usuario</h2>
+                <p style="margin: 5px 0 0 0; opacity: 0.8;">Usuario: <strong>{{ usuario.username }}</strong></p>
+            </div>
+            <div class="card-body">
+                <form method="post" class="create-user-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-section">
+                        <h3 class="section-title">Datos Personales</h3>
+                        <div class="form-row">
+                            <div class="form-group-create">
+                                <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }} <span class="required-star">*</span></label>
+                                {{ form.nombre }}
+                                {% if form.nombre.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.nombre.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-hint">Mínimo 4, máximo 20 caracteres</small>
+                            </div>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.apellido.id_for_label }}">{{ form.apellido.label }} <span class="required-star">*</span></label>
+                                {{ form.apellido }}
+                                {% if form.apellido.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.apellido.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-hint">Mínimo 4, máximo 20 caracteres</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 class="section-title">Identificación y Contacto</h3>
+                        <div class="form-row">
+                            <div class="form-group-create">
+                                <label for="{{ form.rut.id_for_label }}">{{ form.rut.label }} <span class="required-star">*</span></label>
+                                {{ form.rut }}
+                                {% if form.rut.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.rut.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-hint">Formato: 12345678-0 o 1234567-8 (dígito verificador: 0-9 o K)</small>
+                            </div>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.correo_institucional.id_for_label }}">{{ form.correo_institucional.label }} <span class="required-star">*</span></label>
+                                {{ form.correo_institucional }}
+                                {% if form.correo_institucional.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.correo_institucional.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-hint">Correo electrónico institucional válido</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 class="section-title">Configuración de Usuario</h3>
+                        <div class="form-row">
+                            <div class="form-group-create">
+                                <label for="{{ form.rol.id_for_label }}">{{ form.rol.label }} <span class="required-star">*</span></label>
+                                {{ form.rol }}
+                                {% if form.rol.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.rol.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group-create" style="display: flex; align-items: center; padding-top: 30px;">
+                                <label for="{{ form.activo.id_for_label }}" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                                    {{ form.activo }}
+                                    <span>{{ form.activo.label }}</span>
+                                </label>
+                                {% if form.activo.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.activo.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-info-box">
+                        <div class="info-icon">ℹ️</div>
+                        <div class="info-content">
+                            <strong>Información importante:</strong><br>
+                            • El nombre de usuario no se puede modificar<br>
+                            • Si cambias el rol, el usuario deberá iniciar sesión nuevamente
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions-create">
+                        <a href="{% url 'usuarios' %}" class="btn btn-cancel">Cancelar</a>
+                        <button type="submit" class="btn btn-submit">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+

@@ -334,6 +334,17 @@
     </div>
 </nav>
 
+<!-- Mensajes -->
+{% if messages %}
+    <div style="position: fixed; top: 90px; left: 50%; transform: translateX(-50%); z-index: 9999; max-width: 500px; width: 90%;">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" style="margin-bottom: 10px; animation: slideIn 0.3s ease-out;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <!-- Hero Section with Carousel -->
 <div class="hero-section">
     <div class="carousel-container">
