@@ -1,0 +1,197 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Editar Manual Interno - Cadmium{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+{% include 'core/navbar_snippet.html' %}
+
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'index' %}" style="text-decoration: none; color: inherit;">
+                <h2>Cadmium</h2>
+            </a>
+            <p>Panel de Administración</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'panel' %}" class="nav-item {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'usuarios' %}" class="nav-item {% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}">
+                <span class="nav-icon">👥</span>
+                <span>Usuarios</span>
+            </a>
+            <a href="{% url 'inventario' %}" class="nav-item {% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">
+                <span class="nav-icon">📦</span>
+                <span>Inventario</span>
+            </a>
+            <a href="{% url 'productos' %}" class="nav-item {% if request.resolver_match.url_name == 'productos' %}active{% endif %}">
+                <span class="nav-icon">💰</span>
+                <span>Productos</span>
+            </a>
+            <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Asistencia</span>
+            </a>
+            <a href="{% url 'deliverys' %}" class="nav-item {% if request.resolver_match.url_name == 'deliverys' %}active{% endif %}">
+                <span class="nav-icon">🚚</span>
+                <span>Delivery</span>
+            </a>
+            <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                <span class="nav-icon">⚙️</span>
+                <span>Operaciones</span>
+            </a>
+            <a href="{% url 'auditoria' %}" class="nav-item {% if request.resolver_match.url_name == 'auditoria' %}active{% endif %}">
+                <span class="nav-icon">📋</span>
+                <span>Auditoría</span>
+            </a>
+            <a href="{% url 'gestionar_eventos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_eventos' or request.resolver_match.url_name == 'crear_evento' or request.resolver_match.url_name == 'editar_evento' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Eventos</span>
+            </a>
+            <a href="{% url 'gestionar_noticias' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_noticias' or request.resolver_match.url_name == 'crear_noticia' or request.resolver_match.url_name == 'editar_noticia' %}active{% endif %}">
+                <span class="nav-icon">📰</span>
+                <span>Noticias</span>
+            </a>
+            <a href="{% url 'gestionar_contactos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_contactos' or request.resolver_match.url_name == 'crear_contacto' or request.resolver_match.url_name == 'editar_contacto' %}active{% endif %}">
+                <span class="nav-icon">📞</span>
+                <span>Contactos</span>
+            </a>
+            <a href="{% url 'gestionar_manual_interno' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_manual_interno' or request.resolver_match.url_name == 'crear_manual_interno' or request.resolver_match.url_name == 'editar_manual_interno' %}active{% endif %}">
+                <span class="nav-icon">📖</span>
+                <span>Manual Interno</span>
+            </a>
+            <a href="{% url 'gestionar_carrusel' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_carrusel' or request.resolver_match.url_name == 'crear_imagen_carrusel' or request.resolver_match.url_name == 'editar_imagen_carrusel' %}active{% endif %}">
+                <span class="nav-icon">🖼️</span>
+                <span>Carrusel</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <p><strong>{{ user.username }}</strong></p>
+                <p class="user-role">{{ user.get_roles_display }}</p>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Editar Documento</h1>
+            <div class="header-actions">
+                <a href="{% url 'gestionar_manual_interno' %}" class="btn btn-secondary">← Volver a Documentación</a>
+            </div>
+        </header>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="create-user-container">
+            <div class="create-user-card">
+                <div class="card-header-create">
+                    <h2>Modificar Documento: {{ manual.titulo }}</h2>
+                    <p>Actualiza la información del documento</p>
+                </div>
+                
+                <div class="card-body-create">
+                    <form method="post" class="user-form-create" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="form-section">
+                            <h3 class="section-title">Datos del Documento</h3>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.tipo.id_for_label }}">
+                                    {{ form.tipo.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.tipo }}
+                                {% if form.tipo.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.tipo.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.titulo.id_for_label }}">
+                                    {{ form.titulo.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.titulo }}
+                                {% if form.titulo.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.titulo.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.archivo.id_for_label }}">
+                                    {{ form.archivo.label }}
+                                </label>
+                                {% if manual.archivo %}
+                                    <div style="margin-bottom: 10px;">
+                                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">Archivo actual:</p>
+                                        <a href="{{ manual.archivo.url }}" target="_blank" style="color: var(--success-color); text-decoration: underline;">
+                                            Ver archivo actual
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {{ form.archivo }}
+                                {% if form.archivo.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.archivo.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-hint">
+                                    Sube un nuevo archivo del documento. Formatos aceptados: PDF, DOC, DOCX. Deje en blanco para mantener el archivo actual.
+                                </small>
+                            </div>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.activo.id_for_label }}" style="display: flex; align-items: center; gap: 10px;">
+                                    {{ form.activo }}
+                                    {{ form.activo.label }}
+                                </label>
+                                {% if form.activo.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.activo.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-hint">Solo el documento activo más reciente de cada tipo se mostrará en la página de documentación</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions-create">
+                            <button type="button" class="btn btn-cancel" onclick="window.location.href='{% url 'gestionar_manual_interno' %}'">Cancelar</button>
+                            <button type="submit" class="btn btn-submit">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+

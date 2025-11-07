@@ -1,0 +1,162 @@
+/* Estilos para registro de asistencia */
+.registro-asistencia-container {
+    min-height: calc(100vh - 80px);
+    padding: 40px 20px;
+    margin-top: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--bg-color) 0%, var(--card-bg) 100%);
+}
+
+.registro-asistencia-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(46, 42, 39, 0.15);
+    max-width: 600px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.registro-asistencia-card .card-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.registro-asistencia-card .card-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    color: white;
+}
+
+.registro-asistencia-card .card-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.registro-asistencia-card .card-body {
+    padding: 30px;
+}
+
+.user-info-box {
+    background: linear-gradient(135deg, rgba(0, 168, 150, 0.1) 0%, rgba(0, 168, 150, 0.05) 100%);
+    border: 2px solid rgba(0, 168, 150, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.user-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0, 168, 150, 0.1);
+}
+
+.user-info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.info-value {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.turno-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.turno-option {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.turno-option:hover {
+    border-color: var(--success-color);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.15);
+}
+
+.turno-option input[type="radio"] {
+    display: none;
+}
+
+.turno-option input[type="radio"]:checked + .turno-label {
+    background: linear-gradient(135deg, var(--success-color) 0%, #00C896 100%);
+    color: white;
+    border-color: var(--success-color);
+}
+
+.turno-label {
+    display: block;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.turno-name {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    font-family: 'Playfair Display', Georgia, serif;
+}
+
+.turno-time {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.form-actions-registro {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn-registrar {
+    background: linear-gradient(135deg, var(--success-color) 0%, #00C896 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 168, 150, 0.3);
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-registrar:hover {
+    background: linear-gradient(135deg, #00C896 0%, var(--success-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 168, 150, 0.4);
+}
+

@@ -22,15 +22,15 @@
                 </span>
             </a>
             <div class="dropdown-menu">
-                <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
                 {% if user.es_administrador or user.is_superuser %}
-                    <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
-                {% elif user.rol == 'usuario' %}
-                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                    <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
+                {% elif user.es_empleado %}
+                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
                 {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
-                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a>
-                <a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
+                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
+                <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
             </div>
         </div>
     </div>
@@ -74,9 +74,9 @@
                 <span class="nav-icon">📦</span>
                 <span>Inventario</span>
             </a>
-            <a href="{% url 'ventas_pedidos' %}" class="nav-item {% if request.resolver_match.url_name == 'ventas_pedidos' %}active{% endif %}">
+            <a href="{% url 'productos' %}" class="nav-item {% if request.resolver_match.url_name == 'productos' %}active{% endif %}">
                 <span class="nav-icon">💰</span>
-                <span>Ventas y Pedidos</span>
+                <span>Productos</span>
             </a>
             <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
                 <span class="nav-icon">📅</span>
@@ -94,12 +94,24 @@
                 <span class="nav-icon">📋</span>
                 <span>Auditoría</span>
             </a>
+            <a href="{% url 'gestionar_eventos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_eventos' or request.resolver_match.url_name == 'crear_evento' or request.resolver_match.url_name == 'editar_evento' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Eventos</span>
+            </a>
+            <a href="{% url 'gestionar_noticias' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_noticias' or request.resolver_match.url_name == 'crear_noticia' or request.resolver_match.url_name == 'editar_noticia' %}active{% endif %}">
+                <span class="nav-icon">📰</span>
+                <span>Noticias</span>
+            </a>
+            <a href="{% url 'gestionar_carrusel' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_carrusel' or request.resolver_match.url_name == 'crear_imagen_carrusel' or request.resolver_match.url_name == 'editar_imagen_carrusel' %}active{% endif %}">
+                <span class="nav-icon">🖼️</span>
+                <span>Carrusel</span>
+            </a>
         </nav>
         
         <div class="sidebar-footer">
             <div class="user-info">
                 <p><strong>{{ user.username }}</strong></p>
-                <p class="user-role">{{ user.get_rol_display }}</p>
+                <p class="user-role">{{ user.get_roles_display }}</p>
             </div>
         </div>
     </aside>
@@ -128,7 +140,6 @@
                     <tr>
                         <th>Nombre Completo</th>
                         <th>RUT</th>
-                        <th>Email</th>
                         <th>Rol</th>
                         <th>Estado</th>
                         <th>Fecha Creación</th>
@@ -140,8 +151,7 @@
                     <tr>
                         <td><strong>{{ usuario.get_nombre_completo }}</strong></td>
                         <td>{{ usuario.rut|default:"-" }}</td>
-                        <td>{{ usuario.correo_institucional|default:usuario.email|default:"-" }}</td>
-                        <td><span class="badge badge-{{ usuario.rol }}">{{ usuario.get_rol_display }}</span></td>
+                        <td><span class="badge badge-info">{{ usuario.get_roles_display }}</span></td>
                         <td>
                             {% if usuario.activo %}
                                 <span class="badge badge-success">Activo</span>
@@ -160,7 +170,7 @@
                                         <span class="icon-delete">🗑️</span>
                                     </a>
                                 {% else %}
-                                    {% if usuario.rol != 'admin' and not usuario.is_superuser %}
+                                    {% if not usuario.es_administrador and not usuario.is_superuser %}
                                         <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn-action btn-delete" title="Eliminar">
                                             <span class="icon-delete">🗑️</span>
                                         </a>
@@ -171,7 +181,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center">No hay usuarios registrados</td>
+                        <td colspan="6" class="text-center">No hay usuarios registrados</td>
                     </tr>
                     {% endfor %}
                 </tbody>

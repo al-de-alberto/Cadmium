@@ -22,15 +22,15 @@
                 </span>
             </a>
             <div class="dropdown-menu">
-                <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
                 {% if user.es_administrador or user.is_superuser %}
-                    <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
-                {% elif user.rol == 'usuario' %}
-                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                    <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
+                {% elif user.es_empleado %}
+                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
                 {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
-                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a>
-                <a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
+                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
+                <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
             </div>
         </div>
     </div>
@@ -77,9 +77,9 @@
                 <span class="nav-icon">📦</span>
                 <span>Inventario</span>
             </a>
-            <a href="{% url 'ventas_pedidos' %}" class="nav-item {% if request.resolver_match.url_name == 'ventas_pedidos' %}active{% endif %}">
+            <a href="{% url 'productos' %}" class="nav-item {% if request.resolver_match.url_name == 'productos' or request.resolver_match.url_name == 'pedidos' or request.resolver_match.url_name == 'editar_precio_producto' %}active{% endif %}">
                 <span class="nav-icon">💰</span>
-                <span>Ventas y Pedidos</span>
+                <span>Productos</span>
             </a>
             <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
                 <span class="nav-icon">📅</span>
@@ -97,12 +97,32 @@
                 <span class="nav-icon">📋</span>
                 <span>Auditoría</span>
             </a>
+            <a href="{% url 'gestionar_eventos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_eventos' or request.resolver_match.url_name == 'crear_evento' or request.resolver_match.url_name == 'editar_evento' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Eventos</span>
+            </a>
+            <a href="{% url 'gestionar_noticias' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_noticias' or request.resolver_match.url_name == 'crear_noticia' or request.resolver_match.url_name == 'editar_noticia' %}active{% endif %}">
+                <span class="nav-icon">📰</span>
+                <span>Noticias</span>
+            </a>
+            <a href="{% url 'gestionar_contactos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_contactos' or request.resolver_match.url_name == 'crear_contacto' or request.resolver_match.url_name == 'editar_contacto' %}active{% endif %}">
+                <span class="nav-icon">📞</span>
+                <span>Contactos</span>
+            </a>
+            <a href="{% url 'gestionar_manual_interno' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_manual_interno' or request.resolver_match.url_name == 'crear_manual_interno' or request.resolver_match.url_name == 'editar_manual_interno' %}active{% endif %}">
+                <span class="nav-icon">📖</span>
+                <span>Documentación</span>
+            </a>
+            <a href="{% url 'gestionar_carrusel' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_carrusel' or request.resolver_match.url_name == 'crear_imagen_carrusel' or request.resolver_match.url_name == 'editar_imagen_carrusel' %}active{% endif %}">
+                <span class="nav-icon">🖼️</span>
+                <span>Carrusel</span>
+            </a>
         </nav>
         
         <div class="sidebar-footer">
             <div class="user-info">
                 <p><strong>{{ user.username }}</strong></p>
-                <p class="user-role">{{ user.get_rol_display }}</p>
+                <p class="user-role">{{ user.get_roles_display }}</p>
             </div>
         </div>
     </aside>
@@ -130,10 +150,10 @@
                     <p>Control de inventario</p>
                 </a>
                 
-                <a href="{% url 'ventas_pedidos' %}" class="action-card">
+                <a href="{% url 'productos' %}" class="action-card">
                     <span class="action-icon">💰</span>
-                    <h3>Ventas y Pedidos</h3>
-                    <p>Gestión de ventas y pedidos</p>
+                    <h3>Productos</h3>
+                    <p>Gestionar productos</p>
                 </a>
                 
                 <a href="{% url 'asistencia' %}" class="action-card">
@@ -158,6 +178,43 @@
                     <span class="action-icon">📋</span>
                     <h3>Auditoría</h3>
                     <p>Registro de actividades del sistema</p>
+                </a>
+            </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        
+        <div class="quick-actions">
+            <h2>Contenido</h2>
+            <div class="actions-grid">
+                <a href="{% url 'gestionar_eventos' %}" class="action-card">
+                    <span class="action-icon">📅</span>
+                    <h3>Eventos</h3>
+                    <p>Gestionar eventos del PopUp</p>
+                </a>
+                
+                <a href="{% url 'gestionar_noticias' %}" class="action-card">
+                    <span class="action-icon">📰</span>
+                    <h3>Noticias</h3>
+                    <p>Gestionar noticias y actualizaciones</p>
+                </a>
+                
+                <a href="{% url 'gestionar_contactos' %}" class="action-card">
+                    <span class="action-icon">📞</span>
+                    <h3>Contactos</h3>
+                    <p>Gestionar información de contacto</p>
+                </a>
+                
+                <a href="{% url 'gestionar_manual_interno' %}" class="action-card">
+                    <span class="action-icon">📖</span>
+                    <h3>Documentación</h3>
+                    <p>Gestionar reglamento interno y manual de operaciones</p>
+                </a>
+                
+                <a href="{% url 'gestionar_carrusel' %}" class="action-card">
+                    <span class="action-icon">🖼️</span>
+                    <h3>Carrusel</h3>
+                    <p>Gestionar imágenes del carrusel</p>
                 </a>
             </div>
         </div>

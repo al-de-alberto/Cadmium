@@ -28,19 +28,19 @@
             </a>
             <div class="dropdown-menu">
                 {% if user.is_authenticated %}
-                    <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                    <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
                     {% if user.es_administrador or user.is_superuser %}
-                        <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
-                    {% elif user.rol == 'usuario' %}
-                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                        <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
+                    {% elif user.es_empleado %}
+                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'login' %}" class="dropdown-item">Iniciar Sesión</a>
+                    <a href="{% url 'login' %}" class="dropdown-item">🔐 Iniciar Sesión</a>
                 {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
-                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a>
+                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
+                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                    <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
                 {% endif %}
             </div>
         </div>
@@ -63,30 +63,32 @@
     <div class="carousel-container">
         <div class="carousel">
             <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img src="{% static 'images/carousel1.jpg' %}" alt="Imagen 1" onerror="this.style.backgroundColor='#e2e8f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.alt='Imagen 1 - Placeholder'; this.innerHTML='<span style=\"color:#64748b;font-size:2rem;\">Imagen 1</span>'">
-                </div>
-                <div class="carousel-item">
-                    <img src="{% static 'images/carousel2.jpg' %}" alt="Imagen 2" onerror="this.style.backgroundColor='#e2e8f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.alt='Imagen 2 - Placeholder'; this.innerHTML='<span style=\"color:#64748b;font-size:2rem;\">Imagen 2</span>'">
-                </div>
-                <div class="carousel-item">
-                    <img src="{% static 'images/carousel3.jpg' %}" alt="Imagen 3" onerror="this.style.backgroundColor='#e2e8f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.alt='Imagen 3 - Placeholder'; this.innerHTML='<span style=\"color:#64748b;font-size:2rem;\">Imagen 3</span>'">
-                </div>
-                <div class="carousel-item">
-                    <img src="{% static 'images/carousel4.jpg' %}" alt="Imagen 4" onerror="this.style.backgroundColor='#e2e8f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.alt='Imagen 4 - Placeholder'; this.innerHTML='<span style=\"color:#64748b;font-size:2rem;\">Imagen 4</span>'">
-                </div>
-                <div class="carousel-item">
-                    <img src="{% static 'images/carousel5.jpg' %}" alt="Imagen 5" onerror="this.style.backgroundColor='#e2e8f0'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.alt='Imagen 5 - Placeholder'; this.innerHTML='<span style=\"color:#64748b;font-size:2rem;\">Imagen 5</span>'">
-                </div>
+                {% for item in imagenes_carrusel %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}" data-slide-index="{{ forloop.counter0 }}">
+                        <img src="{{ item.imagen.imagen.url }}" alt="Imagen {{ item.indice }}" class="carousel-image" loading="lazy">
+                        {% if item.indice == 1 %}
+                            <div class="carousel-barista-overlay">
+                                <div class="barista-badge">
+                                    <span class="barista-icon">☕</span>
+                                    <span class="barista-text">
+                                        {% if item.titulo_barista %}
+                                            {{ item.titulo_barista }}
+                                        {% else %}
+                                            Barista del Mes
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
-            <button class="carousel-controls carousel-prev" onclick="changeSlide(-1)">&#10094;</button>
-            <button class="carousel-controls carousel-next" onclick="changeSlide(1)">&#10095;</button>
+            <button class="carousel-controls carousel-prev">&#10094;</button>
+            <button class="carousel-controls carousel-next">&#10095;</button>
             <div class="carousel-indicators">
-                <span class="carousel-indicator active" onclick="currentSlide(1)"></span>
-                <span class="carousel-indicator" onclick="currentSlide(2)"></span>
-                <span class="carousel-indicator" onclick="currentSlide(3)"></span>
-                <span class="carousel-indicator" onclick="currentSlide(4)"></span>
-                <span class="carousel-indicator" onclick="currentSlide(5)"></span>
+                {% for item in imagenes_carrusel %}
+                    <span class="carousel-indicator {% if forloop.first %}active{% endif %}" data-slide-index="{{ forloop.counter0 }}"></span>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -94,11 +96,9 @@
 
 <!-- App Icon Section -->
 <div class="app-icon-section">
-    <div class="app-icon">
-        <img src="{% static 'images/logo.png' %}" alt="Logo Cadmium" onerror="this.style.display='none'; this.parentElement.innerHTML='C';" style="width: 100%; height: 100%; object-fit: contain;">
-    </div>
-    <h2 style="color: var(--text-primary); font-size: 2rem; margin-top: 20px; font-family: 'Playfair Display', Georgia, serif; font-weight: 700;">Cadmium</h2>
-    <p style="color: var(--primary-color); font-size: 1.5rem; margin-top: 15px; font-weight: 600; font-family: 'Playfair Display', Georgia, serif; letter-spacing: 1px;">PopUp Nescafe</p>
+    <div class="app-icon">C</div>
+    <h2 class="app-title">Cadmium</h2>
+    <p class="app-subtitle">PopUp Nescafe</p>
 </div>
 
 <!-- News and Events Section -->
@@ -106,16 +106,67 @@
     <div class="news-container">
         <h2 class="section-title">Noticias y Eventos Importantes</h2>
         <div class="news-grid">
-            <div class="news-card">
-                <h3>Eventos PopUp</h3>
-                <p>Mantente al día con las últimas noticias y eventos importantes del PopUp Nescafe. Aquí encontrarás información relevante sobre actividades, anuncios y comunicados.</p>
-                <div class="news-date">Fecha: Próximamente</div>
-            </div>
-            <div class="news-card">
-                <h3>Noticias y Actualizaciones</h3>
-                <p>Información actualizada sobre el funcionamiento del sistema y las actividades del PopUp Nescafe. Consulta regularmente para estar informado.</p>
-                <div class="news-date">Fecha: Próximamente</div>
-            </div>
+            {% if eventos %}
+                {% for evento in eventos %}
+                <div class="news-card">
+                    {% if evento.imagen %}
+                        <div class="news-card-image">
+                            <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" class="news-image">
+                        </div>
+                    {% endif %}
+                    <div class="news-card-content">
+                        <div class="news-category">📅 Eventos PopUp</div>
+                        <h3 class="news-card-title">{{ evento.titulo }}</h3>
+                        <div class="news-description-wrapper">
+                            <p class="news-description news-description-short">{{ evento.descripcion|truncatewords:30 }}</p>
+                            <div class="news-description news-description-full">{{ evento.descripcion|linebreaks }}</div>
+                        </div>
+                        <button class="btn-show-more" onclick="toggleDescription(this)" data-short="{{ evento.descripcion|truncatewords:30|striptags }}" data-full="{{ evento.descripcion|striptags }}" style="display: none;">Mostrar más</button>
+                        <div class="news-date">Fecha: {{ evento.fecha_evento|date:"d/m/Y" }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="news-card">
+                    <div class="news-card-content">
+                        <div class="news-category">📅 Eventos PopUp</div>
+                        <h3 class="news-card-title">Eventos PopUp</h3>
+                        <p class="news-description">Mantente al día con las últimas noticias y eventos importantes del PopUp Nescafe. Aquí encontrarás información relevante sobre actividades, anuncios y comunicados.</p>
+                        <div class="news-date">Fecha: Próximamente</div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if noticias %}
+                {% for noticia in noticias %}
+                <div class="news-card">
+                    {% if noticia.imagen %}
+                        <div class="news-card-image">
+                            <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo }}" class="news-image">
+                        </div>
+                    {% endif %}
+                    <div class="news-card-content">
+                        <div class="news-category">📰 Noticias y Actualizaciones</div>
+                        <h3 class="news-card-title">{{ noticia.titulo }}</h3>
+                        <div class="news-description-wrapper">
+                            <p class="news-description news-description-short">{{ noticia.descripcion|truncatewords:30 }}</p>
+                            <div class="news-description news-description-full">{{ noticia.descripcion|linebreaks }}</div>
+                        </div>
+                        <button class="btn-show-more" onclick="toggleDescription(this)" data-short="{{ noticia.descripcion|truncatewords:30|striptags }}" data-full="{{ noticia.descripcion|striptags }}" style="display: none;">Mostrar más</button>
+                        <div class="news-date">Fecha: {{ noticia.fecha_publicacion|date:"d/m/Y" }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="news-card">
+                    <div class="news-card-content">
+                        <div class="news-category">📰 Noticias y Actualizaciones</div>
+                        <h3 class="news-card-title">Noticias y Actualizaciones</h3>
+                        <p class="news-description">Información actualizada sobre el funcionamiento del sistema y las actividades del PopUp Nescafe. Consulta regularmente para estar informado.</p>
+                        <div class="news-date">Fecha: Próximamente</div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -143,17 +194,100 @@
 <footer class="footer">
     <div class="footer-content">
         <p>&copy; 2025 Cadmium. Todos los derechos reservados.</p>
-        <p style="margin-top: 5px;">Desarrollado por: Tania Vilches, Annais Gálvez, Alberto San Juan</p>
+        <p style="margin-top: 5px;">Desarrollado por: Tania Vilches, Annais Galvez, Alberto San Juan</p>
     </div>
 </footer>
 
 <script>
+
+    // Variables globales para el carrusel
     let currentSlideIndex = 0;
-    const slides = document.querySelectorAll('.carousel-item');
-    const indicators = document.querySelectorAll('.carousel-indicator');
-    const totalSlides = slides.length;
+    let slides = [];
+    let indicators = [];
+    let totalSlides = 0;
+    let carouselInterval = null;
+
+    function initCarousel() {
+        slides = document.querySelectorAll('.carousel-item');
+        indicators = document.querySelectorAll('.carousel-indicator');
+        totalSlides = slides.length;
+
+        // Verificar que hay slides
+        if (totalSlides === 0) {
+            console.warn('No se encontraron imágenes en el carrusel');
+            return;
+        }
+
+        // Limpiar intervalo anterior si existe
+        if (carouselInterval) {
+            clearInterval(carouselInterval);
+            carouselInterval = null;
+        }
+
+        // Inicializar: asegurar que solo la primera slide esté activa
+        slides.forEach((slide, index) => {
+            if (index === 0) {
+                slide.classList.add('active');
+                slide.style.opacity = '1';
+                slide.style.zIndex = '2';
+                slide.style.visibility = 'visible';
+            } else {
+                slide.classList.remove('active');
+                slide.style.opacity = '0';
+                slide.style.zIndex = '1';
+                slide.style.visibility = 'visible';
+            }
+        });
+        
+        // Inicializar indicadores
+        indicators.forEach((indicator, index) => {
+            if (index === 0) {
+                indicator.classList.add('active');
+            } else {
+                indicator.classList.remove('active');
+            }
+            // Añadir event listener a cada indicador
+            const slideIndexAttr = indicator.getAttribute('data-slide-index');
+            const slideIndex = slideIndexAttr !== null ? parseInt(slideIndexAttr) : index;
+            indicator.addEventListener('click', () => {
+                currentSlide(slideIndex + 1); // currentSlide espera índice 1-based
+            });
+        });
+
+        // Añadir event listeners a los botones de control
+        const prevButton = document.querySelector('.carousel-prev');
+        const nextButton = document.querySelector('.carousel-next');
+        if (prevButton) {
+            prevButton.addEventListener('click', () => changeSlide(-1));
+        }
+        if (nextButton) {
+            nextButton.addEventListener('click', () => changeSlide(1));
+        }
+
+        // Auto-play del carrusel cada 4 segundos (solo si hay más de una imagen)
+        if (totalSlides > 1) {
+            carouselInterval = setInterval(() => {
+                changeSlide(1);
+            }, 4000);
+        }
+
+        // Hacer funciones globales para compatibilidad
+        window.changeSlide = changeSlide;
+        window.currentSlide = currentSlide;
+    }
 
     function showSlide(index) {
+        // Recargar elementos por si el DOM cambió
+        if (slides.length === 0) {
+            slides = document.querySelectorAll('.carousel-item');
+            indicators = document.querySelectorAll('.carousel-indicator');
+            totalSlides = slides.length;
+        }
+
+        if (totalSlides === 0) {
+            return;
+        }
+
         // Asegurar que el índice esté en el rango válido
         if (index >= totalSlides) {
             currentSlideIndex = 0;
@@ -164,12 +298,26 @@
         }
 
         // Ocultar todas las slides
-        slides.forEach(slide => slide.classList.remove('active'));
+        slides.forEach((slide, idx) => {
+            slide.classList.remove('active');
+            slide.style.opacity = '0';
+            slide.style.zIndex = '1';
+            slide.style.visibility = 'visible';
+            slide.style.display = 'block';
+        });
         indicators.forEach(indicator => indicator.classList.remove('active'));
 
         // Mostrar la slide actual
-        slides[currentSlideIndex].classList.add('active');
-        indicators[currentSlideIndex].classList.add('active');
+        if (slides[currentSlideIndex]) {
+            slides[currentSlideIndex].classList.add('active');
+            slides[currentSlideIndex].style.opacity = '1';
+            slides[currentSlideIndex].style.zIndex = '2';
+            slides[currentSlideIndex].style.visibility = 'visible';
+            slides[currentSlideIndex].style.display = 'block';
+        }
+        if (indicators[currentSlideIndex]) {
+            indicators[currentSlideIndex].classList.add('active');
+        }
     }
 
     function changeSlide(direction) {
@@ -180,10 +328,17 @@
         showSlide(index - 1);
     }
 
-    // Auto-play del carrusel cada 5 segundos
-    setInterval(() => {
-        changeSlide(1);
-    }, 5000);
+    // Inicializar cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        initCarousel();
+    });
+
+    // También intentar inicializar inmediatamente por si el DOM ya está listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCarousel);
+    } else {
+        initCarousel();
+    }
 
     // Función para el menú desplegable
     function toggleDropdown(event) {
@@ -200,6 +355,87 @@
                 dropdown.classList.remove('active');
             }
         });
+    });
+
+    // Función para verificar si el texto está truncado y mostrar el botón
+    function checkTextTruncation() {
+        document.querySelectorAll('.news-card').forEach(card => {
+            const button = card.querySelector('.btn-show-more');
+            if (!button) return;
+            
+            const shortText = button.getAttribute('data-short') || '';
+            const fullText = button.getAttribute('data-full') || '';
+            
+            // Si no hay texto, ocultar botón
+            if (!shortText || !fullText) {
+                button.style.display = 'none';
+                return;
+            }
+            
+            // Limpiar y normalizar textos (eliminar espacios extra)
+            const shortClean = shortText.trim().replace(/\s+/g, ' ');
+            const fullClean = fullText.trim().replace(/\s+/g, ' ');
+            
+            // Contar palabras (filtrar palabras vacías)
+            const shortWords = shortClean.split(/\s+/).filter(function(w) { return w.length > 0; });
+            const fullWords = fullClean.split(/\s+/).filter(function(w) { return w.length > 0; });
+            
+            // Verificar si el texto completo tiene significativamente más palabras
+            // (más de 5 palabras adicionales para considerar que hay truncamiento real)
+            const wordDifference = fullWords.length - shortWords.length;
+            const hasMoreWords = wordDifference > 5;
+            
+            // Verificar que el texto cortado es el inicio del texto completo
+            // Tomar los primeros 80 caracteres de cada uno para comparar
+            const shortStart = shortClean.substring(0, 80).toLowerCase();
+            const fullStart = fullClean.substring(0, 80).toLowerCase();
+            
+            // El texto está truncado si:
+            // 1. Hay más palabras en el texto completo
+            // 2. Y el inicio del texto cortado coincide con el inicio del texto completo
+            const isTruncated = hasMoreWords && (
+                fullStart.indexOf(shortStart.substring(0, 60)) === 0 ||
+                shortStart.length > 0 && fullStart.substring(0, Math.min(fullStart.length, shortStart.length + 20)).indexOf(shortStart.substring(0, 50)) >= 0
+            );
+            
+            // Mostrar u ocultar el botón según si hay truncamiento
+            button.style.display = isTruncated ? 'block' : 'none';
+        });
+    }
+
+    // Función para mostrar/ocultar descripción completa
+    function toggleDescription(button) {
+        const card = button.closest('.news-card-content');
+        const shortDesc = card.querySelector('.news-description-short');
+        const fullDesc = card.querySelector('.news-description-full');
+        
+        if (fullDesc.classList.contains('show')) {
+            // Ocultar descripción completa - mostrar corta
+            shortDesc.classList.remove('hide');
+            fullDesc.classList.remove('show');
+            button.textContent = 'Mostrar más';
+            button.classList.remove('active');
+        } else {
+            // Mostrar descripción completa - ocultar corta
+            shortDesc.classList.add('hide');
+            fullDesc.classList.add('show');
+            button.textContent = 'Mostrar menos';
+            button.classList.add('active');
+        }
+    }
+
+    // Ejecutar la verificación cuando la página cargue
+    document.addEventListener('DOMContentLoaded', function() {
+        // Asegurar que solo se muestre el texto corto inicialmente
+        document.querySelectorAll('.news-description-full').forEach(function(fullDesc) {
+            fullDesc.classList.remove('show');
+        });
+        document.querySelectorAll('.news-description-short').forEach(function(shortDesc) {
+            shortDesc.classList.remove('hide');
+        });
+        
+        // Verificar truncamiento y mostrar/ocultar botones
+        checkTextTruncation();
     });
 </script>
 {% endblock %}

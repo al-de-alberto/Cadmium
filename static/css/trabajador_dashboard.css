@@ -1,0 +1,94 @@
+/* Estilos para el dashboard del trabajador */
+.trabajador-dashboard-container {
+    min-height: calc(100vh - 80px);
+    padding: 40px 20px;
+    margin-top: 80px;
+    background: linear-gradient(135deg, var(--bg-color) 0%, var(--card-bg) 100%);
+}
+
+.dashboard-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(46, 42, 39, 0.15);
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.dashboard-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 40px;
+    text-align: center;
+}
+
+.dashboard-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 2.5rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+}
+
+.dashboard-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 40px;
+}
+
+.option-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg-color) 100%);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.option-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(46, 42, 39, 0.2);
+    border-color: var(--success-color);
+}
+
+.option-icon {
+    font-size: 4rem;
+    margin-bottom: 10px;
+}
+
+.option-card h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.option-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.option-card.asistencia {
+    border-left: 5px solid var(--success-color);
+}
+
+.option-card.stock {
+    border-left: 5px solid var(--warning-color);
+}
+

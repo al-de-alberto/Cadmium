@@ -5,10 +5,10 @@ from .models import Usuario, Inventario, Asistencia, Pedido, DetallePedido, Audi
 
 @admin.register(Usuario)
 class UsuarioAdmin(BaseUserAdmin):
-    list_display = ['username', 'email', 'rol', 'activo', 'fecha_creacion']
-    list_filter = ['rol', 'activo', 'is_superuser']
+    list_display = ['username', 'email', 'get_roles_display', 'activo', 'fecha_creacion']
+    list_filter = ['_es_administrador', 'es_empleado', 'activo', 'is_superuser']
     fieldsets = BaseUserAdmin.fieldsets + (
-        ('Información Adicional', {'fields': ('rol', 'activo', 'fecha_creacion')}),
+        ('Información Adicional', {'fields': ('_es_administrador', 'es_empleado', 'activo', 'fecha_creacion')}),
     )
     readonly_fields = ['fecha_creacion']
 
@@ -36,9 +36,9 @@ class DetallePedidoInline(admin.TabularInline):
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'fecha_creacion', 'usuario_creacion']
+    list_display = ['codigo', 'fecha_creacion', 'usuario_creacion']
     list_filter = ['fecha_creacion']
-    search_fields = ['nombre', 'observaciones']
+    search_fields = ['codigo', 'observaciones']
     readonly_fields = ['fecha_creacion']
     inlines = [DetallePedidoInline]
 

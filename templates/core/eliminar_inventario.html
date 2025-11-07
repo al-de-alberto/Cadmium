@@ -27,14 +27,15 @@
                 </span>
             </a>
             <div class="dropdown-menu">
-                <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
                 {% if user.es_administrador or user.is_superuser %}
-                    <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
-                {% elif user.rol == 'usuario' %}
-                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                    <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
+                {% elif user.es_empleado %}
+                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
                 {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
-                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a><a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
+                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
+                <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
                 
             </div>
         </div>
@@ -79,9 +80,9 @@
                 <span class="nav-icon">📦</span>
                 <span>Inventario</span>
             </a>
-            <a href="{% url 'ventas_pedidos' %}" class="nav-item {% if request.resolver_match.url_name == 'ventas_pedidos' %}active{% endif %}">
+            <a href="{% url 'productos' %}" class="nav-item {% if request.resolver_match.url_name == 'productos' %}active{% endif %}">
                 <span class="nav-icon">💰</span>
-                <span>Ventas y Pedidos</span>
+                <span>Productos</span>
             </a>
             <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
                 <span class="nav-icon">📅</span>
@@ -91,16 +92,32 @@
                 <span class="nav-icon">🚚</span>
                 <span>Delivery</span>
             </a>
-            <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                        <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
                 <span class="nav-icon">⚙️</span>
                 <span>Operaciones</span>
+            </a>
+            <a href="{% url 'auditoria' %}" class="nav-item {% if request.resolver_match.url_name == 'auditoria' %}active{% endif %}">
+                <span class="nav-icon">📋</span>
+                <span>Auditoría</span>
+            </a>
+            <a href="{% url 'gestionar_eventos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_eventos' or request.resolver_match.url_name == 'crear_evento' or request.resolver_match.url_name == 'editar_evento' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Eventos</span>
+            </a>
+            <a href="{% url 'gestionar_noticias' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_noticias' or request.resolver_match.url_name == 'crear_noticia' or request.resolver_match.url_name == 'editar_noticia' %}active{% endif %}">
+                <span class="nav-icon">📰</span>
+                <span>Noticias</span>
+            </a>
+            <a href="{% url 'gestionar_carrusel' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_carrusel' or request.resolver_match.url_name == 'crear_imagen_carrusel' or request.resolver_match.url_name == 'editar_imagen_carrusel' %}active{% endif %}">
+                <span class="nav-icon">🖼️</span>
+                <span>Carrusel</span>
             </a>
         </nav>
         
         <div class="sidebar-footer">
             <div class="user-info">
                 <p><strong>{{ user.username }}</strong></p>
-                <p class="user-role">{{ user.get_rol_display }}</p>
+                <p class="user-role">{{ user.get_roles_display }}</p>
             </div>
         </div>
     </aside>

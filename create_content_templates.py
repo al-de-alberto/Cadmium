@@ -1,57 +1,15 @@
-{% extends 'core/base.html' %}
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Script para crear templates de eventos y noticias"""
+
+# Template base para gestionar eventos
+gestionar_eventos = '''{% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Ventas y Pedidos - Cadmium{% endblock %}
+{% block title %}Gestionar Eventos - Cadmium{% endblock %}
 
 {% block content %}
-<!-- Navbar -->
-<nav class="navbar">
-    <a href="{% url 'index' %}" class="navbar-brand">
-        <div class="navbar-logo">C</div>
-        <div>
-            <span>Cadmium</span>
-            <span class="tagline">Crea tu mundo</span>
-        </div>
-    </a>
-    <div class="navbar-nav">
-        <div class="dropdown">
-            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
-                <span class="hamburger-icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
-            </a>
-            <div class="dropdown-menu">
-                <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
-                {% if user.es_administrador or user.is_superuser %}
-                    <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
-                {% elif user.rol == 'usuario' %}
-                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
-                {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
-                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a><a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
-                
-            </div>
-        </div>
-    </div>
-</nav>
-
-<script>
-    function toggleDropdown(event) {
-        event.preventDefault();
-        const dropdown = event.currentTarget.closest('.dropdown');
-        dropdown.classList.toggle('active');
-    }
-    document.addEventListener('click', function(event) {
-        const dropdowns = document.querySelectorAll('.dropdown');
-        dropdowns.forEach(dropdown => {
-            if (!dropdown.contains(event.target)) {
-                dropdown.classList.remove('active');
-            }
-        });
-    });
-</script>
+{% include 'core/navbar_snippet.html' %}
 
 <div class="admin-container">
     <aside class="sidebar">
@@ -77,7 +35,7 @@
             </a>
             <a href="{% url 'ventas_pedidos' %}" class="nav-item {% if request.resolver_match.url_name == 'ventas_pedidos' %}active{% endif %}">
                 <span class="nav-icon">💰</span>
-                <span>Ventas y Pedidos</span>
+                <span>Productos</span>
             </a>
             <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
                 <span class="nav-icon">📅</span>
@@ -90,6 +48,18 @@
             <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
                 <span class="nav-icon">⚙️</span>
                 <span>Operaciones</span>
+            </a>
+            <a href="{% url 'gestionar_carrusel' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_carrusel' or request.resolver_match.url_name == 'crear_imagen_carrusel' or request.resolver_match.url_name == 'editar_imagen_carrusel' %}active{% endif %}">
+                <span class="nav-icon">🖼️</span>
+                <span>Carrusel</span>
+            </a>
+            <a href="{% url 'gestionar_eventos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_eventos' or request.resolver_match.url_name == 'crear_evento' or request.resolver_match.url_name == 'editar_evento' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Eventos</span>
+            </a>
+            <a href="{% url 'gestionar_noticias' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_noticias' or request.resolver_match.url_name == 'crear_noticia' or request.resolver_match.url_name == 'editar_noticia' %}active{% endif %}">
+                <span class="nav-icon">📰</span>
+                <span>Noticias</span>
             </a>
             <a href="{% url 'auditoria' %}" class="nav-item {% if request.resolver_match.url_name == 'auditoria' %}active{% endif %}">
                 <span class="nav-icon">📋</span>
@@ -107,14 +77,13 @@
     
     <main class="main-content">
         <header class="content-header">
-            <h1>Ventas y Pedidos</h1>
+            <h1>Gestión de Eventos</h1>
             <div class="header-actions">
-                <a href="{% url 'crear_pedido' %}" class="btn btn-primary">+ Crear Pedido</a>
+                <a href="{% url 'crear_evento' %}" class="btn btn-primary">+ Crear Evento</a>
                 <a href="{% url 'panel' %}" class="btn btn-secondary">← Volver</a>
             </div>
         </header>
         
-        <!-- Mensajes -->
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">
@@ -127,31 +96,32 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Nombre del Pedido</th>
-                        <th>Fecha de Creación</th>
-                        <th>Productos</th>
-                        <th>Exportar a Excel</th>
-                        <th>Eliminar</th>
+                        <th>Título</th>
+                        <th>Fecha del Evento</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for pedido in pedidos %}
+                    {% for evento in eventos %}
                     <tr>
-                        <td><strong>{{ pedido.nombre }}</strong></td>
-                        <td>{{ pedido.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                        <td><strong>{{ evento.titulo }}</strong></td>
+                        <td>{{ evento.fecha_evento|date:"d/m/Y" }}</td>
                         <td>
-                            <span class="badge badge-info">{{ pedido.detalles.count }} producto{{ pedido.detalles.count|pluralize }}</span>
+                            {% if evento.activo %}
+                                <span class="badge badge-success">Activo</span>
+                            {% else %}
+                                <span class="badge badge-danger">Inactivo</span>
+                            {% endif %}
                         </td>
+                        <td>{{ evento.fecha_creacion|date:"d/m/Y H:i" }}</td>
                         <td>
                             <div class="action-buttons">
-                                <a href="{% url 'exportar_pedido_excel' pedido.id %}" class="btn-action btn-export" title="Exportar a Excel">
-                                    <span class="icon-export">📊</span>
+                                <a href="{% url 'editar_evento' evento.id %}" class="btn-action btn-edit" title="Modificar">
+                                    <span class="icon-edit">↻</span>
                                 </a>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <a href="{% url 'eliminar_pedido' pedido.id %}" class="btn-action btn-delete" title="Eliminar">
+                                <a href="{% url 'eliminar_evento' evento.id %}" class="btn-action btn-delete" title="Eliminar">
                                     <span class="icon-delete">🗑️</span>
                                 </a>
                             </div>
@@ -159,7 +129,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center">No hay pedidos registrados</td>
+                        <td colspan="5" class="text-center">No hay eventos registrados</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -190,16 +160,16 @@
     cursor: pointer;
 }
 
-.btn-export {
-    background: linear-gradient(135deg, var(--success-color) 0%, #00C5A4 100%);
-    color: white;
-    box-shadow: 0 2px 6px rgba(0, 168, 150, 0.3);
+.btn-edit {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #FFD700 100%);
+    color: var(--text-primary);
+    box-shadow: 0 2px 6px rgba(245, 203, 92, 0.3);
 }
 
-.btn-export:hover {
-    background: linear-gradient(135deg, #00C5A4 0%, var(--success-color) 100%);
+.btn-edit:hover {
+    background: linear-gradient(135deg, #FFD700 0%, var(--warning-color) 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 168, 150, 0.5);
+    box-shadow: 0 4px 10px rgba(245, 203, 92, 0.5);
 }
 
 .btn-delete {
@@ -214,32 +184,23 @@
     box-shadow: 0 4px 10px rgba(198, 40, 40, 0.5);
 }
 
-.icon-export,
-.icon-delete {
+.icon-edit, .icon-delete {
     display: inline-block;
     font-size: 18px;
     line-height: 1;
 }
 
 .data-table th:last-child,
-.data-table td:last-child,
-.data-table th:nth-last-child(2),
-.data-table td:nth-last-child(2) {
+.data-table td:last-child {
     text-align: center;
     width: 100px;
 }
-
-.badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.badge-info {
-    background: var(--info-color);
-    color: white;
-}
 </style>
 {% endblock %}
+'''
+
+with open('templates/core/gestionar_eventos.html', 'w', encoding='utf-8') as f:
+    f.write(gestionar_eventos)
+
+print("gestionar_eventos.html creado")
+

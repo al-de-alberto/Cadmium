@@ -1,0 +1,103 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Noticia - Cadmium{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+{% include 'core/navbar_snippet.html' %}
+
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'index' %}" style="text-decoration: none; color: inherit;">
+                <h2>Cadmium</h2>
+            </a>
+            <p>Panel de Administración</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'panel' %}" class="nav-item {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'gestionar_noticias' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_noticias' or request.resolver_match.url_name == 'crear_noticia' or request.resolver_match.url_name == 'editar_noticia' %}active{% endif %}">
+                <span class="nav-icon">📰</span>
+                <span>Noticias</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <p><strong>{{ user.username }}</strong></p>
+                <p class="user-role">{{ user.get_roles_display }}</p>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Eliminar Noticia</h1>
+            <div class="header-actions">
+                <a href="{% url 'gestionar_noticias' %}" class="btn btn-secondary">← Volver a Noticias</a>
+            </div>
+        </header>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 style="margin: 0; font-size: 1.5rem; color: var(--danger-color);">⚠️ Confirmar Eliminación</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>¿Estás seguro que deseas eliminar la noticia "{{ noticia.titulo }}"?</strong>
+                    <p style="margin-top: 10px;">Esta opción no se puede deshacer.</p>
+                    <div style="margin-top: 15px;">
+                        <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Fecha de publicación:</strong> {{ noticia.fecha_publicacion|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+                
+                <form method="post" style="margin-top: 20px;">
+                    {% csrf_token %}
+                    <div class="form-actions-create">
+                        <a href="{% url 'gestionar_noticias' %}" class="btn btn-cancel">Cancelar</a>
+                        <button type="submit" class="btn btn-delete-confirm">Eliminar Noticia</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+.btn-delete-confirm {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #E53935 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(198, 40, 40, 0.3);
+}
+
+.btn-delete-confirm:hover {
+    background: linear-gradient(135deg, #E53935 0%, var(--danger-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(198, 40, 40, 0.4);
+}
+</style>
+{% endblock %}
+

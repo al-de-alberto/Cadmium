@@ -1,0 +1,283 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Pedidos - Cadmium{% endblock %}
+
+{% block content %}
+{% include 'core/navbar_snippet.html' %}
+
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'index' %}" style="text-decoration: none; color: inherit;">
+                <h2>Cadmium</h2>
+            </a>
+            <p>Panel de Administración</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'panel' %}" class="nav-item {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'usuarios' %}" class="nav-item {% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}">
+                <span class="nav-icon">👥</span>
+                <span>Usuarios</span>
+            </a>
+            <a href="{% url 'inventario' %}" class="nav-item {% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">
+                <span class="nav-icon">📦</span>
+                <span>Inventario</span>
+            </a>
+            <a href="{% url 'productos' %}" class="nav-item {% if request.resolver_match.url_name == 'productos' or request.resolver_match.url_name == 'pedidos' or request.resolver_match.url_name == 'editar_precio_producto' %}active{% endif %}">
+                <span class="nav-icon">💰</span>
+                <span>Productos</span>
+            </a>
+            <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Asistencia</span>
+            </a>
+            <a href="{% url 'deliverys' %}" class="nav-item {% if request.resolver_match.url_name == 'deliverys' %}active{% endif %}">
+                <span class="nav-icon">🚚</span>
+                <span>Delivery</span>
+            </a>
+            <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                <span class="nav-icon">⚙️</span>
+                <span>Operaciones</span>
+            </a>
+            <a href="{% url 'auditoria' %}" class="nav-item {% if request.resolver_match.url_name == 'auditoria' %}active{% endif %}">
+                <span class="nav-icon">📋</span>
+                <span>Auditoría</span>
+            </a>
+            <a href="{% url 'gestionar_eventos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_eventos' or request.resolver_match.url_name == 'crear_evento' or request.resolver_match.url_name == 'editar_evento' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Eventos</span>
+            </a>
+            <a href="{% url 'gestionar_noticias' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_noticias' or request.resolver_match.url_name == 'crear_noticia' or request.resolver_match.url_name == 'editar_noticia' %}active{% endif %}">
+                <span class="nav-icon">📰</span>
+                <span>Noticias</span>
+            </a>
+            <a href="{% url 'gestionar_carrusel' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_carrusel' or request.resolver_match.url_name == 'crear_imagen_carrusel' or request.resolver_match.url_name == 'editar_imagen_carrusel' %}active{% endif %}">
+                <span class="nav-icon">🖼️</span>
+                <span>Carrusel</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <p><strong>{{ user.username }}</strong></p>
+                <p class="user-role">{{ user.get_roles_display }}</p>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Pedidos</h1>
+            <div class="header-actions">
+                <a href="{% url 'crear_pedido' %}" class="btn btn-primary">+ Crear Pedido</a>
+                <a href="{% url 'productos' %}" class="btn btn-secondary">← Volver a Productos</a>
+            </div>
+        </header>
+        
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Total Gastado -->
+        <div class="total-gastado-card">
+            <div class="total-gastado-content">
+                <div class="total-gastado-icon">💰</div>
+                <div class="total-gastado-info">
+                    <h3>Total Gastado en Pedidos</h3>
+                    <p class="total-gastado-amount">${{ total_gastado|floatformat:0 }}</p>
+                    <p class="total-gastado-subtitle">Suma total de todos los pedidos registrados</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Código del Pedido</th>
+                        <th>Fecha de Creación</th>
+                        <th>Productos</th>
+                        <th>Exportar a Excel</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos %}
+                    <tr>
+                        <td><strong>{{ pedido.codigo }}</strong></td>
+                        <td>{{ pedido.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <span class="badge badge-info">{{ pedido.detalles.count }} producto{{ pedido.detalles.count|pluralize }}</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'exportar_pedido_excel' pedido.id %}" class="btn-action btn-export" title="Exportar a Excel">
+                                    <span class="icon-export">📊</span>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'eliminar_pedido' pedido.id %}" class="btn-action btn-delete" title="Eliminar">
+                                    <span class="icon-delete">🗑️</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay pedidos registrados</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<style>
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-export {
+    background: linear-gradient(135deg, var(--success-color) 0%, #00C5A4 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(0, 168, 150, 0.3);
+}
+
+.btn-export:hover {
+    background: linear-gradient(135deg, #00C5A4 0%, var(--success-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 168, 150, 0.5);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #E53935 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(198, 40, 40, 0.3);
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #E53935 0%, var(--danger-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(198, 40, 40, 0.5);
+}
+
+.icon-export,
+.icon-delete {
+    display: inline-block;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.data-table th:last-child,
+.data-table td:last-child,
+.data-table th:nth-last-child(2),
+.data-table td:nth-last-child(2) {
+    text-align: center;
+    width: 100px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-info {
+    background: var(--info-color);
+    color: white;
+}
+
+.total-gastado-card {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.25);
+    color: white;
+}
+
+.total-gastado-content {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.total-gastado-icon {
+    font-size: 3.5rem;
+    opacity: 0.9;
+}
+
+.total-gastado-info h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.total-gastado-amount {
+    margin: 0 0 5px 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    font-family: 'Playfair Display', Georgia, serif;
+    color: var(--warning-color);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.total-gastado-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: 'Poppins', sans-serif;
+}
+
+@media (max-width: 768px) {
+    .total-gastado-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .total-gastado-icon {
+        font-size: 2.5rem;
+    }
+    
+    .total-gastado-amount {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}
+

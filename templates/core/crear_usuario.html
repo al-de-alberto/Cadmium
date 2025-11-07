@@ -27,14 +27,15 @@
                 </span>
             </a>
             <div class="dropdown-menu">
-                <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
                 {% if user.es_administrador or user.is_superuser %}
-                    <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
-                {% elif user.rol == 'usuario' %}
-                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                    <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
+                {% elif user.es_empleado %}
+                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
                 {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
-                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a><a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
+                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
+                <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
                 
             </div>
         </div>
@@ -79,9 +80,9 @@
                 <span class="nav-icon">📦</span>
                 <span>Inventario</span>
             </a>
-            <a href="{% url 'ventas_pedidos' %}" class="nav-item {% if request.resolver_match.url_name == 'ventas_pedidos' %}active{% endif %}">
+            <a href="{% url 'productos' %}" class="nav-item {% if request.resolver_match.url_name == 'productos' %}active{% endif %}">
                 <span class="nav-icon">💰</span>
-                <span>Ventas y Pedidos</span>
+                <span>Productos</span>
             </a>
             <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
                 <span class="nav-icon">📅</span>
@@ -91,7 +92,7 @@
                 <span class="nav-icon">🚚</span>
                 <span>Delivery</span>
             </a>
-            <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                        <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
                 <span class="nav-icon">⚙️</span>
                 <span>Operaciones</span>
             </a>
@@ -99,12 +100,24 @@
                 <span class="nav-icon">📋</span>
                 <span>Auditoría</span>
             </a>
+            <a href="{% url 'gestionar_eventos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_eventos' or request.resolver_match.url_name == 'crear_evento' or request.resolver_match.url_name == 'editar_evento' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Eventos</span>
+            </a>
+            <a href="{% url 'gestionar_noticias' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_noticias' or request.resolver_match.url_name == 'crear_noticia' or request.resolver_match.url_name == 'editar_noticia' %}active{% endif %}">
+                <span class="nav-icon">📰</span>
+                <span>Noticias</span>
+            </a>
+            <a href="{% url 'gestionar_carrusel' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_carrusel' or request.resolver_match.url_name == 'crear_imagen_carrusel' or request.resolver_match.url_name == 'editar_imagen_carrusel' %}active{% endif %}">
+                <span class="nav-icon">🖼️</span>
+                <span>Carrusel</span>
+            </a>
         </nav>
         
         <div class="sidebar-footer">
             <div class="user-info">
                 <p><strong>{{ user.username }}</strong></p>
-                <p class="user-role">{{ user.get_rol_display }}</p>
+                <p class="user-role">{{ user.get_roles_display }}</p>
             </div>
         </div>
     </aside>
@@ -214,13 +227,58 @@
                             </div>
                         </div>
                         
+                        <div class="form-section">
+                            <h3 class="section-title">Configuración de Usuario</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group-create" style="display: flex; flex-direction: column; gap: 15px;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <label for="{{ form.es_administrador.id_for_label }}" style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0;">
+                                            {{ form.es_administrador }}
+                                            <span>{{ form.es_administrador.label }}</span>
+                                        </label>
+                                        {% if form.es_administrador.errors %}
+                                            <div class="form-error">
+                                                {% for error in form.es_administrador.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    {% if form.es_administrador.help_text %}
+                                        <small class="form-hint">{{ form.es_administrador.help_text }}</small>
+                                    {% endif %}
+                                    
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <label for="{{ form.es_empleado.id_for_label }}" style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0;">
+                                            {{ form.es_empleado }}
+                                            <span>{{ form.es_empleado.label }}</span>
+                                        </label>
+                                        {% if form.es_empleado.errors %}
+                                            <div class="form-error">
+                                                {% for error in form.es_empleado.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    {% if form.es_empleado.help_text %}
+                                        <small class="form-hint">{{ form.es_empleado.help_text }}</small>
+                                    {% endif %}
+                                    <small class="form-hint" style="color: #856404; background: #fff3cd; padding: 8px; border-radius: 4px; border: 1px solid #ffc107;">
+                                        <strong>Nota:</strong> El usuario puede tener ambos roles a la vez (Administrador y Empleado). Selecciona al menos uno.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="form-info-box">
                             <div class="info-icon">ℹ️</div>
                             <div class="info-content">
                                 <strong>Información importante:</strong><br>
                                 • El nombre de usuario se generará automáticamente como: primera letra del nombre + apellido completo (ejemplo: Juan Perez → jperez)<br>
                                 • La contraseña por defecto será: <strong>popup</strong><br>
-                                • El usuario deberá cambiar su contraseña en el primer inicio de sesión
+                                • <strong>Todos los usuarios</strong> (Administradores y Empleados) deberán cambiar su contraseña en el primer inicio de sesión
                             </div>
                         </div>
                         

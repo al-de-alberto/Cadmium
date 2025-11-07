@@ -1,0 +1,199 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Carrito - Cadmium{% endblock %}
+
+{% block content %}
+{% include 'core/navbar_snippet.html' %}
+
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'index' %}" style="text-decoration: none; color: inherit;">
+                <h2>Cadmium</h2>
+            </a>
+            <p>Panel de Administración</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'panel' %}" class="nav-item {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'usuarios' %}" class="nav-item {% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}">
+                <span class="nav-icon">👥</span>
+                <span>Usuarios</span>
+            </a>
+            <a href="{% url 'inventario' %}" class="nav-item {% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">
+                <span class="nav-icon">📦</span>
+                <span>Inventario</span>
+            </a>
+            <a href="{% url 'productos' %}" class="nav-item {% if request.resolver_match.url_name == 'productos' or request.resolver_match.url_name == 'ver_carrito' or request.resolver_match.url_name == 'editar_precio_producto' %}active{% endif %}">
+                <span class="nav-icon">💰</span>
+                <span>Productos</span>
+            </a>
+            <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Asistencia</span>
+            </a>
+            <a href="{% url 'deliverys' %}" class="nav-item {% if request.resolver_match.url_name == 'deliverys' %}active{% endif %}">
+                <span class="nav-icon">🚚</span>
+                <span>Delivery</span>
+            </a>
+            <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                <span class="nav-icon">⚙️</span>
+                <span>Operaciones</span>
+            </a>
+            <a href="{% url 'auditoria' %}" class="nav-item {% if request.resolver_match.url_name == 'auditoria' %}active{% endif %}">
+                <span class="nav-icon">📋</span>
+                <span>Auditoría</span>
+            </a>
+            <a href="{% url 'gestionar_eventos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_eventos' or request.resolver_match.url_name == 'crear_evento' or request.resolver_match.url_name == 'editar_evento' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Eventos</span>
+            </a>
+            <a href="{% url 'gestionar_noticias' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_noticias' or request.resolver_match.url_name == 'crear_noticia' or request.resolver_match.url_name == 'editar_noticia' %}active{% endif %}">
+                <span class="nav-icon">📰</span>
+                <span>Noticias</span>
+            </a>
+            <a href="{% url 'gestionar_carrusel' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_carrusel' or request.resolver_match.url_name == 'crear_imagen_carrusel' or request.resolver_match.url_name == 'editar_imagen_carrusel' %}active{% endif %}">
+                <span class="nav-icon">🖼️</span>
+                <span>Carrusel</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <p><strong>{{ user.username }}</strong></p>
+                <p class="user-role">{{ user.get_roles_display }}</p>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Carrito de Compras</h1>
+            <div class="header-actions">
+                <a href="{% url 'productos' %}" class="btn btn-secondary">← Volver a Productos</a>
+            </div>
+        </header>
+        
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% if productos_carrito %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio Unitario</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in productos_carrito %}
+                    <tr>
+                        <td><strong>{{ item.nombre }}</strong></td>
+                        <td>${{ item.precio|floatformat:0 }}</td>
+                        <td>
+                            <form method="post" action="{% url 'modificar_cantidad_carrito' item.id %}" style="display: inline-flex; gap: 5px; align-items: center;">
+                                {% csrf_token %}
+                                <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" required style="width: 70px; padding: 6px; border: 1px solid var(--border-color); border-radius: 6px; text-align: center;">
+                                <button type="submit" class="btn-action btn-edit" title="Actualizar cantidad" style="width: 36px; height: 36px; padding: 0;">
+                                    <span>↻</span>
+                                </button>
+                            </form>
+                        </td>
+                        <td><strong>${{ item.subtotal|floatformat:0 }}</strong></td>
+                        <td>
+                            <a href="{% url 'eliminar_del_carrito' item.id %}" class="btn-action btn-delete" title="Eliminar del carrito">
+                                <span class="icon-delete">🗑️</span>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr style="background: var(--bg-color); font-weight: bold;">
+                        <td colspan="3" style="text-align: right; padding-right: 20px;">TOTAL:</td>
+                        <td colspan="2" style="font-size: 1.2rem; color: var(--success-color);">${{ total|floatformat:0 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="{% url 'crear_pedido' %}" class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem;">Crear Pedido</a>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 60px 20px;">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🛒</div>
+            <h2 style="color: var(--text-secondary); margin-bottom: 10px;">Tu carrito está vacío</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 30px;">Agrega productos desde la página de productos</p>
+            <a href="{% url 'productos' %}" class="btn btn-primary">Ir a Productos</a>
+        </div>
+        {% endif %}
+    </main>
+</div>
+
+<style>
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #FFD700 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(245, 203, 92, 0.3);
+}
+
+.btn-edit:hover {
+    background: linear-gradient(135deg, #FFD700 0%, var(--warning-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(245, 203, 92, 0.5);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #E53935 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(198, 40, 40, 0.3);
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #E53935 0%, var(--danger-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(198, 40, 40, 0.5);
+}
+
+.icon-delete {
+    display: inline-block;
+    font-size: 18px;
+    line-height: 1;
+}
+</style>
+{% endblock %}
+

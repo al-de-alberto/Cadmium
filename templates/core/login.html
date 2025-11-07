@@ -28,19 +28,19 @@
             </a>
             <div class="dropdown-menu">
                 {% if user.is_authenticated %}
-                    <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                    <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
                     {% if user.es_administrador or user.is_superuser %}
-                        <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
-                    {% elif user.rol == 'usuario' %}
-                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                        <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
+                    {% elif user.es_empleado %}
+                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'login' %}" class="dropdown-item">Iniciar Sesión</a>
+                    <a href="{% url 'login' %}" class="dropdown-item">🔐 Iniciar Sesión</a>
                 {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
-                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a>
+                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
+                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                    <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
                 {% endif %}
             </div>
         </div>
@@ -98,6 +98,9 @@
                 
                 <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
                 <button type="button" class="btn btn-secondary" onclick="goBack()" style="margin-top: 10px; width: 100%;">Volver Atrás</button>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="{% url 'solicitar_restablecimiento' %}" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem;">¿Olvidaste tu contraseña?</a>
+                </div>
             </form>
         </div>
     </div>

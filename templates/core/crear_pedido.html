@@ -5,59 +5,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/forms.css' %}">
-<style>
-.productos-list {
-    margin-top: 20px;
-}
-
-.producto-item {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    padding: 15px;
-    background: var(--bg-color);
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    align-items: center;
-}
-
-.producto-item input {
-    flex: 1;
-}
-
-.btn-remove-product {
-    background: var(--danger-color);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.btn-remove-product:hover {
-    background: #E53935;
-}
-
-.btn-add-product {
-    background: var(--success-color);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-top: 10px;
-}
-
-.btn-add-product:hover {
-    background: #00C5A4;
-}
-
-#productos-hidden {
-    display: none;
-}
-</style>
 {% endblock %}
 
 {% block content %}
@@ -80,14 +27,15 @@
                 </span>
             </a>
             <div class="dropdown-menu">
-                <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
                 {% if user.es_administrador or user.is_superuser %}
-                    <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
-                {% elif user.rol == 'usuario' %}
-                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                    <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
+                {% elif user.es_empleado %}
+                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
                 {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
-                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a><a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
+                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
+                <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
                 
             </div>
         </div>
@@ -132,9 +80,9 @@
                 <span class="nav-icon">📦</span>
                 <span>Inventario</span>
             </a>
-            <a href="{% url 'ventas_pedidos' %}" class="nav-item {% if request.resolver_match.url_name == 'ventas_pedidos' %}active{% endif %}">
+            <a href="{% url 'productos' %}" class="nav-item {% if request.resolver_match.url_name == 'productos' %}active{% endif %}">
                 <span class="nav-icon">💰</span>
-                <span>Ventas y Pedidos</span>
+                <span>Productos</span>
             </a>
             <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
                 <span class="nav-icon">📅</span>
@@ -144,16 +92,32 @@
                 <span class="nav-icon">🚚</span>
                 <span>Delivery</span>
             </a>
-            <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                        <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
                 <span class="nav-icon">⚙️</span>
                 <span>Operaciones</span>
+            </a>
+            <a href="{% url 'auditoria' %}" class="nav-item {% if request.resolver_match.url_name == 'auditoria' %}active{% endif %}">
+                <span class="nav-icon">📋</span>
+                <span>Auditoría</span>
+            </a>
+            <a href="{% url 'gestionar_eventos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_eventos' or request.resolver_match.url_name == 'crear_evento' or request.resolver_match.url_name == 'editar_evento' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Eventos</span>
+            </a>
+            <a href="{% url 'gestionar_noticias' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_noticias' or request.resolver_match.url_name == 'crear_noticia' or request.resolver_match.url_name == 'editar_noticia' %}active{% endif %}">
+                <span class="nav-icon">📰</span>
+                <span>Noticias</span>
+            </a>
+            <a href="{% url 'gestionar_carrusel' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_carrusel' or request.resolver_match.url_name == 'crear_imagen_carrusel' or request.resolver_match.url_name == 'editar_imagen_carrusel' %}active{% endif %}">
+                <span class="nav-icon">🖼️</span>
+                <span>Carrusel</span>
             </a>
         </nav>
         
         <div class="sidebar-footer">
             <div class="user-info">
                 <p><strong>{{ user.username }}</strong></p>
-                <p class="user-role">{{ user.get_rol_display }}</p>
+                <p class="user-role">{{ user.get_roles_display }}</p>
             </div>
         </div>
     </aside>
@@ -162,7 +126,7 @@
         <header class="content-header">
             <h1>Crear Nuevo Pedido</h1>
             <div class="header-actions">
-                <a href="{% url 'ventas_pedidos' %}" class="btn btn-secondary">← Volver a Pedidos</a>
+                <a href="{% url 'pedidos' %}" class="btn btn-secondary">← Volver a Pedidos</a>
             </div>
         </header>
         
@@ -180,7 +144,7 @@
             <div class="create-user-card">
                 <div class="card-header-create">
                     <h2>Información del Pedido</h2>
-                    <p>Complete los datos del pedido y agregue los productos</p>
+                    <p>Complete los datos del pedido</p>
                 </div>
                 
                 <div class="card-body-create">
@@ -191,28 +155,14 @@
                             <h3 class="section-title">Datos del Pedido</h3>
                             
                             <div class="form-group-create">
-                                <label for="{{ form.nombre.id_for_label }}">
-                                    {{ form.nombre.label }}
+                                <label for="{{ form.codigo.id_for_label }}">
+                                    {{ form.codigo.label }}
                                     <span class="required">*</span>
                                 </label>
-                                {{ form.nombre }}
-                                {% if form.nombre.errors %}
+                                {{ form.codigo }}
+                                {% if form.codigo.errors %}
                                     <div class="form-error">
-                                        {% for error in form.nombre.errors %}
-                                            <span>{{ error }}</span>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="form-group-create">
-                                <label for="{{ form.observaciones.id_for_label }}">
-                                    {{ form.observaciones.label }}
-                                </label>
-                                {{ form.observaciones }}
-                                {% if form.observaciones.errors %}
-                                    <div class="form-error">
-                                        {% for error in form.observaciones.errors %}
+                                        {% for error in form.codigo.errors %}
                                             <span>{{ error }}</span>
                                         {% endfor %}
                                     </div>
@@ -223,18 +173,48 @@
                         <div class="form-section">
                             <h3 class="section-title">Productos del Pedido</h3>
                             
-                            <div class="productos-list" id="productos-list">
-                                <!-- Los productos se agregarán dinámicamente aquí -->
+                            {% if carrito %}
+                            <div class="table-container" style="margin-top: 20px;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Precio Unitario</th>
+                                            <th>Cantidad</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in productos_carrito %}
+                                        <tr>
+                                            <td><strong>{{ item.nombre }}</strong></td>
+                                            <td>${{ item.precio|floatformat:0 }}</td>
+                                            <td>{{ item.cantidad }}</td>
+                                            <td><strong>${{ item.subtotal|floatformat:0 }}</strong></td>
+                                        </tr>
+                                        {% endfor %}
+                                        <tr style="background: var(--bg-color); font-weight: bold;">
+                                            <td colspan="3" style="text-align: right; padding-right: 20px;">TOTAL:</td>
+                                            <td style="font-size: 1.1rem; color: var(--success-color);">${{ total|floatformat:0 }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            
-                            <button type="button" class="btn-add-product" onclick="agregarProducto()">+ Agregar Producto</button>
-                            
-                            <input type="hidden" name="productos" id="productos-hidden" value="[]">
+                            <div style="margin-top: 15px; text-align: center;">
+                                <a href="{% url 'ver_carrito' %}" class="btn btn-secondary">Modificar Carrito</a>
+                            </div>
+                            {% else %}
+                            <div style="text-align: center; padding: 30px; color: var(--text-secondary);">
+                                <p>No hay productos en el carrito. <a href="{% url 'productos' %}">Agregar productos</a></p>
+                            </div>
+                            {% endif %}
                         </div>
                         
                         <div class="form-actions-create">
-                            <button type="button" class="btn btn-cancel" onclick="window.location.href='{% url 'ventas_pedidos' %}'">Cancelar</button>
+                            <a href="{% url 'ver_carrito' %}" class="btn btn-cancel">Cancelar</a>
+                            {% if carrito %}
                             <button type="submit" class="btn btn-submit">Crear Pedido</button>
+                            {% endif %}
                         </div>
                     </form>
                 </div>
@@ -243,89 +223,5 @@
     </main>
 </div>
 
-<script>
-let productos = [];
-let contadorProductos = 0;
-
-function agregarProducto() {
-    const productosList = document.getElementById('productos-list');
-    const productoDiv = document.createElement('div');
-    productoDiv.className = 'producto-item';
-    productoDiv.id = `producto-${contadorProductos}`;
-    
-    productoDiv.innerHTML = `
-        <input type="text" 
-               class="form-control" 
-               placeholder="Nombre del producto" 
-               id="nombre-${contadorProductos}"
-               required>
-        <input type="number" 
-               class="form-control" 
-               placeholder="Cantidad" 
-               id="cantidad-${contadorProductos}"
-               min="1"
-               required>
-        <button type="button" 
-                class="btn-remove-product" 
-                onclick="eliminarProducto(${contadorProductos})">
-            Eliminar
-        </button>
-    `;
-    
-    productosList.appendChild(productoDiv);
-    contadorProductos++;
-}
-
-function eliminarProducto(id) {
-    const productoDiv = document.getElementById(`producto-${id}`);
-    if (productoDiv) {
-        productoDiv.remove();
-        actualizarProductos();
-    }
-}
-
-function actualizarProductos() {
-    productos = [];
-    const items = document.querySelectorAll('.producto-item');
-    
-    items.forEach((item, index) => {
-        const nombreInput = item.querySelector('input[type="text"]');
-        const cantidadInput = item.querySelector('input[type="number"]');
-        
-        if (nombreInput && cantidadInput && nombreInput.value && cantidadInput.value) {
-            productos.push({
-                nombre: nombreInput.value,
-                cantidad: parseInt(cantidadInput.value)
-            });
-        }
-    });
-    
-    document.getElementById('productos-hidden').value = JSON.stringify(productos);
-}
-
-document.getElementById('pedidoForm').addEventListener('submit', function(e) {
-    actualizarProductos();
-    
-    if (productos.length === 0) {
-        e.preventDefault();
-        alert('Debe agregar al menos un producto al pedido.');
-        return false;
-    }
-    
-    document.getElementById('productos-hidden').value = JSON.stringify(productos);
-});
-
-// Agregar evento para actualizar productos cuando cambien los inputs
-document.addEventListener('input', function(e) {
-    if (e.target.classList.contains('form-control')) {
-        actualizarProductos();
-    }
-});
-
-// Agregar un producto por defecto al cargar la página
-window.addEventListener('DOMContentLoaded', function() {
-    agregarProducto();
-});
-</script>
 {% endblock %}
 

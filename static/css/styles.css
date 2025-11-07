@@ -51,7 +51,7 @@ h1, h2, h3, h4, h5, h6 {
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 1001;
     width: 100%;
     backdrop-filter: blur(10px);
 }
@@ -535,15 +535,16 @@ body.login-page {
     display: flex;
     flex-direction: column;
     position: fixed;
-    height: calc(100vh - 80px);
+    height: 100vh;
     overflow-y: auto;
-    top: 80px;
+    top: 0;
     left: 0;
     z-index: 1000;
+    padding-top: 80px;
 }
 
 .sidebar-header {
-    padding: 30px 20px;
+    padding: 30px 20px 20px 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -733,6 +734,27 @@ body.login-page {
     color: var(--text-primary);
     font-family: 'Playfair Display', Georgia, serif;
     font-weight: 600;
+}
+
+/* Section Divider */
+.section-divider {
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--secondary-color) 50%, transparent 100%);
+    margin: 40px 0;
+    position: relative;
+}
+
+.section-divider::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background-color: var(--secondary-color);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--bg-color);
 }
 
 .actions-grid {

@@ -28,19 +28,19 @@
             </a>
             <div class="dropdown-menu">
                 {% if user.is_authenticated %}
-                    <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                    <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
                     {% if user.es_administrador or user.is_superuser %}
-                        <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
-                    {% elif user.rol == 'usuario' %}
-                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                        <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
+                    {% elif user.es_empleado %}
+                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'login' %}" class="dropdown-item">Iniciar Sesión</a>
+                    <a href="{% url 'login' %}" class="dropdown-item">🔐 Iniciar Sesión</a>
                 {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
-                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a>
+                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
+                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                    <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
                 {% endif %}
             </div>
         </div>
@@ -58,7 +58,11 @@
         <div class="contacts-grid">
             {% for contacto in contactos %}
             <div class="contact-card">
-                <div class="contact-icon">👤</div>
+                {% if contacto.imagen %}
+                    <img src="{{ contacto.imagen.url }}" alt="{{ contacto.nombre }}" class="contact-image" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 15px;">
+                {% else %}
+                    <div class="contact-icon">👤</div>
+                {% endif %}
                 <h3>{{ contacto.nombre }}</h3>
                 <div class="cargo">{{ contacto.cargo }}</div>
                 {% if usuario_autenticado %}
@@ -79,6 +83,10 @@
                     </div>
                 </div>
                 {% endif %}
+            </div>
+            {% empty %}
+            <div class="contact-card" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <p style="color: var(--text-secondary);">No hay contactos disponibles</p>
             </div>
             {% endfor %}
         </div>

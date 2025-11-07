@@ -41,13 +41,7 @@ def validar_rut_chileno(rut):
 
 
 class Usuario(AbstractUser):
-    """Modelo de usuario personalizado"""
-    ROL_CHOICES = [
-        ('admin', 'Administrador'),
-        ('usuario', 'Usuario'),
-    ]
-    
-    rol = models.CharField(max_length=20, choices=ROL_CHOICES, default='usuario')
+    """Modelo de usuario personalizado con roles múltiples"""
     fecha_creacion = models.DateTimeField(default=timezone.now)
     activo = models.BooleanField(default=True)
     nombre = models.CharField(max_length=20, blank=True, null=True, verbose_name='Nombre')
@@ -56,6 +50,13 @@ class Usuario(AbstractUser):
     correo_institucional = models.EmailField(blank=True, null=True, verbose_name='Correo Institucional')
     cambio_password_requerido = models.BooleanField(default=True, verbose_name='Cambio de Contraseña Requerido')
     
+    # Roles múltiples - un usuario puede ser Administrador y/o Empleado
+    _es_administrador = models.BooleanField(default=False, verbose_name='Es Administrador', db_column='es_administrador')
+    es_empleado = models.BooleanField(default=True, verbose_name='Es Empleado')
+    
+    # Mantener el campo 'rol' para compatibilidad con migraciones existentes (deprecated)
+    rol = models.CharField(max_length=20, blank=True, null=True, verbose_name='Rol (deprecated)')
+    
     class Meta:
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
@@ -63,14 +64,35 @@ class Usuario(AbstractUser):
     def __str__(self):
         return self.username
     
+    @property
     def es_administrador(self):
-        return self.rol == 'admin' or self.is_superuser
+        """Property para acceder al campo es_administrador"""
+        return self._es_administrador
+    
+    @es_administrador.setter
+    def es_administrador(self, value):
+        """Setter para el campo es_administrador"""
+        self._es_administrador = value
+    
+    def get_roles_display(self):
+        """Retorna una lista de roles activos del usuario"""
+        roles = []
+        if self._es_administrador or self.is_superuser:
+            roles.append('Administrador')
+        if self.es_empleado:
+            roles.append('Empleado')
+        return ', '.join(roles) if roles else 'Sin rol asignado'
     
     def get_nombre_completo(self):
         """Retorna el nombre completo del usuario"""
         if self.nombre and self.apellido:
             return f"{self.nombre} {self.apellido}"
         return self.username
+    
+    # Método para compatibilidad con código existente
+    def tiene_permisos_administrador(self):
+        """Retorna True si el usuario tiene permisos de administrador"""
+        return self._es_administrador or self.is_superuser
 
 
 class Inventario(models.Model):
@@ -176,7 +198,7 @@ class RegistroLlamada(models.Model):
 
 class Pedido(models.Model):
     """Modelo para gestionar pedidos"""
-    nombre = models.CharField(max_length=200, verbose_name='Nombre del Pedido')
+    codigo = models.CharField(max_length=200, verbose_name='Código del Pedido')
     fecha_creacion = models.DateTimeField(default=timezone.now, verbose_name='Fecha de Creación')
     usuario_creacion = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='pedidos_creados', verbose_name='Usuario que Crea')
     observaciones = models.TextField(blank=True, verbose_name='Observaciones')
@@ -187,7 +209,7 @@ class Pedido(models.Model):
         ordering = ['-fecha_creacion']
     
     def __str__(self):
-        return f"Pedido: {self.nombre} - {self.fecha_creacion.strftime('%d/%m/%Y %H:%M')}"
+        return f"Pedido: {self.codigo} - {self.fecha_creacion.strftime('%d/%m/%Y %H:%M')}"
 
 
 class DetallePedido(models.Model):
@@ -195,14 +217,20 @@ class DetallePedido(models.Model):
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='detalles', verbose_name='Pedido')
     producto_nombre = models.CharField(max_length=200, verbose_name='Nombre del Producto')
     cantidad = models.IntegerField(verbose_name='Cantidad')
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name='Precio Unitario')
     
     class Meta:
         verbose_name = 'Detalle de Pedido'
         verbose_name_plural = 'Detalles de Pedido'
         ordering = ['pedido', 'id']
     
+    @property
+    def precio_total(self):
+        """Calcula el precio total del detalle (cantidad * precio_unitario)"""
+        return self.cantidad * self.precio_unitario
+    
     def __str__(self):
-        return f"{self.producto_nombre} - Cantidad: {self.cantidad}"
+        return f"{self.producto_nombre} - Cantidad: {self.cantidad} - Precio: ${self.precio_unitario}"
 
 
 class Auditoria(models.Model):
@@ -212,6 +240,8 @@ class Auditoria(models.Model):
         ('logout', 'Cierre de Sesión'),
         ('login_failed', 'Intento de Login Fallido'),
         ('password_change', 'Cambio de Contraseña'),
+        ('password_reset_request', 'Solicitud de Restablecimiento de Contraseña'),
+        ('password_reset_admin', 'Restablecimiento de Contraseña por Admin'),
         ('usuario_create', 'Creación de Usuario'),
         ('usuario_edit', 'Edición de Usuario'),
         ('usuario_delete', 'Eliminación de Usuario'),
@@ -227,12 +257,24 @@ class Auditoria(models.Model):
         ('pedido_create', 'Creación de Pedido'),
         ('pedido_delete', 'Eliminación de Pedido'),
         ('pedido_export', 'Exportación de Pedido'),
+        ('carrusel_create', 'Creación de Imagen Carrusel'),
+        ('carrusel_edit', 'Edición de Imagen Carrusel'),
+        ('carrusel_delete', 'Eliminación de Imagen Carrusel'),
+        ('evento_create', 'Creación de Evento'),
+        ('evento_edit', 'Edición de Evento'),
+        ('evento_delete', 'Eliminación de Evento'),
+        ('noticia_create', 'Creación de Noticia'),
+        ('noticia_edit', 'Edición de Noticia'),
+        ('noticia_delete', 'Eliminación de Noticia'),
         ('falla_create', 'Registro de Falla'),
         ('falla_edit', 'Edición de Falla'),
         ('falla_delete', 'Eliminación de Falla'),
         ('llamada_create', 'Registro de Llamada'),
         ('llamada_edit', 'Edición de Llamada'),
         ('llamada_delete', 'Eliminación de Llamada'),
+        ('contacto_create', 'Creación de Contacto'),
+        ('contacto_edit', 'Edición de Contacto'),
+        ('contacto_delete', 'Eliminación de Contacto'),
     ]
     
     MODULO_CHOICES = [
@@ -242,6 +284,7 @@ class Auditoria(models.Model):
         ('asistencia', 'Asistencia'),
         ('pedidos', 'Ventas y Pedidos'),
         ('operaciones', 'Operaciones'),
+        ('contenido', 'Contenido'),
     ]
     
     usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='auditorias', verbose_name='Usuario')
@@ -268,5 +311,109 @@ class Auditoria(models.Model):
         return f"{usuario_nombre} - {self.get_accion_display()} - {self.fecha_hora.strftime('%d/%m/%Y %H:%M:%S')}"
 
 
+class ImagenCarrusel(models.Model):
+    """Modelo para gestionar las imágenes del carrusel"""
+    imagen = models.ImageField(upload_to='carousel/', verbose_name='Imagen del Carrusel')
+    orden = models.IntegerField(default=0, verbose_name='Orden de Visualización')
+    titulo_barista = models.CharField(max_length=200, blank=True, null=True, verbose_name='Título/Nombre del Barista del Mes (solo para orden 1)')
+    activo = models.BooleanField(default=True, verbose_name='Activo')
+    fecha_creacion = models.DateTimeField(default=timezone.now, verbose_name='Fecha de Creación')
+    fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name='Fecha de Actualización')
+    
+    class Meta:
+        verbose_name = 'Imagen del Carrusel'
+        verbose_name_plural = 'Imágenes del Carrusel'
+        ordering = ['orden', 'fecha_creacion']
+    
+    def __str__(self):
+        if self.orden == 1 and self.titulo_barista:
+            return f"Barista del Mes: {self.titulo_barista} - {'Activa' if self.activo else 'Inactiva'}"
+        return f"Imagen Carrusel #{self.orden} - {'Activa' if self.activo else 'Inactiva'}"
+    
+    def es_barista_mes(self):
+        """Indica si esta imagen es para el barista del mes (orden 1)"""
+        return self.orden == 1
+
+
+class Evento(models.Model):
+    """Modelo para gestionar eventos del PopUp"""
+    titulo = models.CharField(max_length=200, verbose_name='Título del Evento')
+    descripcion = models.TextField(verbose_name='Descripción')
+    fecha_evento = models.DateField(verbose_name='Fecha del Evento')
+    imagen = models.ImageField(upload_to='eventos/', blank=True, null=True, verbose_name='Imagen del Evento')
+    activo = models.BooleanField(default=True, verbose_name='Activo')
+    fecha_creacion = models.DateTimeField(default=timezone.now, verbose_name='Fecha de Creación')
+    fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name='Fecha de Actualización')
+    
+    class Meta:
+        verbose_name = 'Evento'
+        verbose_name_plural = 'Eventos'
+        ordering = ['-fecha_evento', '-fecha_creacion']
+    
+    def __str__(self):
+        return f"{self.titulo} - {self.fecha_evento.strftime('%d/%m/%Y')}"
+
+
+class Noticia(models.Model):
+    """Modelo para gestionar noticias y actualizaciones"""
+    titulo = models.CharField(max_length=200, verbose_name='Título de la Noticia')
+    descripcion = models.TextField(verbose_name='Descripción')
+    fecha_publicacion = models.DateField(default=timezone.now, verbose_name='Fecha de Publicación')
+    imagen = models.ImageField(upload_to='noticias/', blank=True, null=True, verbose_name='Imagen de la Noticia')
+    activo = models.BooleanField(default=True, verbose_name='Activo')
+    fecha_creacion = models.DateTimeField(default=timezone.now, verbose_name='Fecha de Creación')
+    fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name='Fecha de Actualización')
+    
+    class Meta:
+        verbose_name = 'Noticia'
+        verbose_name_plural = 'Noticias'
+        ordering = ['-fecha_publicacion', '-fecha_creacion']
+    
+    def __str__(self):
+        return f"{self.titulo} - {self.fecha_publicacion.strftime('%d/%m/%Y')}"
+
+
+class ManualInterno(models.Model):
+    """Modelo para el manual interno (reglamento interno y manual de operaciones)"""
+    TIPO_CHOICES = [
+        ('reglamento', 'Reglamento Interno'),
+        ('operaciones', 'Manual de Operaciones'),
+    ]
+    
+    titulo = models.CharField(max_length=200, verbose_name='Título del Documento')
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='reglamento', verbose_name='Tipo de Documento')
+    archivo = models.FileField(upload_to='manuales/', verbose_name='Archivo del Documento')
+    fecha_creacion = models.DateTimeField(default=timezone.now, verbose_name='Fecha de Creación')
+    fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name='Fecha de Actualización')
+    activo = models.BooleanField(default=True, verbose_name='Activo')
+    
+    class Meta:
+        verbose_name = 'Documentación'
+        verbose_name_plural = 'Documentación'
+        ordering = ['-fecha_actualizacion']
+    
+    def __str__(self):
+        return f"{self.get_tipo_display()} - {self.titulo}"
+
+
+class Contacto(models.Model):
+    """Modelo para los contactos de gerencia"""
+    nombre = models.CharField(max_length=200, verbose_name='Nombre')
+    cargo = models.CharField(max_length=200, verbose_name='Cargo')
+    email = models.EmailField(verbose_name='Correo Electrónico')
+    telefono = models.CharField(max_length=20, verbose_name='Teléfono')
+    imagen = models.ImageField(upload_to='contactos/', blank=True, null=True, verbose_name='Imagen')
+    orden = models.IntegerField(default=0, verbose_name='Orden de Visualización')
+    activo = models.BooleanField(default=True, verbose_name='Activo')
+    fecha_creacion = models.DateTimeField(default=timezone.now, verbose_name='Fecha de Creación')
+    fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name='Fecha de Actualización')
+    
+    class Meta:
+        verbose_name = 'Contacto'
+        verbose_name_plural = 'Contactos'
+        ordering = ['orden', 'nombre']
+    
+    def __str__(self):
+        return f"{self.nombre} - {self.cargo}"
 
 

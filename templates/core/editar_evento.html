@@ -1,0 +1,227 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Editar Evento - Cadmium{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+{% include 'core/navbar_snippet.html' %}
+
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'index' %}" style="text-decoration: none; color: inherit;">
+                <h2>Cadmium</h2>
+            </a>
+            <p>Panel de Administración</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'panel' %}" class="nav-item {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'usuarios' %}" class="nav-item {% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}">
+                <span class="nav-icon">👥</span>
+                <span>Usuarios</span>
+            </a>
+            <a href="{% url 'inventario' %}" class="nav-item {% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">
+                <span class="nav-icon">📦</span>
+                <span>Inventario</span>
+            </a>
+            <a href="{% url 'productos' %}" class="nav-item {% if request.resolver_match.url_name == 'productos' %}active{% endif %}">
+                <span class="nav-icon">💰</span>
+                <span>Productos</span>
+            </a>
+            <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Asistencia</span>
+            </a>
+            <a href="{% url 'deliverys' %}" class="nav-item {% if request.resolver_match.url_name == 'deliverys' %}active{% endif %}">
+                <span class="nav-icon">🚚</span>
+                <span>Delivery</span>
+            </a>
+                        <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                <span class="nav-icon">⚙️</span>
+                <span>Operaciones</span>
+            </a>
+            <a href="{% url 'auditoria' %}" class="nav-item {% if request.resolver_match.url_name == 'auditoria' %}active{% endif %}">
+                <span class="nav-icon">📋</span>
+                <span>Auditoría</span>
+            </a>
+            <a href="{% url 'gestionar_eventos' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_eventos' or request.resolver_match.url_name == 'crear_evento' or request.resolver_match.url_name == 'editar_evento' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Eventos</span>
+            </a>
+            <a href="{% url 'gestionar_noticias' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_noticias' or request.resolver_match.url_name == 'crear_noticia' or request.resolver_match.url_name == 'editar_noticia' %}active{% endif %}">
+                <span class="nav-icon">📰</span>
+                <span>Noticias</span>
+            </a>
+            <a href="{% url 'gestionar_carrusel' %}" class="nav-item {% if request.resolver_match.url_name == 'gestionar_carrusel' or request.resolver_match.url_name == 'crear_imagen_carrusel' or request.resolver_match.url_name == 'editar_imagen_carrusel' %}active{% endif %}">
+                <span class="nav-icon">🖼️</span>
+                <span>Carrusel</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <p><strong>{{ user.username }}</strong></p>
+                <p class="user-role">{{ user.get_roles_display }}</p>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Editar Evento</h1>
+            <div class="header-actions">
+                <a href="{% url 'gestionar_eventos' %}" class="btn btn-secondary">← Volver a Eventos</a>
+            </div>
+        </header>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="create-user-container">
+            <div class="create-user-card">
+                <div class="card-header-create">
+                    <h2>Modificar Evento: {{ evento.titulo }}</h2>
+                    <p>Actualiza la información del evento</p>
+                </div>
+                
+                <div class="card-body-create">
+                    <form method="post" class="user-form-create" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="form-section">
+                            <h3 class="section-title">Datos del Evento</h3>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.titulo.id_for_label }}">
+                                    {{ form.titulo.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.titulo }}
+                                {% if form.titulo.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.titulo.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.descripcion.id_for_label }}">
+                                    {{ form.descripcion.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.descripcion }}
+                                {% if form.descripcion.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.descripcion.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.fecha_evento.id_for_label }}">
+                                    {{ form.fecha_evento.label }}
+                                    <span class="required">*</span>
+                                </label>
+                                {{ form.fecha_evento }}
+                                {% if form.fecha_evento.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.fecha_evento.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.imagen.id_for_label }}">
+                                    {{ form.imagen.label }}
+                                </label>
+                                {% if evento.imagen %}
+                                    <div style="margin-bottom: 10px;">
+                                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 8px;">Imagen actual:</p>
+                                        <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" style="max-width: 300px; max-height: 200px; border-radius: 8px; border: 2px solid var(--border-color);">
+                                    </div>
+                                {% endif %}
+                                {{ form.imagen }}
+                                {% if form.imagen.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.imagen.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-hint">
+                                    <strong>Recomendaciones de imagen:</strong><br>
+                                    • <strong>Tamaño recomendado:</strong> 1200x800 píxeles (proporción 3:2) o 1600x900 píxeles (16:9)<br>
+                                    • <strong>Formato:</strong> PNG, JPG, JPEG (solo estos formatos serán aceptados)<br>
+                                    • <strong>Tamaño de archivo máximo:</strong> 5MB (el sistema rechazará archivos más grandes)<br>
+                                    • <strong>Dimensiones mínimas:</strong> 400x200 píxeles (el sistema rechazará imágenes más pequeñas)<br>
+                                    • <strong>Dimensiones máximas:</strong> 5000x5000 píxeles<br>
+                                    • <strong>Orientación:</strong> Horizontal (landscape) para mejor visualización<br>
+                                    • La imagen se mostrará con una altura de 200px y ancho completo en la página principal<br>
+                                    • Deje en blanco para mantener la imagen actual
+                                </small>
+                            </div>
+                            
+                            {% if evento.imagen %}
+                            <div class="form-group-create">
+                                <label for="{{ form.eliminar_imagen.id_for_label }}" style="display: flex; align-items: center; gap: 10px;">
+                                    {{ form.eliminar_imagen }}
+                                    {{ form.eliminar_imagen.label }}
+                                </label>
+                                {% if form.eliminar_imagen.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.eliminar_imagen.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-hint">Marque esta opción para eliminar la imagen actual del evento</small>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="form-group-create">
+                                <label for="{{ form.activo.id_for_label }}" style="display: flex; align-items: center; gap: 10px;">
+                                    {{ form.activo }}
+                                    {{ form.activo.label }}
+                                </label>
+                                {% if form.activo.errors %}
+                                    <div class="form-error">
+                                        {% for error in form.activo.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-hint">Los eventos inactivos no se mostrarán en el index</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions-create">
+                            <button type="button" class="btn btn-cancel" onclick="window.location.href='{% url 'gestionar_eventos' %}'">Cancelar</button>
+                            <button type="submit" class="btn btn-submit">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
