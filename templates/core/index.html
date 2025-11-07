@@ -4,306 +4,7 @@
 {% block title %}Inicio - Cadmium{% endblock %}
 
 {% block extra_css %}
-<style>
-    /* Navbar Styles */
-    .navbar {
-        background-color: var(--sidebar-bg);
-        color: white;
-        padding: 1rem 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-    }
-
-    .navbar-brand {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        color: white;
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-
-    .navbar-logo {
-        width: 40px;
-        height: 40px;
-        background-color: var(--primary-color);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        color: white;
-    }
-
-    .navbar-nav {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .nav-link {
-        color: white;
-        text-decoration: none;
-        padding: 8px 16px;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-        font-weight: 500;
-    }
-
-    .nav-link:hover {
-        background-color: var(--sidebar-hover);
-    }
-
-    .btn-contactanos {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-contactanos:hover {
-        background-color: var(--primary-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-    }
-
-    /* Hero Section with Carousel */
-    .hero-section {
-        position: relative;
-        width: 100%;
-        max-width: 1200px;
-        margin: 40px auto;
-        padding: 0 20px;
-    }
-
-    .carousel-container {
-        position: relative;
-        width: 100%;
-        max-width: 900px;
-        margin: 0 auto;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    }
-
-    .carousel {
-        position: relative;
-        width: 100%;
-        height: 500px;
-    }
-
-    .carousel-inner {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-    }
-
-    .carousel-item {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        transition: opacity 0.6s ease-in-out;
-    }
-
-    .carousel-item.active {
-        opacity: 1;
-        z-index: 2;
-    }
-
-    .carousel-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .carousel-controls {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        border: none;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        font-size: 1.5rem;
-        cursor: pointer;
-        z-index: 10;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .carousel-controls:hover {
-        background-color: rgba(0, 0, 0, 0.8);
-    }
-
-    .carousel-prev {
-        left: 20px;
-    }
-
-    .carousel-next {
-        right: 20px;
-    }
-
-    .carousel-indicators {
-        position: absolute;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 10px;
-        z-index: 10;
-    }
-
-    .carousel-indicator {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background-color: rgba(255, 255, 255, 0.5);
-        border: 2px solid white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .carousel-indicator.active {
-        background-color: white;
-    }
-
-    /* App Icon Section */
-    .app-icon-section {
-        text-align: center;
-        margin: 60px auto;
-        max-width: 1200px;
-        padding: 0 20px;
-    }
-
-    .app-icon {
-        width: 150px;
-        height: 150px;
-        margin: 0 auto 20px;
-        background-color: var(--primary-color);
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 4rem;
-        color: white;
-        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
-    }
-
-    /* News and Events Section */
-    .news-section {
-        background-color: var(--bg-color);
-        padding: 60px 20px;
-        margin-top: 60px;
-    }
-
-    .news-container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .section-title {
-        text-align: center;
-        font-size: 2.5rem;
-        color: var(--text-primary);
-        margin-bottom: 40px;
-        font-weight: 700;
-    }
-
-    .news-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 30px;
-        margin-bottom: 40px;
-    }
-
-    .news-card {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 24px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-
-    .news-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    }
-
-    .news-card h3 {
-        color: var(--primary-color);
-        margin-bottom: 12px;
-        font-size: 1.25rem;
-    }
-
-    .news-card p {
-        color: var(--text-secondary);
-        line-height: 1.6;
-    }
-
-    .news-date {
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-        margin-top: 12px;
-        font-style: italic;
-    }
-
-    /* Footer Section */
-    .footer {
-        background-color: var(--sidebar-bg);
-        color: white;
-        padding: 40px 20px;
-        text-align: center;
-    }
-
-    .footer-content {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-
-    .footer p {
-        margin-top: 20px;
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.875rem;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .navbar {
-            flex-direction: column;
-            gap: 15px;
-            padding: 1rem;
-        }
-
-        .navbar-nav {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .carousel {
-            height: 300px;
-        }
-
-        .news-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -326,9 +27,21 @@
                 </span>
             </a>
             <div class="dropdown-menu">
-                <a href="{% url 'login' %}" class="dropdown-item">Iniciar Sesión</a>
+                {% if user.is_authenticated %}
+                    <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                    {% if user.es_administrador or user.is_superuser %}
+                        <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
+                    {% elif user.rol == 'usuario' %}
+                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}" class="dropdown-item">Iniciar Sesión</a>
+                {% endif %}
                 <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
                 <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -384,8 +97,8 @@
     <div class="app-icon">
         <img src="{% static 'images/logo.png' %}" alt="Logo Cadmium" onerror="this.style.display='none'; this.parentElement.innerHTML='C';" style="width: 100%; height: 100%; object-fit: contain;">
     </div>
-    <h2 style="color: var(--text-primary); font-size: 2rem; margin-top: 20px;">Cadmium</h2>
-    <p style="color: var(--text-secondary); font-size: 1.1rem; margin-top: 10px;">PopUp Nescafe</p>
+    <h2 style="color: var(--text-primary); font-size: 2rem; margin-top: 20px; font-family: 'Playfair Display', Georgia, serif; font-weight: 700;">Cadmium</h2>
+    <p style="color: var(--primary-color); font-size: 1.5rem; margin-top: 15px; font-weight: 600; font-family: 'Playfair Display', Georgia, serif; letter-spacing: 1px;">PopUp Nescafe</p>
 </div>
 
 <!-- News and Events Section -->
@@ -404,6 +117,25 @@
                 <div class="news-date">Fecha: Próximamente</div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Social Media Floating Button -->
+<div class="social-float-btn">
+    <div class="social-bar">
+        <a href="https://www.tiktok.com/@creatumundoinacapsur" target="_blank" rel="noopener noreferrer" class="social-link tiktok" title="Síguenos en TikTok">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+            </svg>
+        </a>
+        <a href="https://www.instagram.com/creatumundo_inacapsur/" target="_blank" rel="noopener noreferrer" class="social-link instagram" title="Síguenos en Instagram">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+        </a>
+    </div>
+    <div class="social-btn-main" title="Síguenos en redes sociales">
+        <img src="{% static 'images/social/social.png' %}" alt="Redes sociales" style="width: 30px; height: 30px; object-fit: contain;">
     </div>
 </div>
 

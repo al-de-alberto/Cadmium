@@ -4,9 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.db import IntegrityError
-from django.db.models import Max
-from .models import Usuario, Inventario, Asistencia, RegistroFalla, RegistroLlamada
-from .forms import CrearUsuarioForm, RegistroAsistenciaForm, CambiarPasswordForm, EditarAsistenciaForm, EditarUsuarioForm, RegistroFallaForm, RegistroLlamadaForm
+from django.db.models import Max, Q
+from .models import Usuario, Inventario, Asistencia, RegistroFalla, RegistroLlamada, Pedido, DetallePedido, Auditoria
+from .forms import CrearUsuarioForm, RegistroAsistenciaForm, CambiarPasswordForm, EditarAsistenciaForm, EditarUsuarioForm, RegistroFallaForm, RegistroLlamadaForm, CrearInventarioForm, EditarInventarioForm, CrearPedidoForm, CambiarStockForm
+from django.http import HttpResponse
+import json
 
 
 def login_view(request):
@@ -19,8 +21,8 @@ def login_view(request):
         # Si es admin, ir al panel
         if request.user.es_administrador() or request.user.is_superuser:
             return redirect('panel')
-        # Si es usuario trabajador sin necesidad de cambiar contraseña, redirigir a registro asistencia
-        return redirect('registro_asistencia')
+        # Si es usuario trabajador sin necesidad de cambiar contraseña, redirigir a dashboard trabajador
+        return redirect('trabajador_dashboard')
     
     if request.method == 'POST':
         account_type = request.POST.get('account_type')
@@ -41,6 +43,11 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
+            # Verificar si el usuario está activo
+            if not user.activo:
+                messages.error(request, 'Tu cuenta está inactiva. Contacta al administrador para más información.')
+                return render(request, 'core/login.html', {'account_type': account_type})
+            
             # Validar que el tipo de cuenta seleccionado coincida con el rol del usuario
             expected_rol = 'admin' if account_type == 'gerencia' else 'usuario'
             
@@ -60,9 +67,9 @@ def login_view(request):
                 if user.es_administrador() or user.is_superuser:
                     return redirect('panel')
                 
-                # Para usuarios trabajadores, ir a registro asistencia
+                # Para usuarios trabajadores, ir a dashboard trabajador
                 if user.rol == 'usuario':
-                    return redirect('registro_asistencia')
+                    return redirect('trabajador_dashboard')
                 
                 # Fallback al panel
                 return redirect('panel')
@@ -79,17 +86,12 @@ def login_view(request):
 
 def logout_view(request):
     """Vista para cerrar sesión - accesible sin autenticación para limpiar sesiones"""
-    # Verificar si el usuario es administrador antes de cerrar sesión
-    es_admin = request.user.is_authenticated and (request.user.es_administrador() or request.user.is_superuser)
-    
     if request.user.is_authenticated:
         logout(request)
         messages.success(request, 'Sesión cerrada correctamente')
     
-    # Si era administrador, redirigir al index, si no al login
-    if es_admin:
-        return redirect('index')
-    return redirect('login')
+    # Siempre redirigir al index después de cerrar sesión
+    return redirect('index')
 
 
 @login_required
@@ -112,7 +114,7 @@ def cambiar_password_view(request):
             messages.success(request, 'Contraseña cambiada exitosamente. Por favor, inicie sesión nuevamente.')
             from django.contrib.auth import logout
             logout(request)
-            return redirect('login')
+            return redirect('index')
     
     return render(request, 'core/cambiar_password.html', {'form': form})
 
@@ -190,11 +192,53 @@ def editar_usuario_view(request, usuario_id):
     
     usuario = get_object_or_404(Usuario, id=usuario_id)
     
+    # Verificar si el usuario intenta cambiar su propio estado y es administrador
+    es_propia_cuenta_admin = usuario.id == request.user.id and (usuario.es_administrador() or usuario.is_superuser)
+    
     if request.method == 'POST':
         form = EditarUsuarioForm(request.POST, instance=usuario)
         if form.is_valid():
             try:
-                usuario = form.save()
+                # Guardar datos anteriores para auditoría
+                datos_anteriores = {
+                    'nombre': usuario.nombre,
+                    'apellido': usuario.apellido,
+                    'rut': usuario.rut,
+                    'correo_institucional': usuario.correo_institucional,
+                    'rol': usuario.rol,
+                    'activo': usuario.activo,
+                }
+                
+                # Si es su propia cuenta de administrador, prevenir cambio de estado activo
+                if es_propia_cuenta_admin:
+                    # Restaurar el estado activo a True antes de guardar
+                    usuario = form.save(commit=False)
+                    usuario.activo = True
+                    usuario.save()
+                    messages.info(request, 'No puedes desactivar tu propia cuenta de administrador. El estado activo se mantuvo en True.')
+                else:
+                    usuario = form.save()
+                # Registrar auditoría
+                from .utils import registrar_auditoria
+                detalles = {
+                    'datos_anteriores': datos_anteriores,
+                    'datos_nuevos': {
+                        'nombre': usuario.nombre,
+                        'apellido': usuario.apellido,
+                        'rut': usuario.rut,
+                        'correo_institucional': usuario.correo_institucional,
+                        'rol': usuario.rol,
+                        'activo': usuario.activo,
+                    }
+                }
+                registrar_auditoria(
+                    usuario=request.user,
+                    accion='usuario_edit',
+                    modulo='usuarios',
+                    descripcion=f'Usuario "{usuario.get_nombre_completo()}" (username: {usuario.username}) modificado',
+                    objeto_afectado=f"{usuario.nombre} {usuario.apellido}",
+                    detalles=detalles
+                )
                 messages.success(request, f'Usuario {usuario.get_nombre_completo()} actualizado exitosamente')
                 return redirect('usuarios')
             except IntegrityError as e:
@@ -203,8 +247,112 @@ def editar_usuario_view(request, usuario_id):
                 messages.error(request, f'Error al actualizar el usuario: {str(e)}')
     else:
         form = EditarUsuarioForm(instance=usuario)
+        # Si es su propia cuenta de administrador, deshabilitar el campo activo
+        if es_propia_cuenta_admin:
+            form.fields['activo'].widget.attrs['disabled'] = True
+            form.fields['activo'].widget.attrs['readonly'] = True
     
-    return render(request, 'core/editar_usuario.html', {'form': form, 'usuario': usuario})
+    return render(request, 'core/editar_usuario.html', {
+        'form': form, 
+        'usuario': usuario,
+        'es_propia_cuenta_admin': es_propia_cuenta_admin
+    })
+
+
+@login_required
+def eliminar_usuario_view(request, usuario_id):
+    """Vista para eliminar un usuario (solo si no tiene registros relacionados)"""
+    # Solo usuarios trabajadores deben cambiar su contraseña
+    if request.user.rol == 'usuario' and request.user.cambio_password_requerido:
+        return redirect('cambiar_password')
+    if not (request.user.es_administrador() or request.user.is_superuser):
+        messages.error(request, 'No tienes permisos para acceder a esta sección')
+        return redirect('panel')
+    
+    usuario = get_object_or_404(Usuario, id=usuario_id)
+    
+    # Verificar si el usuario intenta eliminar/desactivar su propia cuenta y es administrador
+    if usuario.id == request.user.id and (usuario.es_administrador() or usuario.is_superuser):
+        messages.error(request, 'No puedes eliminar o desactivar tu propia cuenta de administrador.')
+        return redirect('usuarios')
+    
+    # Verificar si el usuario tiene registros relacionados
+    tiene_asistencias = usuario.asistencias.exists()
+    tiene_fallas = usuario.fallas_registradas.exists()
+    tiene_llamadas = usuario.llamadas_registradas.exists()
+    tiene_pedidos = usuario.pedidos_creados.exists()
+    tiene_auditorias = usuario.auditorias.exists()
+    
+    tiene_registros = tiene_asistencias or tiene_fallas or tiene_llamadas or tiene_pedidos or tiene_auditorias
+    
+    if request.method == 'POST':
+        if tiene_registros:
+            # Solo desactivar si tiene registros
+            usuario.activo = False
+            usuario.save()
+            # Registrar auditoría
+            from .utils import registrar_auditoria
+            registrar_auditoria(
+                usuario=request.user,
+                accion='usuario_deactivate',
+                modulo='usuarios',
+                descripcion=f'Usuario "{usuario.get_nombre_completo()}" desactivado (tiene registros relacionados)',
+                objeto_afectado=f"{usuario.nombre} {usuario.apellido}",
+                detalles={
+                    'tiene_asistencias': tiene_asistencias,
+                    'tiene_fallas': tiene_fallas,
+                    'tiene_llamadas': tiene_llamadas,
+                    'tiene_pedidos': tiene_pedidos,
+                    'tiene_auditorias': tiene_auditorias,
+                }
+            )
+            messages.warning(request, f'El usuario {usuario.get_nombre_completo()} tiene registros relacionados. Se ha desactivado en lugar de eliminar.')
+            return redirect('usuarios')
+        else:
+            # Eliminar si no tiene registros
+            nombre_completo = usuario.get_nombre_completo()
+            usuario_nombre = f"{usuario.nombre} {usuario.apellido}"
+            # Registrar auditoría antes de eliminar
+            from .utils import registrar_auditoria
+            registrar_auditoria(
+                usuario=request.user,
+                accion='usuario_delete',
+                modulo='usuarios',
+                descripcion=f'Usuario "{nombre_completo}" eliminado',
+                objeto_afectado=usuario_nombre,
+                detalles={
+                    'username': usuario.username,
+                    'rut': usuario.rut,
+                    'correo_institucional': usuario.correo_institucional,
+                }
+            )
+            usuario.delete()
+            messages.success(request, f'Usuario {nombre_completo} eliminado exitosamente.')
+            return redirect('usuarios')
+    
+    # Preparar información sobre los registros
+    registros_info = []
+    if tiene_asistencias:
+        count = usuario.asistencias.count()
+        registros_info.append(f'{count} registro(s) de asistencia')
+    if tiene_fallas:
+        count = usuario.fallas_registradas.count()
+        registros_info.append(f'{count} registro(s) de fallas')
+    if tiene_llamadas:
+        count = usuario.llamadas_registradas.count()
+        registros_info.append(f'{count} registro(s) de llamadas')
+    if tiene_pedidos:
+        count = usuario.pedidos_creados.count()
+        registros_info.append(f'{count} pedido(s)')
+    if tiene_auditorias:
+        count = usuario.auditorias.count()
+        registros_info.append(f'{count} registro(s) de auditoría')
+    
+    return render(request, 'core/eliminar_usuario.html', {
+        'usuario': usuario,
+        'tiene_registros': tiene_registros,
+        'registros_info': registros_info
+    })
 
 
 @login_required
@@ -217,8 +365,143 @@ def inventario_view(request):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
         return redirect('panel')
     
-    inventarios = Inventario.objects.all().order_by('-fecha_actualizacion')
-    return render(request, 'core/inventario.html', {'inventarios': inventarios})
+    # Organizar productos por categoría
+    bodega = Inventario.objects.filter(categoria='bodega').order_by('nombre')
+    meson = Inventario.objects.filter(categoria='meson').order_by('nombre')
+    limpieza = Inventario.objects.filter(categoria='limpieza').order_by('nombre')
+    
+    context = {
+        'bodega': bodega,
+        'meson': meson,
+        'limpieza': limpieza,
+    }
+    
+    return render(request, 'core/inventario.html', context)
+
+
+@login_required
+def crear_inventario_view(request):
+    """Vista para crear productos de inventario"""
+    if request.user.rol == 'usuario' and request.user.cambio_password_requerido:
+        return redirect('cambiar_password')
+    if not (request.user.es_administrador() or request.user.is_superuser):
+        messages.error(request, 'No tienes permisos para acceder a esta sección')
+        return redirect('panel')
+    
+    form = CrearInventarioForm()
+    
+    if request.method == 'POST':
+        form = CrearInventarioForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                producto = form.save()
+                messages.success(request, f'Producto "{producto.nombre}" creado exitosamente.')
+                return redirect('inventario')
+            except Exception as e:
+                messages.error(request, f'Error al crear el producto: {str(e)}')
+        else:
+            messages.error(request, 'Por favor, corrige los errores en el formulario.')
+    
+    return render(request, 'core/crear_inventario.html', {'form': form})
+
+
+@login_required
+def editar_inventario_view(request, producto_id):
+    """Vista para editar un producto de inventario"""
+    if request.user.rol == 'usuario' and request.user.cambio_password_requerido:
+        return redirect('cambiar_password')
+    if not (request.user.es_administrador() or request.user.is_superuser):
+        messages.error(request, 'No tienes permisos para acceder a esta sección')
+        return redirect('panel')
+    
+    try:
+        producto = Inventario.objects.get(id=producto_id)
+    except Inventario.DoesNotExist:
+        messages.error(request, "El producto no existe.")
+        return redirect('inventario')
+    
+    if request.method == 'POST':
+        form = EditarInventarioForm(request.POST, request.FILES, instance=producto)
+        if form.is_valid():
+            # Guardar datos anteriores para auditoría
+            datos_anteriores = {
+                'nombre': producto.nombre,
+                'categoria': producto.categoria,
+                'cantidad': producto.cantidad,
+            }
+            form.save()
+            producto.refresh_from_db()
+            # Registrar auditoría
+            from .utils import registrar_auditoria
+            detalles = {
+                'datos_anteriores': datos_anteriores,
+                'datos_nuevos': {
+                    'nombre': producto.nombre,
+                    'categoria': producto.categoria,
+                    'cantidad': producto.cantidad,
+                }
+            }
+            registrar_auditoria(
+                usuario=request.user,
+                accion='inventario_edit',
+                modulo='inventario',
+                descripcion=f'Producto "{producto.nombre}" modificado',
+                objeto_afectado=producto.nombre,
+                detalles=detalles
+            )
+            messages.success(request, f'Producto "{producto.nombre}" actualizado correctamente.')
+            return redirect('inventario')
+        else:
+            messages.error(request, 'Por favor, corrige los errores en el formulario.')
+    else:
+        form = EditarInventarioForm(instance=producto)
+    
+    return render(request, 'core/editar_inventario.html', {
+        'form': form,
+        'producto': producto
+    })
+
+
+@login_required
+def eliminar_inventario_view(request, producto_id):
+    """Vista para eliminar un producto de inventario"""
+    if request.user.rol == 'usuario' and request.user.cambio_password_requerido:
+        return redirect('cambiar_password')
+    if not (request.user.es_administrador() or request.user.is_superuser):
+        messages.error(request, 'No tienes permisos para acceder a esta sección')
+        return redirect('panel')
+    
+    try:
+        producto = Inventario.objects.get(id=producto_id)
+    except Inventario.DoesNotExist:
+        messages.error(request, "El producto no existe.")
+        return redirect('inventario')
+    
+    if request.method == 'POST':
+        nombre_producto = producto.nombre
+        categoria_producto = producto.categoria
+        cantidad_producto = producto.cantidad
+        # Registrar auditoría antes de eliminar
+        from .utils import registrar_auditoria
+        registrar_auditoria(
+            usuario=request.user,
+            accion='inventario_delete',
+            modulo='inventario',
+            descripcion=f'Producto "{nombre_producto}" eliminado',
+            objeto_afectado=nombre_producto,
+            detalles={
+                'categoria': categoria_producto,
+                'cantidad': cantidad_producto,
+            }
+        )
+        # Eliminar la imagen si existe
+        if producto.imagen:
+            producto.imagen.delete()
+        producto.delete()
+        messages.success(request, f'Producto "{nombre_producto}" eliminado exitosamente.')
+        return redirect('inventario')
+    
+    return render(request, 'core/eliminar_inventario.html', {'producto': producto})
 
 
 @login_required
@@ -231,8 +514,140 @@ def ventas_pedidos_view(request):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
         return redirect('panel')
     
-    # Por ahora, renderizar una página básica
-    return render(request, 'core/ventas_pedidos.html')
+    pedidos = Pedido.objects.all().order_by('-fecha_creacion')
+    return render(request, 'core/ventas_pedidos.html', {'pedidos': pedidos})
+
+
+@login_required
+def crear_pedido_view(request):
+    """Vista para crear un nuevo pedido"""
+    if request.user.rol == 'usuario' and request.user.cambio_password_requerido:
+        return redirect('cambiar_password')
+    if not (request.user.es_administrador() or request.user.is_superuser):
+        messages.error(request, 'No tienes permisos para acceder a esta sección')
+        return redirect('panel')
+    
+    if request.method == 'POST':
+        form = CrearPedidoForm(request.POST)
+        productos_data = json.loads(request.POST.get('productos', '[]'))
+        
+        if form.is_valid() and productos_data:
+            pedido = form.save(commit=False)
+            pedido.usuario_creacion = request.user
+            pedido.save()
+            
+            # Crear los detalles del pedido
+            for producto in productos_data:
+                DetallePedido.objects.create(
+                    pedido=pedido,
+                    producto_nombre=producto.get('nombre', ''),
+                    cantidad=producto.get('cantidad', 0)
+                )
+            
+            messages.success(request, f'Pedido "{pedido.nombre}" creado exitosamente.')
+            return redirect('ventas_pedidos')
+        else:
+            if not productos_data:
+                messages.error(request, 'Debe agregar al menos un producto al pedido.')
+    else:
+        form = CrearPedidoForm()
+    
+    return render(request, 'core/crear_pedido.html', {'form': form})
+
+
+@login_required
+def exportar_pedido_excel(request, pedido_id):
+    """Vista para exportar un pedido a Excel"""
+    if request.user.rol == 'usuario' and request.user.cambio_password_requerido:
+        return redirect('cambiar_password')
+    if not (request.user.es_administrador() or request.user.is_superuser):
+        messages.error(request, 'No tienes permisos para acceder a esta sección')
+        return redirect('panel')
+    
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, Alignment, PatternFill
+    except ImportError:
+        messages.error(request, 'La librería openpyxl no está instalada.')
+        return redirect('ventas_pedidos')
+    
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    detalles = pedido.detalles.all()
+    
+    # Crear un libro de trabajo Excel
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Pedido"
+    
+    # Estilos
+    header_fill = PatternFill(start_color="B08968", end_color="B08968", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF", size=12)
+    title_font = Font(bold=True, size=14)
+    
+    # Encabezado
+    ws['A1'] = "PEDIDO"
+    ws['A1'].font = title_font
+    ws.merge_cells('A1:C1')
+    
+    ws['A2'] = f"Nombre: {pedido.nombre}"
+    ws['A3'] = f"Fecha: {pedido.fecha_creacion.strftime('%d/%m/%Y %H:%M')}"
+    ws['A4'] = f"Usuario: {pedido.usuario_creacion.get_nombre_completo() if pedido.usuario_creacion else 'N/A'}"
+    
+    if pedido.observaciones:
+        ws['A5'] = f"Observaciones: {pedido.observaciones}"
+    
+    # Encabezados de tabla
+    ws['A7'] = "Nombre del Producto"
+    ws['B7'] = "Cantidad"
+    ws['C7'] = "Total"
+    
+    for cell in ['A7', 'B7', 'C7']:
+        ws[cell].fill = header_fill
+        ws[cell].font = header_font
+        ws[cell].alignment = Alignment(horizontal='center', vertical='center')
+    
+    # Datos
+    row = 8
+    for detalle in detalles:
+        ws[f'A{row}'] = detalle.producto_nombre
+        ws[f'B{row}'] = detalle.cantidad
+        ws[f'C{row}'] = detalle.cantidad  # Por ahora solo cantidad, puede expandirse
+        row += 1
+    
+    # Ajustar ancho de columnas
+    ws.column_dimensions['A'].width = 40
+    ws.column_dimensions['B'].width = 15
+    ws.column_dimensions['C'].width = 15
+    
+    # Respuesta HTTP con el archivo Excel
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    nombre_archivo = f"Pedido_{pedido.nombre.replace(' ', '_')}_{pedido.fecha_creacion.strftime('%Y%m%d')}.xlsx"
+    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+    
+    wb.save(response)
+    return response
+
+
+@login_required
+def eliminar_pedido_view(request, pedido_id):
+    """Vista para eliminar un pedido"""
+    if request.user.rol == 'usuario' and request.user.cambio_password_requerido:
+        return redirect('cambiar_password')
+    if not (request.user.es_administrador() or request.user.is_superuser):
+        messages.error(request, 'No tienes permisos para acceder a esta sección')
+        return redirect('panel')
+    
+    pedido = get_object_or_404(Pedido, id=pedido_id)
+    
+    if request.method == 'POST':
+        nombre_pedido = pedido.nombre
+        pedido.delete()
+        messages.success(request, f'Pedido "{nombre_pedido}" eliminado exitosamente.')
+        return redirect('ventas_pedidos')
+    
+    return render(request, 'core/eliminar_pedido.html', {'pedido': pedido})
 
 
 @login_required
@@ -325,6 +740,20 @@ def crear_falla_view(request):
             falla.contador_falla = (ultimo_contador or 0) + 1
             falla.usuario_registro = request.user
             falla.save()
+            # Registrar auditoría
+            from .utils import registrar_auditoria
+            registrar_auditoria(
+                usuario=request.user,
+                accion='falla_create',
+                modulo='operaciones',
+                descripcion=f'Falla #{falla.contador_falla} registrada: {falla.maquina}',
+                objeto_afectado=f"Falla #{falla.contador_falla}",
+                detalles={
+                    'contador_falla': falla.contador_falla,
+                    'maquina': falla.maquina,
+                    'fecha': str(falla.fecha),
+                }
+            )
             messages.success(request, f'Falla #{falla.contador_falla} registrada exitosamente.')
             return redirect('operaciones')
     else:
@@ -353,6 +782,21 @@ def crear_llamada_view(request):
             llamada.contador_llamada = (ultimo_contador or 0) + 1
             llamada.usuario_registro = request.user
             llamada.save()
+            # Registrar auditoría
+            from .utils import registrar_auditoria
+            registrar_auditoria(
+                usuario=request.user,
+                accion='llamada_create',
+                modulo='operaciones',
+                descripcion=f'Llamada #{llamada.contador_llamada} registrada: {llamada.motivo}',
+                objeto_afectado=f"Llamada #{llamada.contador_llamada}",
+                detalles={
+                    'contador_llamada': llamada.contador_llamada,
+                    'motivo': llamada.motivo,
+                    'tecnico_contactado': llamada.tecnico_contactado,
+                    'fecha': str(llamada.fecha),
+                }
+            )
             messages.success(request, f'Llamada #{llamada.contador_llamada} registrada exitosamente.')
             return redirect('operaciones')
     else:
@@ -376,6 +820,20 @@ def editar_falla_view(request, falla_id):
         form = RegistroFallaForm(request.POST, instance=falla)
         if form.is_valid():
             form.save()
+            # Registrar auditoría
+            from .utils import registrar_auditoria
+            registrar_auditoria(
+                usuario=request.user,
+                accion='falla_edit',
+                modulo='operaciones',
+                descripcion=f'Falla #{falla.contador_falla} modificada: {falla.maquina}',
+                objeto_afectado=f"Falla #{falla.contador_falla}",
+                detalles={
+                    'contador_falla': falla.contador_falla,
+                    'maquina': falla.maquina,
+                    'fecha': str(falla.fecha),
+                }
+            )
             messages.success(request, f'Falla #{falla.contador_falla} actualizada exitosamente.')
             return redirect('operaciones')
     else:
@@ -397,7 +855,23 @@ def eliminar_falla_view(request, falla_id):
     
     if request.method == 'POST':
         contador = falla.contador_falla
+        maquina = falla.maquina
+        fecha = str(falla.fecha)
         falla.delete()
+        # Registrar auditoría
+        from .utils import registrar_auditoria
+        registrar_auditoria(
+            usuario=request.user,
+            accion='falla_delete',
+            modulo='operaciones',
+                descripcion=f'Falla #{contador} eliminada: {maquina}',
+            objeto_afectado=f"Falla #{contador}",
+            detalles={
+                'contador_falla': contador,
+                'maquina': maquina,
+                'fecha': fecha,
+            }
+        )
         messages.success(request, f'Falla #{contador} eliminada exitosamente.')
         return redirect('operaciones')
     
@@ -419,6 +893,21 @@ def editar_llamada_view(request, llamada_id):
         form = RegistroLlamadaForm(request.POST, instance=llamada)
         if form.is_valid():
             form.save()
+            # Registrar auditoría
+            from .utils import registrar_auditoria
+            registrar_auditoria(
+                usuario=request.user,
+                accion='llamada_edit',
+                modulo='operaciones',
+                descripcion=f'Llamada #{llamada.contador_llamada} modificada: {llamada.motivo}',
+                objeto_afectado=f"Llamada #{llamada.contador_llamada}",
+                detalles={
+                    'contador_llamada': llamada.contador_llamada,
+                    'motivo': llamada.motivo,
+                    'tecnico_contactado': llamada.tecnico_contactado,
+                    'fecha': str(llamada.fecha),
+                }
+            )
             messages.success(request, f'Llamada #{llamada.contador_llamada} actualizada exitosamente.')
             return redirect('operaciones')
     else:
@@ -440,7 +929,25 @@ def eliminar_llamada_view(request, llamada_id):
     
     if request.method == 'POST':
         contador = llamada.contador_llamada
+        motivo = llamada.motivo
+        tecnico = llamada.tecnico_contactado
+        fecha = str(llamada.fecha)
         llamada.delete()
+        # Registrar auditoría
+        from .utils import registrar_auditoria
+        registrar_auditoria(
+            usuario=request.user,
+            accion='llamada_delete',
+            modulo='operaciones',
+                descripcion=f'Llamada #{contador} eliminada: {motivo}',
+            objeto_afectado=f"Llamada #{contador}",
+            detalles={
+                'contador_llamada': contador,
+                'motivo': motivo,
+                'tecnico_contactado': tecnico,
+                'fecha': fecha,
+            }
+        )
         messages.success(request, f'Llamada #{contador} eliminada exitosamente.')
         return redirect('operaciones')
     
@@ -540,7 +1047,23 @@ def editar_asistencia_view(request, asistencia_id):
     if request.method == 'POST':
         form = EditarAsistenciaForm(request.POST, instance=asistencia)
         if form.is_valid():
+            usuario_nombre = asistencia.usuario.get_nombre_completo() if asistencia.usuario else 'Usuario Anónimo'
+            usuario_nombre_completo = f"{asistencia.usuario.nombre} {asistencia.usuario.apellido}" if asistencia.usuario else 'Usuario Anónimo'
             form.save()
+            # Registrar auditoría
+            from .utils import registrar_auditoria
+            registrar_auditoria(
+                usuario=request.user,
+                accion='asistencia_edit',
+                modulo='asistencia',
+                descripcion=f'Asistencia modificada de {usuario_nombre} - Fecha: {asistencia.fecha}, Turno: {asistencia.get_turno_display()}',
+                objeto_afectado=usuario_nombre_completo,
+                detalles={
+                    'usuario': usuario_nombre,
+                    'fecha': str(asistencia.fecha),
+                    'turno': asistencia.turno,
+                }
+            )
             messages.success(request, 'Registro de asistencia actualizado exitosamente.')
             return redirect('asistencia')
     else:
@@ -562,8 +1085,26 @@ def eliminar_asistencia_view(request, asistencia_id):
     asistencia = get_object_or_404(Asistencia, id=asistencia_id)
     
     if request.method == 'POST':
-        usuario_nombre = asistencia.usuario.nombre or asistencia.usuario.username
+        usuario_nombre = asistencia.usuario.get_nombre_completo() if asistencia.usuario else 'Usuario Anónimo'
+        usuario_nombre_completo = f"{asistencia.usuario.nombre} {asistencia.usuario.apellido}" if asistencia.usuario else 'Usuario Anónimo'
+        fecha = str(asistencia.fecha)
+        turno = asistencia.turno
+        turno_display = asistencia.get_turno_display()
         asistencia.delete()
+        # Registrar auditoría
+        from .utils import registrar_auditoria
+        registrar_auditoria(
+            usuario=request.user,
+            accion='asistencia_delete',
+            modulo='asistencia',
+                descripcion=f'Asistencia eliminada de {usuario_nombre} - Fecha: {fecha}, Turno: {turno_display}',
+            objeto_afectado=usuario_nombre_completo,
+            detalles={
+                'usuario': usuario_nombre,
+                'fecha': fecha,
+                'turno': turno,
+            }
+        )
         messages.success(request, f'Registro de asistencia de {usuario_nombre} eliminado exitosamente.')
         return redirect('asistencia')
     
@@ -577,6 +1118,9 @@ def index_view(request):
 
 def contactanos_view(request):
     """Vista para la página de contáctanos"""
+    # Verificar si el usuario está autenticado
+    usuario_autenticado = request.user.is_authenticated
+    
     # Lista de contactos de gerencia (5 contactos)
     contactos = [
         {
@@ -598,19 +1142,39 @@ def contactanos_view(request):
             'telefono': '+56 9 XXXX XXXX',
         },
         {
-            'nombre': 'Gerente Comercial',
-            'cargo': 'Gerente Comercial',
-            'email': 'comercial@popupnescafe.cl',
+            'nombre': 'Gerente de Marketing',
+            'cargo': 'Gerente de Marketing',
+            'email': 'marketing@popupnescafe.cl',
             'telefono': '+56 9 XXXX XXXX',
         },
         {
-            'nombre': 'Gerente Administrativo',
-            'cargo': 'Gerente Administrativo',
-            'email': 'administracion@popupnescafe.cl',
+            'nombre': 'Gerente de Finanzas',
+            'cargo': 'Gerente de Finanzas',
+            'email': 'finanzas@popupnescafe.cl',
             'telefono': '+56 9 XXXX XXXX',
         },
     ]
-    return render(request, 'core/contactanos.html', {'contactos': contactos})
+    return render(request, 'core/contactanos.html', {
+        'contactos': contactos,
+        'usuario_autenticado': usuario_autenticado
+    })
+
+
+@login_required
+def trabajador_dashboard_view(request):
+    """Dashboard principal para usuarios trabajadores"""
+    # Solo usuarios trabajadores pueden acceder
+    if request.user.rol != 'usuario':
+        messages.error(request, 'No tienes permisos para acceder a esta sección')
+        return redirect('panel')
+    
+    # Si el usuario necesita cambiar su contraseña, redirigir primero
+    if request.user.cambio_password_requerido:
+        return redirect('cambiar_password')
+    
+    return render(request, 'core/trabajador_dashboard.html', {
+        'usuario': request.user
+    })
 
 
 @login_required
@@ -656,9 +1220,8 @@ def registro_asistencia_view(request):
                 
                 if asistencia_existente:
                     messages.warning(request, f'Ya se registró asistencia para hoy. Tu turno registrado es: {asistencia_existente.get_turno_display()}')
-                    # Cerrar sesión y redirigir al index
-                    logout(request)
-                    return redirect('index')
+                    # Redirigir al dashboard del trabajador
+                    return redirect('trabajador_dashboard')
                 else:
                     # Crear nuevo registro de asistencia
                     # fecha_registro se guarda automáticamente con la fecha y hora exacta del registro (GMT-3 Chile)
@@ -673,9 +1236,8 @@ def registro_asistencia_view(request):
                         fecha_registro=fecha_registro_chile  # Fecha y hora exacta del registro en horario chileno GMT-3
                     )
                     messages.success(request, f'Asistencia registrada exitosamente. Turno: {asistencia.get_turno_display()}')
-                    # Cerrar sesión y redirigir al index
-                    logout(request)
-                    return redirect('index')
+                    # Redirigir al dashboard del trabajador
+                    return redirect('trabajador_dashboard')
                 
             except Exception as e:
                 messages.error(request, f'Error al registrar asistencia: {str(e)}')
@@ -689,4 +1251,148 @@ def registro_asistencia_view(request):
         'usuario': request.user,
         'fecha_actual': fecha_actual
     })
+
+
+@login_required
+def cambiar_stock_view(request):
+    """Vista para que trabajadores cambien el stock de productos"""
+    # Solo usuarios trabajadores pueden cambiar stock
+    if request.user.rol != 'usuario':
+        messages.error(request, 'Solo los usuarios trabajadores pueden cambiar el stock')
+        return redirect('panel')
+    
+    # Si el usuario necesita cambiar su contraseña, redirigir primero
+    if request.user.cambio_password_requerido:
+        return redirect('cambiar_password')
+    
+    # Obtener todos los productos
+    productos = Inventario.objects.all().order_by('categoria', 'nombre')
+    
+    # Organizar productos por categoría
+    bodega = productos.filter(categoria='bodega')
+    meson = productos.filter(categoria='meson')
+    limpieza = productos.filter(categoria='limpieza')
+    
+    return render(request, 'core/cambiar_stock.html', {
+        'bodega': bodega,
+        'meson': meson,
+        'limpieza': limpieza,
+        'usuario': request.user
+    })
+
+
+@login_required
+def actualizar_stock_view(request, producto_id):
+    """Vista para actualizar el stock de un producto específico (solo trabajadores)"""
+    # Solo usuarios trabajadores pueden cambiar stock
+    if request.user.rol != 'usuario':
+        messages.error(request, 'Solo los usuarios trabajadores pueden cambiar el stock')
+        return redirect('panel')
+    
+    # Si el usuario necesita cambiar su contraseña, redirigir primero
+    if request.user.cambio_password_requerido:
+        return redirect('cambiar_password')
+    
+    try:
+        producto = Inventario.objects.get(id=producto_id)
+    except Inventario.DoesNotExist:
+        messages.error(request, 'Producto no encontrado')
+        return redirect('cambiar_stock')
+    
+    form = CambiarStockForm(initial={'cantidad': producto.cantidad})
+    
+    if request.method == 'POST':
+        form = CambiarStockForm(request.POST)
+        if form.is_valid():
+            cantidad_anterior = producto.cantidad
+            nueva_cantidad = form.cleaned_data['cantidad']
+            producto.cantidad = nueva_cantidad
+            producto.save()
+            # Registrar auditoría de cambio de stock
+            from .utils import registrar_auditoria
+            registrar_auditoria(
+                usuario=request.user,
+                accion='inventario_stock_change',
+                modulo='inventario',
+                descripcion=f'Stock de "{producto.nombre}" cambió de {cantidad_anterior} a {nueva_cantidad} unidades',
+                objeto_afectado=producto.nombre,
+                detalles={
+                    'cantidad_anterior': cantidad_anterior,
+                    'cantidad_nueva': nueva_cantidad,
+                    'diferencia': nueva_cantidad - cantidad_anterior,
+                    'categoria': producto.categoria,
+                }
+            )
+            messages.success(request, f'Stock de "{producto.nombre}" actualizado a {nueva_cantidad} unidades')
+            return redirect('cambiar_stock')
+    
+    return render(request, 'core/actualizar_stock.html', {
+        'producto': producto,
+        'form': form,
+        'usuario': request.user
+    })
+
+
+@login_required
+def auditoria_view(request):
+    """Vista para ver los registros de auditoría"""
+    # Solo administradores pueden ver la auditoría
+    if not (request.user.es_administrador() or request.user.is_superuser):
+        messages.error(request, 'No tienes permisos para acceder a esta sección')
+        return redirect('panel')
+    
+    # Obtener todos los registros de auditoría
+    registros = Auditoria.objects.all().select_related('usuario')
+    
+    # Filtros
+    modulo_filter = request.GET.get('modulo', '')
+    accion_filter = request.GET.get('accion', '')
+    usuario_filter = request.GET.get('usuario', '')
+    fecha_desde = request.GET.get('fecha_desde', '')
+    fecha_hasta = request.GET.get('fecha_hasta', '')
+    search_query = request.GET.get('search', '')
+    
+    # Aplicar filtros
+    if modulo_filter:
+        registros = registros.filter(modulo=modulo_filter)
+    if accion_filter:
+        registros = registros.filter(accion=accion_filter)
+    if usuario_filter:
+        registros = registros.filter(usuario_id=usuario_filter)
+    if fecha_desde:
+        registros = registros.filter(fecha_hora__date__gte=fecha_desde)
+    if fecha_hasta:
+        registros = registros.filter(fecha_hora__date__lte=fecha_hasta)
+    if search_query:
+        registros = registros.filter(
+            Q(descripcion__icontains=search_query) |
+            Q(objeto_afectado__icontains=search_query) |
+            Q(usuario__username__icontains=search_query) |
+            Q(usuario__nombre__icontains=search_query) |
+            Q(usuario__apellido__icontains=search_query)
+        )
+    
+    # Ordenar por fecha más reciente
+    registros = registros.order_by('-fecha_hora')
+    
+    # Paginación (opcional, por ahora mostramos todos)
+    # registros = registros[:100]  # Limitar a los últimos 100 registros
+    
+    # Obtener opciones para los filtros
+    usuarios = Usuario.objects.all().order_by('username')
+    
+    context = {
+        'registros': registros,
+        'usuarios': usuarios,
+        'modulos': Auditoria.MODULO_CHOICES,
+        'acciones': Auditoria.ACCION_CHOICES,
+        'modulo_filter': modulo_filter,
+        'accion_filter': accion_filter,
+        'usuario_filter': usuario_filter,
+        'fecha_desde': fecha_desde,
+        'fecha_hasta': fecha_hasta,
+        'search_query': search_query,
+    }
+    
+    return render(request, 'core/auditoria.html', context)
 

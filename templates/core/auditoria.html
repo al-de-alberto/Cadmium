@@ -1,0 +1,304 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Auditoría - Cadmium{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{% url 'index' %}" class="navbar-brand">
+        <div class="navbar-logo">C</div>
+        <div>
+            <span>Cadmium</span>
+            <span class="tagline">Crea tu mundo</span>
+        </div>
+    </a>
+    <div class="navbar-nav">
+        <div class="dropdown">
+            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
+                <span class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </a>
+            <div class="dropdown-menu">
+                <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                {% if user.es_administrador or user.is_superuser %}
+                    <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
+                {% elif user.rol == 'usuario' %}
+                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                {% endif %}
+                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
+                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a><a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    function toggleDropdown(event) {
+        event.preventDefault();
+        const dropdown = event.currentTarget.closest('.dropdown');
+        dropdown.classList.toggle('active');
+    }
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+</script>
+
+<div class="admin-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'index' %}" style="text-decoration: none; color: inherit;">
+                <h2>Cadmium</h2>
+            </a>
+            <p>Panel de Administración</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'panel' %}" class="nav-item {% if request.resolver_match.url_name == 'panel' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'usuarios' %}" class="nav-item {% if request.resolver_match.url_name == 'usuarios' %}active{% endif %}">
+                <span class="nav-icon">👥</span>
+                <span>Usuarios</span>
+            </a>
+            <a href="{% url 'inventario' %}" class="nav-item {% if request.resolver_match.url_name == 'inventario' %}active{% endif %}">
+                <span class="nav-icon">📦</span>
+                <span>Inventario</span>
+            </a>
+            <a href="{% url 'ventas_pedidos' %}" class="nav-item {% if request.resolver_match.url_name == 'ventas_pedidos' %}active{% endif %}">
+                <span class="nav-icon">💰</span>
+                <span>Ventas y Pedidos</span>
+            </a>
+            <a href="{% url 'asistencia' %}" class="nav-item {% if request.resolver_match.url_name == 'asistencia' %}active{% endif %}">
+                <span class="nav-icon">📅</span>
+                <span>Asistencia</span>
+            </a>
+            <a href="{% url 'deliverys' %}" class="nav-item {% if request.resolver_match.url_name == 'deliverys' %}active{% endif %}">
+                <span class="nav-icon">🚚</span>
+                <span>Delivery</span>
+            </a>
+            <a href="{% url 'operaciones' %}" class="nav-item {% if request.resolver_match.url_name == 'operaciones' %}active{% endif %}">
+                <span class="nav-icon">⚙️</span>
+                <span>Operaciones</span>
+            </a>
+            <a href="{% url 'auditoria' %}" class="nav-item {% if request.resolver_match.url_name == 'auditoria' %}active{% endif %}">
+                <span class="nav-icon">📋</span>
+                <span>Auditoría</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <p><strong>{{ user.username }}</strong></p>
+                <p class="user-role">{{ user.get_rol_display }}</p>
+            </div>
+        </div>
+    </aside>
+    
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Registros de Auditoría</h1>
+            <div class="header-actions">
+                <a href="{% url 'panel' %}" class="btn btn-secondary">← Volver</a>
+            </div>
+        </header>
+        
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Filtros -->
+        <div class="filters-container" style="margin-bottom: 40px;">
+            <form method="get" class="filters-form">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="search">Buscar:</label>
+                        <input type="text" name="search" id="search" value="{{ search_query }}" placeholder="Buscar por descripción, usuario...">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="modulo">Módulo:</label>
+                        <select name="modulo" id="modulo">
+                            <option value="">Todos</option>
+                            {% for value, label in modulos %}
+                                <option value="{{ value }}" {% if modulo_filter == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="accion">Acción:</label>
+                        <select name="accion" id="accion">
+                            <option value="">Todas</option>
+                            {% for value, label in acciones %}
+                                <option value="{{ value }}" {% if accion_filter == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="usuario">Usuario:</label>
+                        <select name="usuario" id="usuario">
+                            <option value="">Todos</option>
+                            {% for usuario in usuarios %}
+                                <option value="{{ usuario.id }}" {% if usuario_filter == usuario.id|stringformat:"s" %}selected{% endif %}>{{ usuario.get_nombre_completo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="fecha_desde">Fecha Desde:</label>
+                        <input type="date" name="fecha_desde" id="fecha_desde" value="{{ fecha_desde }}">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="fecha_hasta">Fecha Hasta:</label>
+                        <input type="date" name="fecha_hasta" id="fecha_hasta" value="{{ fecha_hasta }}">
+                    </div>
+                    
+                    <div class="filter-group" style="display: flex; align-items: flex-end; gap: 10px;">
+                        <button type="submit" class="btn btn-primary">Filtrar</button>
+                        <a href="{% url 'auditoria' %}" class="btn btn-secondary">Limpiar</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Tabla de registros -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha y Hora</th>
+                                <th>Usuario</th>
+                                <th>Módulo</th>
+                                <th>Acción</th>
+                                <th>Descripción</th>
+                                <th>Objeto Afectado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for registro in registros %}
+                            <tr>
+                                <td>{{ registro.fecha_hora|date:"d/m/Y H:i:s" }}</td>
+                                <td>
+                                    {% if registro.usuario %}
+                                        {{ registro.usuario.get_nombre_completo }}
+                                    {% else %}
+                                        <span style="color: var(--text-secondary); font-style: italic;">Anónimo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge badge-modulo-{{ registro.modulo }}">
+                                        {{ registro.get_modulo_display }}
+                                    </span>
+                                </td>
+                                <td>{{ registro.get_accion_display }}</td>
+                                <td style="text-align: center;">
+                                    {% if 'create' in registro.accion or registro.accion == 'usuario_create' or registro.accion == 'inventario_create' or registro.accion == 'asistencia_create' or registro.accion == 'pedido_create' or registro.accion == 'falla_create' or registro.accion == 'llamada_create' %}
+                                        <span class="badge badge-accion-creado">Creado</span>
+                                    {% elif 'delete' in registro.accion or registro.accion == 'usuario_delete' or registro.accion == 'inventario_delete' or registro.accion == 'asistencia_delete' or registro.accion == 'pedido_delete' or registro.accion == 'falla_delete' or registro.accion == 'llamada_delete' %}
+                                        <span class="badge badge-accion-eliminado">Eliminado</span>
+                                    {% elif 'edit' in registro.accion or registro.accion == 'usuario_edit' or registro.accion == 'inventario_edit' or registro.accion == 'asistencia_edit' or registro.accion == 'pedido_edit' or registro.accion == 'falla_edit' or registro.accion == 'llamada_edit' or 'stock_change' in registro.accion or 'password_change' in registro.accion %}
+                                        <span class="badge badge-accion-modificado">Modificado</span>
+                                    {% else %}
+                                        <span class="badge badge-accion-otro">{{ registro.get_accion_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ registro.objeto_afectado|default:"-" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                                    <p>No se encontraron registros de auditoría.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+.badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.badge-modulo-sesion {
+    background-color: #E3F2FD;
+    color: #1976D2;
+}
+
+.badge-modulo-usuarios {
+    background-color: #F3E5F5;
+    color: #7B1FA2;
+}
+
+.badge-modulo-inventario {
+    background-color: #FFF3E0;
+    color: #F57C00;
+}
+
+.badge-modulo-asistencia {
+    background-color: #E8F5E9;
+    color: #388E3C;
+}
+
+.badge-modulo-pedidos {
+    background-color: #FFF8E1;
+    color: #FBC02D;
+}
+
+.badge-modulo-operaciones {
+    background-color: #ECEFF1;
+    color: #455A64;
+}
+
+.badge-accion-creado {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+}
+
+.badge-accion-modificado {
+    background-color: #FFF9C4;
+    color: #F57F17;
+}
+
+.badge-accion-eliminado {
+    background-color: #FFEBEE;
+    color: #C62828;
+}
+
+.badge-accion-otro {
+    background-color: #E3F2FD;
+    color: #1976D2;
+}
+</style>
+{% endblock %}
+

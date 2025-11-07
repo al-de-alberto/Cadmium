@@ -1,0 +1,319 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Actualizar Stock - Cadmium{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<style>
+.stock-update-container {
+    min-height: calc(100vh - 80px);
+    padding: 40px 20px;
+    margin-top: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--bg-color) 0%, var(--card-bg) 100%);
+}
+
+.stock-update-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(46, 42, 39, 0.15);
+    max-width: 600px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.card-header-stock {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #E6B84F 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.card-header-stock h2 {
+    margin: 0 0 10px 0;
+    font-size: 2rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    color: white;
+}
+
+.card-header-stock p {
+    margin: 0;
+    opacity: 0.95;
+    font-size: 1rem;
+}
+
+.producto-preview {
+    background: var(--bg-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.producto-preview img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: white;
+    padding: 10px;
+}
+
+.producto-preview-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+}
+
+.producto-preview-info p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.producto-preview-info .stock-actual {
+    margin-top: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.stock-form {
+    padding: 30px;
+}
+
+.form-group-stock {
+    margin-bottom: 25px;
+}
+
+.form-group-stock label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-group-stock input[type="number"] {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    background: var(--bg-color);
+    color: var(--text-primary);
+}
+
+.form-group-stock input[type="number"]:focus {
+    outline: none;
+    border-color: var(--warning-color);
+    box-shadow: 0 0 0 4px rgba(245, 203, 92, 0.15);
+    background: white;
+}
+
+.form-actions-stock {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn-cancel-stock {
+    padding: 14px 28px;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-cancel-stock:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.15);
+    color: var(--text-primary);
+}
+
+.btn-update-stock {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--warning-color) 0%, #E6B84F 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(245, 203, 92, 0.3);
+}
+
+.btn-update-stock:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 203, 92, 0.5);
+    background: linear-gradient(135deg, #E6B84F 0%, var(--warning-color) 100%);
+}
+
+@media (max-width: 768px) {
+    .stock-update-container {
+        padding: 20px 15px;
+    }
+    
+    .card-header-stock {
+        padding: 20px;
+    }
+    
+    .card-header-stock h2 {
+        font-size: 1.5rem;
+    }
+    
+    .stock-form {
+        padding: 20px;
+    }
+    
+    .producto-preview {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .form-actions-stock {
+        flex-direction: column;
+    }
+    
+    .btn-cancel-stock,
+    .btn-update-stock {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{% url 'index' %}" class="navbar-brand">
+        <div class="navbar-logo">C</div>
+        <div>
+            <span>Cadmium</span>
+            <span class="tagline">Crea tu mundo</span>
+        </div>
+    </a>
+    <div class="navbar-nav">
+        <div class="dropdown">
+            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
+                <span class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </a>
+            <div class="dropdown-menu">
+                <span class="dropdown-item welcome-item">Bienvenido/a {{ usuario.nombre|default:usuario.username }}</span>
+                {% if usuario.es_administrador or usuario.is_superuser %}
+                    <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
+                {% elif usuario.rol == 'usuario' %}
+                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                {% endif %}
+                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
+                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a><a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    function toggleDropdown(event) {
+        event.preventDefault();
+        const dropdown = event.currentTarget.closest('.dropdown');
+        dropdown.classList.toggle('active');
+    }
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+</script>
+
+<div class="stock-update-container">
+    <div class="stock-update-card">
+        <div class="card-header-stock">
+            <h2>Actualizar Stock</h2>
+            <p>Modifica la cantidad del producto</p>
+        </div>
+        
+        <div class="stock-form">
+            <!-- Mensajes -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="producto-preview">
+                {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                {% else %}
+                    <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 8px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#B08968" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        </svg>
+                    </div>
+                {% endif %}
+                <div class="producto-preview-info">
+                    <h3>{{ producto.nombre }}</h3>
+                    <p>{{ producto.get_categoria_display }}</p>
+                    <p class="stock-actual">Stock actual: {{ producto.cantidad }} unidades</p>
+                </div>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group-stock">
+                    <label for="{{ form.cantidad.id_for_label }}">
+                        {{ form.cantidad.label }}
+                    </label>
+                    {{ form.cantidad }}
+                    {% if form.cantidad.errors %}
+                        <div class="form-error">
+                            {% for error in form.cantidad.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-actions-stock">
+                    <a href="{% url 'cambiar_stock' %}" class="btn-cancel-stock">Cancelar</a>
+                    <button type="submit" class="btn-update-stock">Actualizar Stock</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -226,6 +226,22 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom-right-radius: 6px;
 }
 
+.dropdown-item.welcome-item {
+    font-weight: 600;
+    color: var(--primary-color);
+    cursor: default;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 4px;
+    padding-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+.dropdown-item.welcome-item:hover {
+    background-color: transparent;
+    padding-left: 20px;
+    color: var(--primary-color);
+}
+
 .nav-link {
     color: white;
     text-decoration: none;
@@ -646,11 +662,12 @@ body.login-page {
 }
 
 .welcome-text {
-    font-weight: 700;
-    font-size: 1.2rem;
+    font-weight: 600;
+    font-size: 1.3rem;
     color: var(--text-primary);
     font-family: 'Playfair Display', Georgia, serif;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
+    line-height: 1.5;
 }
 
 /* Stats Grid */
@@ -993,6 +1010,30 @@ body.login-page {
     .form-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* Footer Styles */
+.footer {
+    background-color: var(--sidebar-bg);
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+    margin-top: 60px;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+}
+
+.footer p:first-child {
+    margin-bottom: 5px;
 }
 
 

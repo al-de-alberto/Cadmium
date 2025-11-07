@@ -6,45 +6,38 @@ import re
 
 
 def validar_rut_chileno(rut):
-    """Valida el formato de RUT chileno"""
+    """Valida el formato de RUT chileno (solo formato, no dígito verificador matemático)"""
     if not rut:
         return
     
     # Limpiar espacios y convertir a mayúsculas
     rut = rut.strip().upper()
     
-    # Patrón: 12345678-0 o 1234567-8 (8 o 7 dígitos, guion, dígito verificador 0-9 o K)
+    # Remover puntos si existen (formato chileno común: 12.345.678-0)
+    rut = rut.replace('.', '')
+    
+    # Patrón: 12345678-0 o 1234567-8 (7 u 8 dígitos, guion, dígito verificador 0-9 o K)
     patron = r'^\d{7,8}-[0-9K]$'
     if not re.match(patron, rut):
         raise ValidationError('El RUT debe tener el formato 12345678-0 o 1234567-8 (dígito verificador: 0-9 o K)')
     
-    # Validar dígito verificador
+    # Validar que tenga el formato correcto
     rut_parts = rut.split('-')
+    if len(rut_parts) != 2:
+        raise ValidationError('El RUT debe tener el formato 12345678-0 o 1234567-8')
+    
     numero = rut_parts[0]
     dv = rut_parts[1]
     
-    # Calcular dígito verificador
-    suma = 0
-    multiplicador = 2
+    # Verificar que el número tenga entre 7 y 8 dígitos
+    if len(numero) < 7 or len(numero) > 8:
+        raise ValidationError('El RUT debe tener entre 7 y 8 dígitos antes del guion')
     
-    for digito in reversed(numero):
-        suma += int(digito) * multiplicador
-        multiplicador += 1
-        if multiplicador > 7:
-            multiplicador = 2
+    # Verificar que el dígito verificador sea un número (0-9) o K
+    if dv not in '0123456789K':
+        raise ValidationError('El dígito verificador debe ser un número del 0 al 9 o la letra K')
     
-    resto = suma % 11
-    dv_calculado = 11 - resto
-    
-    if dv_calculado == 11:
-        dv_calculado = '0'
-    elif dv_calculado == 10:
-        dv_calculado = 'K'
-    else:
-        dv_calculado = str(dv_calculado)
-    
-    if dv != dv_calculado:
-        raise ValidationError('El dígito verificador del RUT es incorrecto')
+    # No se valida el dígito verificador matemáticamente, solo el formato
 
 
 class Usuario(AbstractUser):
@@ -82,21 +75,28 @@ class Usuario(AbstractUser):
 
 class Inventario(models.Model):
     """Modelo para gestionar el inventario"""
-    nombre = models.CharField(max_length=200)
-    descripcion = models.TextField(blank=True)
-    cantidad = models.IntegerField(default=0)
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    categoria = models.CharField(max_length=100, blank=True)
+    CATEGORIA_CHOICES = [
+        ('bodega', 'Bodega'),
+        ('meson', 'Mesón'),
+        ('limpieza', 'Limpieza'),
+    ]
+    
+    nombre = models.CharField(max_length=200, verbose_name='Nombre del Producto')
+    descripcion = models.TextField(blank=True, verbose_name='Descripción')
+    cantidad = models.IntegerField(default=0, verbose_name='Cantidad')
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name='Precio Unitario')
+    categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES, verbose_name='Categoría')
+    imagen = models.ImageField(upload_to='inventario/', blank=True, null=True, verbose_name='Imagen del Producto')
     fecha_creacion = models.DateTimeField(default=timezone.now)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = 'Inventario'
-        verbose_name_plural = 'Inventarios'
-        ordering = ['-fecha_actualizacion']
+        verbose_name = 'Producto de Inventario'
+        verbose_name_plural = 'Productos de Inventario'
+        ordering = ['categoria', 'nombre']
     
     def __str__(self):
-        return f"{self.nombre} - Cantidad: {self.cantidad}"
+        return f"{self.nombre} ({self.get_categoria_display()}) - Cantidad: {self.cantidad}"
 
 
 class Asistencia(models.Model):
@@ -172,6 +172,100 @@ class RegistroLlamada(models.Model):
     
     def __str__(self):
         return f"Llamada #{self.contador_llamada} - {self.motivo} - {self.fecha}"
+
+
+class Pedido(models.Model):
+    """Modelo para gestionar pedidos"""
+    nombre = models.CharField(max_length=200, verbose_name='Nombre del Pedido')
+    fecha_creacion = models.DateTimeField(default=timezone.now, verbose_name='Fecha de Creación')
+    usuario_creacion = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='pedidos_creados', verbose_name='Usuario que Crea')
+    observaciones = models.TextField(blank=True, verbose_name='Observaciones')
+    
+    class Meta:
+        verbose_name = 'Pedido'
+        verbose_name_plural = 'Pedidos'
+        ordering = ['-fecha_creacion']
+    
+    def __str__(self):
+        return f"Pedido: {self.nombre} - {self.fecha_creacion.strftime('%d/%m/%Y %H:%M')}"
+
+
+class DetallePedido(models.Model):
+    """Modelo para los detalles de un pedido"""
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='detalles', verbose_name='Pedido')
+    producto_nombre = models.CharField(max_length=200, verbose_name='Nombre del Producto')
+    cantidad = models.IntegerField(verbose_name='Cantidad')
+    
+    class Meta:
+        verbose_name = 'Detalle de Pedido'
+        verbose_name_plural = 'Detalles de Pedido'
+        ordering = ['pedido', 'id']
+    
+    def __str__(self):
+        return f"{self.producto_nombre} - Cantidad: {self.cantidad}"
+
+
+class Auditoria(models.Model):
+    """Modelo para registrar todas las acciones del sistema"""
+    ACCION_CHOICES = [
+        ('login', 'Inicio de Sesión'),
+        ('logout', 'Cierre de Sesión'),
+        ('login_failed', 'Intento de Login Fallido'),
+        ('password_change', 'Cambio de Contraseña'),
+        ('usuario_create', 'Creación de Usuario'),
+        ('usuario_edit', 'Edición de Usuario'),
+        ('usuario_delete', 'Eliminación de Usuario'),
+        ('usuario_activate', 'Activación de Usuario'),
+        ('usuario_deactivate', 'Desactivación de Usuario'),
+        ('inventario_create', 'Creación de Producto'),
+        ('inventario_edit', 'Edición de Producto'),
+        ('inventario_delete', 'Eliminación de Producto'),
+        ('inventario_stock_change', 'Cambio de Stock'),
+        ('asistencia_create', 'Registro de Asistencia'),
+        ('asistencia_edit', 'Edición de Asistencia'),
+        ('asistencia_delete', 'Eliminación de Asistencia'),
+        ('pedido_create', 'Creación de Pedido'),
+        ('pedido_delete', 'Eliminación de Pedido'),
+        ('pedido_export', 'Exportación de Pedido'),
+        ('falla_create', 'Registro de Falla'),
+        ('falla_edit', 'Edición de Falla'),
+        ('falla_delete', 'Eliminación de Falla'),
+        ('llamada_create', 'Registro de Llamada'),
+        ('llamada_edit', 'Edición de Llamada'),
+        ('llamada_delete', 'Eliminación de Llamada'),
+    ]
+    
+    MODULO_CHOICES = [
+        ('sesion', 'Sesión'),
+        ('usuarios', 'Usuarios'),
+        ('inventario', 'Inventario'),
+        ('asistencia', 'Asistencia'),
+        ('pedidos', 'Ventas y Pedidos'),
+        ('operaciones', 'Operaciones'),
+    ]
+    
+    usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='auditorias', verbose_name='Usuario')
+    accion = models.CharField(max_length=50, choices=ACCION_CHOICES, verbose_name='Acción')
+    modulo = models.CharField(max_length=50, choices=MODULO_CHOICES, verbose_name='Módulo')
+    descripcion = models.TextField(verbose_name='Descripción')
+    detalles = models.TextField(blank=True, null=True, verbose_name='Detalles Adicionales (JSON)')
+    fecha_hora = models.DateTimeField(default=timezone.now, verbose_name='Fecha y Hora')
+    objeto_afectado = models.CharField(max_length=200, blank=True, null=True, verbose_name='Objeto Afectado')
+    
+    class Meta:
+        verbose_name = 'Registro de Auditoría'
+        verbose_name_plural = 'Registros de Auditoría'
+        ordering = ['-fecha_hora']
+        indexes = [
+            models.Index(fields=['-fecha_hora']),
+            models.Index(fields=['usuario']),
+            models.Index(fields=['modulo']),
+            models.Index(fields=['accion']),
+        ]
+    
+    def __str__(self):
+        usuario_nombre = self.usuario.get_nombre_completo() if self.usuario else 'Usuario Anónimo'
+        return f"{usuario_nombre} - {self.get_accion_display()} - {self.fecha_hora.strftime('%d/%m/%Y %H:%M:%S')}"
 
 
 

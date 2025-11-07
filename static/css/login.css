@@ -1,0 +1,6 @@
+body {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 50%, var(--primary-dark) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+

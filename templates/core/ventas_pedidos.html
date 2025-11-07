@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}Ventas y Pedidos - Cadmium{% endblock %}
 
@@ -13,10 +14,44 @@
         </div>
     </a>
     <div class="navbar-nav">
-        <span class="nav-link welcome-name">Bienvenido/a {{ user.nombre|default:user.username }}</span>
-        <a href="{% url 'logout' %}" class="btn-contactanos">Cerrar Sesión</a>
+        <div class="dropdown">
+            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
+                <span class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </a>
+            <div class="dropdown-menu">
+                <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                {% if user.es_administrador or user.is_superuser %}
+                    <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
+                {% elif user.rol == 'usuario' %}
+                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                {% endif %}
+                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
+                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a><a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                
+            </div>
+        </div>
     </div>
 </nav>
+
+<script>
+    function toggleDropdown(event) {
+        event.preventDefault();
+        const dropdown = event.currentTarget.closest('.dropdown');
+        dropdown.classList.toggle('active');
+    }
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+</script>
 
 <div class="admin-container">
     <aside class="sidebar">
@@ -56,6 +91,10 @@
                 <span class="nav-icon">⚙️</span>
                 <span>Operaciones</span>
             </a>
+            <a href="{% url 'auditoria' %}" class="nav-item {% if request.resolver_match.url_name == 'auditoria' %}active{% endif %}">
+                <span class="nav-icon">📋</span>
+                <span>Auditoría</span>
+            </a>
         </nav>
         
         <div class="sidebar-footer">
@@ -70,20 +109,137 @@
         <header class="content-header">
             <h1>Ventas y Pedidos</h1>
             <div class="header-actions">
+                <a href="{% url 'crear_pedido' %}" class="btn btn-primary">+ Crear Pedido</a>
                 <a href="{% url 'panel' %}" class="btn btn-secondary">← Volver</a>
             </div>
         </header>
         
-        <div class="card">
-            <div class="card-body" style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 4rem; margin-bottom: 20px;">💰</div>
-                <h2 style="color: var(--text-primary); margin-bottom: 15px;">Módulo en Desarrollo</h2>
-                <p style="color: var(--text-secondary); font-size: 1.1rem;">
-                    La sección de Ventas y Pedidos está en desarrollo y estará disponible próximamente.
-                </p>
-            </div>
+        <!-- Mensajes -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nombre del Pedido</th>
+                        <th>Fecha de Creación</th>
+                        <th>Productos</th>
+                        <th>Exportar a Excel</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos %}
+                    <tr>
+                        <td><strong>{{ pedido.nombre }}</strong></td>
+                        <td>{{ pedido.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <span class="badge badge-info">{{ pedido.detalles.count }} producto{{ pedido.detalles.count|pluralize }}</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'exportar_pedido_excel' pedido.id %}" class="btn-action btn-export" title="Exportar a Excel">
+                                    <span class="icon-export">📊</span>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'eliminar_pedido' pedido.id %}" class="btn-action btn-delete" title="Eliminar">
+                                    <span class="icon-delete">🗑️</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay pedidos registrados</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </main>
 </div>
-{% endblock %}
 
+<style>
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-export {
+    background: linear-gradient(135deg, var(--success-color) 0%, #00C5A4 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(0, 168, 150, 0.3);
+}
+
+.btn-export:hover {
+    background: linear-gradient(135deg, #00C5A4 0%, var(--success-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 168, 150, 0.5);
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #E53935 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(198, 40, 40, 0.3);
+}
+
+.btn-delete:hover {
+    background: linear-gradient(135deg, #E53935 0%, var(--danger-color) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(198, 40, 40, 0.5);
+}
+
+.icon-export,
+.icon-delete {
+    display: inline-block;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.data-table th:last-child,
+.data-table td:last-child,
+.data-table th:nth-last-child(2),
+.data-table td:nth-last-child(2) {
+    text-align: center;
+    width: 100px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-info {
+    background: var(--info-color);
+    color: white;
+}
+</style>
+{% endblock %}

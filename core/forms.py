@@ -2,49 +2,42 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
 import re
-from .models import Usuario, Asistencia, RegistroFalla, RegistroLlamada
+from .models import Usuario, Asistencia, RegistroFalla, RegistroLlamada, Inventario, Pedido
 
 
 def validar_rut_chileno_form(rut):
-    """Valida el formato de RUT chileno para formularios"""
+    """Valida el formato de RUT chileno para formularios (solo formato, no dígito verificador matemático)"""
     if not rut:
         return
     
     # Limpiar espacios y convertir a mayúsculas
     rut = rut.strip().upper()
     
-    # Patrón: 12345678-0 o 1234567-8 (8 o 7 dígitos, guion, dígito verificador 0-9 o K)
+    # Remover puntos si existen (formato chileno común: 12.345.678-0)
+    rut = rut.replace('.', '')
+    
+    # Patrón: 12345678-0 o 1234567-8 (7 u 8 dígitos, guion, dígito verificador 0-9 o K)
     patron = r'^\d{7,8}-[0-9K]$'
     if not re.match(patron, rut):
         raise ValidationError('El RUT debe tener el formato 12345678-0 o 1234567-8 (dígito verificador: 0-9 o K)')
     
-    # Validar dígito verificador
+    # Validar que tenga el formato correcto
     rut_parts = rut.split('-')
+    if len(rut_parts) != 2:
+        raise ValidationError('El RUT debe tener el formato 12345678-0 o 1234567-8')
+    
     numero = rut_parts[0]
     dv = rut_parts[1]
     
-    # Calcular dígito verificador
-    suma = 0
-    multiplicador = 2
+    # Verificar que el número tenga entre 7 y 8 dígitos
+    if len(numero) < 7 or len(numero) > 8:
+        raise ValidationError('El RUT debe tener entre 7 y 8 dígitos antes del guion')
     
-    for digito in reversed(numero):
-        suma += int(digito) * multiplicador
-        multiplicador += 1
-        if multiplicador > 7:
-            multiplicador = 2
+    # Verificar que el dígito verificador sea un número (0-9) o K
+    if dv not in '0123456789K':
+        raise ValidationError('El dígito verificador debe ser un número del 0 al 9 o la letra K')
     
-    resto = suma % 11
-    dv_calculado = 11 - resto
-    
-    if dv_calculado == 11:
-        dv_calculado = '0'
-    elif dv_calculado == 10:
-        dv_calculado = 'K'
-    else:
-        dv_calculado = str(dv_calculado)
-    
-    if dv != dv_calculado:
-        raise ValidationError('El dígito verificador del RUT es incorrecto')
+    # No se valida el dígito verificador matemáticamente, solo el formato
 
 
 class CrearUsuarioForm(forms.ModelForm):
@@ -134,7 +127,8 @@ class CrearUsuarioForm(forms.ModelForm):
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
         if rut:
-            rut = rut.strip().upper()
+            # Limpiar y normalizar el RUT
+            rut = rut.strip().upper().replace('.', '')
             # Verificar si el RUT ya existe
             if Usuario.objects.filter(rut=rut).exists():
                 raise ValidationError('Este RUT ya está registrado en el sistema')
@@ -561,4 +555,122 @@ class RegistroLlamadaForm(forms.ModelForm):
             'descripcion': 'Descripción',
             'observaciones': 'Observaciones',
             'fecha': 'Fecha'
+        }
+
+
+class CrearInventarioForm(forms.ModelForm):
+    """Formulario para crear productos de inventario"""
+    
+    class Meta:
+        model = Inventario
+        fields = ['nombre', 'categoria', 'cantidad', 'imagen']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del producto'
+            }),
+            'categoria': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'cantidad': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'placeholder': '0'
+            }),
+            'imagen': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            })
+        }
+        labels = {
+            'nombre': 'Nombre del Producto',
+            'categoria': 'Categoría',
+            'cantidad': 'Cantidad',
+            'imagen': 'Sube una imagen referencial (máx. 5MB)'
+        }
+    
+    def clean_cantidad(self):
+        cantidad = self.cleaned_data.get('cantidad')
+        if cantidad is not None and cantidad < 0:
+            raise ValidationError('La cantidad no puede ser negativa')
+        return cantidad
+
+
+class EditarInventarioForm(forms.ModelForm):
+    """Formulario para editar productos de inventario"""
+    
+    class Meta:
+        model = Inventario
+        fields = ['nombre', 'categoria', 'cantidad', 'imagen']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del producto'
+            }),
+            'categoria': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'cantidad': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'placeholder': '0'
+            }),
+            'imagen': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            })
+        }
+        labels = {
+            'nombre': 'Nombre del Producto',
+            'categoria': 'Categoría',
+            'cantidad': 'Cantidad',
+            'imagen': 'Sube una imagen referencial (máx. 5MB)'
+        }
+    
+    def clean_cantidad(self):
+        cantidad = self.cleaned_data.get('cantidad')
+        if cantidad is not None and cantidad < 0:
+            raise ValidationError('La cantidad no puede ser negativa')
+        return cantidad
+
+
+class CambiarStockForm(forms.Form):
+    """Formulario simple para que trabajadores cambien solo la cantidad de stock"""
+    cantidad = forms.IntegerField(
+        label='Nueva Cantidad',
+        required=True,
+        min_value=0,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'min': '0',
+            'placeholder': 'Ingrese la nueva cantidad',
+            'style': 'text-align: center; font-size: 1.2rem; padding: 15px;'
+        }),
+        error_messages={
+            'required': 'La cantidad es obligatoria',
+            'min_value': 'La cantidad no puede ser negativa'
+        }
+    )
+
+
+class CrearPedidoForm(forms.ModelForm):
+    """Formulario para crear un pedido"""
+    
+    class Meta:
+        model = Pedido
+        fields = ['nombre', 'observaciones']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del pedido'
+            }),
+            'observaciones': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': '3',
+                'placeholder': 'Observaciones (opcional)'
+            })
+        }
+        labels = {
+            'nombre': 'Nombre del Pedido',
+            'observaciones': 'Observaciones'
         }

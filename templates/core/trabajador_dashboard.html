@@ -1,0 +1,213 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Panel Trabajador - Cadmium{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<style>
+.trabajador-dashboard-container {
+    min-height: calc(100vh - 80px);
+    padding: 40px 20px;
+    margin-top: 80px;
+    background: linear-gradient(135deg, var(--bg-color) 0%, var(--card-bg) 100%);
+}
+
+.dashboard-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(46, 42, 39, 0.15);
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.dashboard-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 40px;
+    text-align: center;
+}
+
+.dashboard-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 2.5rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+}
+
+.dashboard-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 40px;
+}
+
+.option-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg-color) 100%);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.option-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(46, 42, 39, 0.2);
+    border-color: var(--success-color);
+}
+
+.option-icon {
+    font-size: 4rem;
+    margin-bottom: 10px;
+}
+
+.option-card h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.option-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.option-card.asistencia {
+    border-left: 5px solid var(--success-color);
+}
+
+.option-card.stock {
+    border-left: 5px solid var(--warning-color);
+}
+
+.option-card.asistencia:hover {
+    background: linear-gradient(135deg, rgba(0, 168, 150, 0.05) 0%, var(--card-bg) 100%);
+}
+
+.option-card.stock:hover {
+    background: linear-gradient(135deg, rgba(245, 203, 92, 0.05) 0%, var(--card-bg) 100%);
+}
+
+@media (max-width: 768px) {
+    .trabajador-dashboard-container {
+        padding: 20px 15px;
+    }
+    
+    .dashboard-header {
+        padding: 30px 20px;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2rem;
+    }
+    
+    .options-grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 20px;
+    }
+    
+    .option-card {
+        padding: 25px;
+    }
+    
+    .option-icon {
+        font-size: 3rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{% url 'index' %}" class="navbar-brand">
+        <div class="navbar-logo">C</div>
+        <div>
+            <span>Cadmium</span>
+            <span class="tagline">Crea tu mundo</span>
+        </div>
+    </a>
+    <div class="navbar-nav">
+        <div class="dropdown">
+            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
+                <span class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </a>
+            <div class="dropdown-menu">
+                <span class="dropdown-item welcome-item">Bienvenido/a {{ usuario.nombre|default:usuario.username }}</span>
+                {% if usuario.es_administrador or usuario.is_superuser %}
+                    <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
+                {% elif usuario.rol == 'usuario' %}
+                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                {% endif %}
+                <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
+                <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a><a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    function toggleDropdown(event) {
+        event.preventDefault();
+        const dropdown = event.currentTarget.closest('.dropdown');
+        dropdown.classList.toggle('active');
+    }
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+</script>
+
+<div class="trabajador-dashboard-container">
+    <div class="dashboard-card">
+        <div class="dashboard-header">
+            <h1>Panel de Trabajador</h1>
+            <p>Gestiona tu asistencia y el stock de productos</p>
+        </div>
+        
+        <div class="options-grid">
+            <a href="{% url 'registro_asistencia' %}" class="option-card asistencia">
+                <div class="option-icon">📅</div>
+                <h2>Registrar Asistencia</h2>
+                <p>Registra tu asistencia diaria seleccionando tu turno de trabajo</p>
+            </a>
+            
+            <a href="{% url 'cambiar_stock' %}" class="option-card stock">
+                <div class="option-icon">📦</div>
+                <h2>Cambiar Stock</h2>
+                <p>Actualiza la cantidad de productos en el inventario</p>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -4,204 +4,7 @@
 {% block title %}Contáctanos - Cadmium{% endblock %}
 
 {% block extra_css %}
-<style>
-    /* Navbar Styles (same as index) */
-    .navbar {
-        background-color: var(--sidebar-bg);
-        color: white;
-        padding: 1rem 2rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-    }
-
-    .navbar-brand {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        color: white;
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-
-    .navbar-logo {
-        width: 40px;
-        height: 40px;
-        background-color: var(--primary-color);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        color: white;
-    }
-
-    .navbar-nav {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .nav-link {
-        color: white;
-        text-decoration: none;
-        padding: 8px 16px;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-        font-weight: 500;
-    }
-
-    .nav-link:hover {
-        background-color: var(--sidebar-hover);
-    }
-
-    .btn-contactanos {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-contactanos:hover {
-        background-color: var(--primary-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-    }
-
-    /* Contact Section */
-    .contact-section {
-        min-height: calc(100vh - 80px);
-        padding: 60px 20px;
-        background-color: var(--bg-color);
-    }
-
-    .contact-container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .page-header {
-        text-align: center;
-        margin-bottom: 50px;
-    }
-
-    .page-header h1 {
-        font-size: 2.5rem;
-        color: var(--text-primary);
-        margin-bottom: 15px;
-        font-weight: 700;
-    }
-
-    .page-header p {
-        font-size: 1.1rem;
-        color: var(--text-secondary);
-    }
-
-    .contacts-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 30px;
-        margin-top: 40px;
-    }
-
-    .contact-card {
-        background: var(--card-bg);
-        border-radius: 12px;
-        padding: 30px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        text-align: center;
-    }
-
-    .contact-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    }
-
-    .contact-icon {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-        font-size: 2rem;
-        color: white;
-    }
-
-    .contact-card h3 {
-        color: var(--text-primary);
-        font-size: 1.5rem;
-        margin-bottom: 10px;
-    }
-
-    .contact-card .cargo {
-        color: var(--primary-color);
-        font-weight: 600;
-        margin-bottom: 20px;
-        font-size: 1rem;
-    }
-
-    .contact-info {
-        margin-top: 20px;
-    }
-
-    .contact-info-item {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 12px;
-        color: var(--text-secondary);
-    }
-
-    .contact-info-item a {
-        color: var(--primary-color);
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    .contact-info-item a:hover {
-        color: var(--primary-dark);
-        text-decoration: underline;
-    }
-
-    .contact-info-icon {
-        font-size: 1.2rem;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .navbar {
-            flex-direction: column;
-            gap: 15px;
-            padding: 1rem;
-        }
-
-        .navbar-nav {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .contacts-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .page-header h1 {
-            font-size: 2rem;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/contactanos.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -224,9 +27,21 @@
                 </span>
             </a>
             <div class="dropdown-menu">
-                <a href="{% url 'login' %}" class="dropdown-item">Iniciar Sesión</a>
+                {% if user.is_authenticated %}
+                    <span class="dropdown-item welcome-item">Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                    {% if user.es_administrador or user.is_superuser %}
+                        <a href="{% url 'panel' %}" class="dropdown-item">Mi Panel</a>
+                    {% elif user.rol == 'usuario' %}
+                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">Mi Panel</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}" class="dropdown-item">Iniciar Sesión</a>
+                {% endif %}
                 <a href="{% url 'contactanos' %}" class="dropdown-item">Contáctanos</a>
                 <a href="#" class="dropdown-item" onclick="return false;">Reglamento Interno</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="dropdown-item">Cerrar Sesión</a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -246,6 +61,7 @@
                 <div class="contact-icon">👤</div>
                 <h3>{{ contacto.nombre }}</h3>
                 <div class="cargo">{{ contacto.cargo }}</div>
+                {% if usuario_autenticado %}
                 <div class="contact-info">
                     <div class="contact-info-item">
                         <span class="contact-info-icon">📧</span>
@@ -256,6 +72,13 @@
                         <span>{{ contacto.telefono }}</span>
                     </div>
                 </div>
+                {% else %}
+                <div class="contact-info">
+                    <div class="contact-info-item" style="text-align: center; padding: 15px; color: var(--text-secondary); font-style: italic;">
+                        <p>Debes <a href="{% url 'login' %}" style="color: var(--success-color); text-decoration: underline;">iniciar sesión</a> para ver la información de contacto</p>
+                    </div>
+                </div>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
