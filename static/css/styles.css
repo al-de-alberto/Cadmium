@@ -818,8 +818,8 @@ body.login-page {
 .quick-actions h2 {
     margin-bottom: 20px;
     color: var(--text-primary);
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
-    font-weight: 600;
+    font-family: 'Marcellus SC', serif;
+    font-weight: 400;
 }
 
 /* Section Divider */
@@ -894,8 +894,8 @@ body.login-page {
 .action-card h3 {
     margin-bottom: 10px;
     color: var(--text-primary);
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
-    font-weight: 600;
+    font-family: 'Marcellus SC', serif;
+    font-weight: 400;
 }
 
 .action-card p {
