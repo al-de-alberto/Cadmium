@@ -778,22 +778,7 @@ body.login-page {
     gap: 20px;
 }
 
-/* Panel dashboard sin sidebar - solo paneles de acceso rápido */
-.admin-container.panel-dashboard {
-    display: block;
-    max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0 2rem;
-}
-
-.admin-container.panel-dashboard .panel-main-content {
-    margin-left: 0;
-    width: 100%;
-    max-width: 100%;
-    padding: 30px 0;
-}
-
+/* Panel dashboard: mantener sidebar en desktop, ocultar en móviles */
 .admin-container.panel-dashboard .actions-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
@@ -1022,11 +1007,7 @@ body.login-page {
     }
     
     .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        top: 0;
-        margin-bottom: 0;
+        display: none; /* Ocultar sidebar en móviles */
     }
     
     .main-content {
@@ -1036,17 +1017,15 @@ body.login-page {
     }
     
     /* Panel dashboard en tablets/móviles */
-    .admin-container.panel-dashboard {
-        padding: 0 16px;
-    }
-    
-    .admin-container.panel-dashboard .panel-main-content {
-        padding: 24px 0;
-    }
-    
     .admin-container.panel-dashboard .quick-actions h2 {
         font-size: 1.5rem;
         margin-bottom: 20px;
+    }
+    
+    /* Panel dashboard: 1 columna en móviles */
+    .admin-container.panel-dashboard .actions-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
     
     .content-header {
@@ -1080,10 +1059,12 @@ body.login-page {
         gap: 16px;
     }
     
-    /* En el panel dashboard, mantener 2 columnas en tablets */
-    .admin-container.panel-dashboard .actions-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+    /* En el panel dashboard, mantener 2 columnas en tablets (si el ancho lo permite) */
+    @media (min-width: 600px) and (max-width: 768px) {
+        .admin-container.panel-dashboard .actions-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
     }
     
     .table-container {
