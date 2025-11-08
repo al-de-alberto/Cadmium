@@ -179,7 +179,9 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # La sesión no expira al cerrar el nav
 if not DEBUG:
     try:
         import whitenoise
-        STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        # Usar CompressedStaticFilesStorage en lugar de CompressedManifestStaticFilesStorage
+        # para evitar errores con archivos faltantes (como fuentes locales)
+        STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     except ImportError:
         pass  # WhiteNoise no instalado, se usará otro método en producción
     
