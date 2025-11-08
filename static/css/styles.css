@@ -101,7 +101,7 @@ h1, h2, h3, h4, h5, h6 {
     color: white;
     box-shadow: 0 2px 8px rgba(46, 42, 39, 0.2);
     transition: transform 0.3s ease;
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
     overflow: hidden;
     position: relative;
 }
@@ -271,7 +271,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .welcome-name {
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Raleway', sans-serif;
     font-weight: 600;
     font-style: italic;
     letter-spacing: 0.5px;
@@ -638,8 +638,8 @@ body.login-page {
     font-size: 1.5rem;
     margin-bottom: 5px;
     transition: color 0.3s ease;
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
-    font-weight: 600;
+    font-family: 'Marcellus SC', serif;
+    font-weight: 400;
 }
 
 .sidebar-header a {
@@ -728,8 +728,8 @@ body.login-page {
 .content-header h1 {
     color: var(--text-primary);
     font-size: 1.85rem;
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
-    font-weight: 600;
+    font-family: 'Marcellus SC', serif;
+    font-weight: 400;
 }
 
 .header-actions {
@@ -863,8 +863,8 @@ body.login-page {
     font-size: 1.75rem;
     margin-bottom: 24px;
     color: var(--primary-color);
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
-    font-weight: 600;
+    font-family: 'Marcellus SC', serif;
+    font-weight: 400;
 }
 
 .action-card {
