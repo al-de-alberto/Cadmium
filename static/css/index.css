@@ -178,7 +178,7 @@
 }
 
 .barista-text {
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
     font-weight: 700;
     font-size: 1.1rem;
     color: var(--primary-color);
@@ -222,7 +222,7 @@
     font-weight: 600;
     color: var(--text-primary);
     margin: 10px 0 5px 0;
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
 }
 
 .placeholder-subtext {
@@ -310,7 +310,7 @@
     font-weight: bold;
     color: white;
     box-shadow: 0 8px 24px rgba(46, 42, 39, 0.3);
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
     overflow: hidden;
     position: relative;
 }
@@ -326,7 +326,7 @@
     color: var(--text-primary);
     font-size: 2rem;
     margin-top: 20px;
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
     font-weight: 700;
     margin-bottom: 10px;
 }
@@ -335,7 +335,7 @@
     color: var(--primary-color);
     font-size: 1.5rem;
     font-weight: 600;
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
     letter-spacing: 1px;
     margin: 0;
 }
@@ -423,7 +423,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 10px;
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
 }
 
 .news-card-title {
@@ -431,7 +431,7 @@
     margin-bottom: 12px;
     font-size: 1.5rem;
     font-weight: 700;
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
     line-height: 1.3;
 }
 
@@ -445,7 +445,7 @@
     color: var(--text-secondary);
     line-height: 1.6;
     margin-bottom: 0;
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
@@ -485,7 +485,7 @@
     margin-bottom: 12px;
     text-align: left;
     transition: all 0.3s ease;
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
     align-self: flex-start;
 }
 
@@ -506,7 +506,7 @@
     font-weight: 500;
     padding-top: 12px;
     border-top: 1px solid var(--border-color);
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
 }
 
 /* Estilos para tarjetas sin imagen - el padding ya está definido en .news-card-content */

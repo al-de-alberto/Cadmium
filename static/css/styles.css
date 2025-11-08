@@ -3,7 +3,7 @@
 /* Las referencias locales han sido removidas porque los archivos no están disponibles */
 
 /* Importar fuentes de Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Crimson+Text:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Raleway:wght@300;400;500;600;700;800&display=swap');
 
 * {
     margin: 0;
@@ -30,7 +30,7 @@
 }
 
 body {
-    font-family: 'Crimson Text', Georgia, serif;
+    font-family: 'Raleway', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-primary);
     line-height: 1.7;
@@ -39,8 +39,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
+    font-family: 'Marcellus SC', serif;
+    font-weight: 400;
     letter-spacing: 0.5px;
 }
 
@@ -70,7 +70,7 @@ h1, h2, h3, h4, h5, h6 {
     color: white;
     font-size: 1.5rem;
     font-weight: 700;
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
 }
 
 .navbar-brand > div {
@@ -128,7 +128,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 400;
     font-style: italic;
     color: rgba(255, 255, 255, 0.85);
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
     letter-spacing: 0.8px;
     padding-left: 10px;
     border-left: 1.5px solid rgba(255, 255, 255, 0.4);
@@ -155,7 +155,7 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
 }
 
 .hamburger-icon {
@@ -221,7 +221,7 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-primary);
     text-decoration: none;
     transition: all 0.3s ease;
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
     font-weight: 500;
 }
 
@@ -297,7 +297,7 @@ h1, h2, h3, h4, h5, h6 {
     border: none;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 168, 150, 0.2);
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
 }
 
 .btn-contactanos:hover {
@@ -372,7 +372,7 @@ body.login-page {
     font-size: 2.5rem;
     margin-bottom: 10px;
     font-weight: 700;
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
 }
 
 .login-header p {
@@ -427,7 +427,7 @@ body.login-page {
     background: linear-gradient(135deg, var(--success-color) 0%, #008A7A 100%);
     color: white;
     box-shadow: 0 2px 8px rgba(0, 168, 150, 0.2);
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
     font-weight: 600;
 }
 
@@ -441,7 +441,7 @@ body.login-page {
     background: linear-gradient(135deg, var(--secondary-color) 0%, #9A7358 100%);
     color: white;
     box-shadow: 0 2px 8px rgba(176, 137, 104, 0.2);
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
     font-weight: 600;
 }
 
@@ -801,7 +801,7 @@ body.login-page {
     font-size: 0.95rem;
     margin-bottom: 5px;
     font-weight: 500;
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
 }
 
 .stat-number {
@@ -1373,7 +1373,7 @@ body.login-page {
     border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
-    font-family: 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Raleway', sans-serif;
     transition: all 0.3s ease;
     background: var(--card-bg);
     color: var(--text-primary);

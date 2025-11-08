@@ -86,7 +86,7 @@
     margin: 0 0 10px 0;
     font-size: 1rem;
     color: var(--text-primary);
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
     font-weight: 600;
 }
 
@@ -95,7 +95,7 @@
     font-size: 2rem;
     font-weight: 700;
     color: var(--text-primary);
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
 }
 
 .stat-promedio {
@@ -149,7 +149,7 @@
     margin: 0;
     color: white;
     font-size: 1.35rem;
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
     font-weight: 600;
 }
 
