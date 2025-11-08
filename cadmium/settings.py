@@ -36,10 +36,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary',
-    'cloudinary_storage',
     'core',
 ]
+
+# Agregar Cloudinary solo si está disponible (para desarrollo local sin Cloudinary)
+try:
+    import cloudinary
+    import cloudinary_storage
+    # Insertar antes de 'core' (insertar en orden inverso para mantener el orden correcto)
+    INSTALLED_APPS.insert(-1, 'cloudinary_storage')
+    INSTALLED_APPS.insert(-1, 'cloudinary')
+except ImportError:
+    pass  # Cloudinary no instalado, se usará almacenamiento local
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
