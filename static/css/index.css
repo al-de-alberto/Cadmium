@@ -83,9 +83,9 @@
     position: relative;
     width: 100%;
     max-width: 1200px;
-    margin: 40px auto;
+    margin: 20px auto;
     padding: 0 20px;
-    padding-top: 90px; /* Espacio para navbar fijo */
+    padding-top: 70px; /* Espacio reducido para navbar fijo */
 }
 
 .carousel-container {
@@ -662,9 +662,9 @@
     
     /* Hero section con mejor espaciado */
     .hero-section {
-        margin: 0 auto 24px;
+        margin: 0 auto 20px;
         padding: 0 16px;
-        padding-top: 80px; /* Espacio para navbar fijo más pequeño en móviles */
+        padding-top: 65px; /* Espacio reducido para navbar fijo más pequeño en móviles */
     }
 
     .carousel {
@@ -826,8 +826,8 @@
     
     /* Hero section ajustado */
     .hero-section {
-        padding-top: 76px;
-        margin-bottom: 20px;
+        padding-top: 60px;
+        margin-bottom: 16px;
     }
     
     .carousel {

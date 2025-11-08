@@ -463,22 +463,93 @@ body.login-page {
 }
 
 .alert {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    animation: slideIn 0.3s ease-out;
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    animation: slideInDown 0.4s ease-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 2px solid;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.alert.alert-fade-out {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
 }
 
 .alert-error {
-    background-color: rgba(198, 40, 40, 0.1);
-    color: var(--danger-color);
-    border-left: 4px solid var(--danger-color);
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.95) 0%, rgba(198, 40, 40, 0.95) 100%);
+    color: #ffffff;
+    border-color: #dc3545;
+    box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3);
 }
 
 .alert-success {
-    background-color: rgba(0, 168, 150, 0.1);
-    color: var(--success-color);
-    border-left: 4px solid var(--success-color);
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.95) 0%, rgba(0, 168, 150, 0.95) 100%);
+    color: #ffffff;
+    border-color: #28a745;
+    box-shadow: 0 4px 16px rgba(40, 167, 69, 0.3);
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.95) 0%, rgba(255, 152, 0, 0.95) 100%);
+    color: #212529;
+    border-color: #ffc107;
+    box-shadow: 0 4px 16px rgba(255, 193, 7, 0.3);
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(0, 123, 255, 0.95) 0%, rgba(23, 162, 184, 0.95) 100%);
+    color: #ffffff;
+    border-color: #007bff;
+    box-shadow: 0 4px 16px rgba(0, 123, 255, 0.3);
+}
+
+.alert-container {
+    margin-bottom: 20px;
+}
+
+.alert-container:empty {
+    display: none;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments for alerts */
+@media (max-width: 768px) {
+    .alert {
+        padding: 14px 16px;
+        font-size: 0.95rem;
+        border-radius: 10px;
+    }
+    
+    .alert-container[style*="position: fixed"] {
+        max-width: 95% !important;
+        width: 95% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .alert {
+        padding: 12px 14px;
+        font-size: 0.9rem;
+    }
 }
 
 /* Login Step Styles */
