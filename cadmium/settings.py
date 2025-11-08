@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',
+    'cloudinary_storage',
     'core',
 ]
 
@@ -153,8 +155,30 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files (user uploaded content)
-MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Configuración de Cloudinary para almacenamiento de imágenes
+if os.environ.get('CLOUDINARY_CLOUD_NAME'):
+    # Usar Cloudinary en producción
+    try:
+        import cloudinary
+        import cloudinary.uploader
+        import cloudinary.api
+        
+        CLOUDINARY_STORAGE = {
+            'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+            'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+            'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+        }
+        
+        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+        MEDIA_URL = '/media/'
+    except ImportError:
+        # Si cloudinary no está instalado, usar configuración local
+        MEDIA_URL = 'media/'
+        MEDIA_ROOT = BASE_DIR / 'media'
+else:
+    # Configuración local (desarrollo)
+    MEDIA_URL = 'media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
