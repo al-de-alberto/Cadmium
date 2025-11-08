@@ -22,14 +22,14 @@
 .card-header-create h2 {
     margin: 0 0 10px 0;
     font-size: 2rem;
-    font-family: 'Coolvetica', 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
     font-weight: 600;
 }
 
 .card-header-create p {
     margin: 0;
     opacity: 0.9;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
 }
 
 .card-body-create {
@@ -49,8 +49,8 @@
 }
 
 .section-title {
-    font-size: 1.3rem;
-    font-family: 'Coolvetica', 'Space Grotesk', sans-serif, Georgia, serif;
+    font-size: 1.2rem;
+    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
     color: var(--primary-color);
     margin: 0 0 15px 0;
     padding-bottom: 10px;
@@ -73,7 +73,7 @@
     font-weight: 600;
     color: var(--text-primary);
     font-size: 1rem;
-    font-family: 'Kaoly', 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Crimson Text', Georgia, serif, sans-serif;
     display: block;
     margin-bottom: 8px;
 }
@@ -93,7 +93,7 @@
     border: 2px solid var(--border-color);
     border-radius: 10px;
     font-size: 1rem;
-    font-family: 'Kaoly', 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Crimson Text', Georgia, serif, sans-serif;
     transition: all 0.3s ease;
     background: var(--bg-color);
     color: var(--text-primary);
@@ -103,7 +103,7 @@
 .form-group-create textarea {
     min-height: 100px;
     resize: vertical;
-    font-family: 'Kaoly', 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Crimson Text', Georgia, serif, sans-serif;
 }
 
 .form-group-create input[type="text"]:focus,
@@ -123,7 +123,7 @@
     border: 2px solid var(--border-color);
     border-radius: 10px;
     font-size: 1rem;
-    font-family: 'Kaoly', 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Crimson Text', Georgia, serif, sans-serif;
     transition: all 0.3s ease;
     background: var(--bg-color);
     color: var(--text-primary);
@@ -138,7 +138,7 @@
 }
 
 .form-hint {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: var(--text-secondary);
     margin-top: 4px;
     font-style: italic;
@@ -146,7 +146,7 @@
 
 .form-error {
     color: var(--danger-color);
-    font-size: 0.85rem;
+    font-size: 1rem;
     margin-top: 4px;
     display: flex;
     flex-direction: column;
@@ -171,7 +171,7 @@
 .info-content {
     flex: 1;
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     line-height: 1.6;
 }
 
@@ -190,7 +190,7 @@
     border-radius: 10px;
     font-size: 1rem;
     font-weight: 600;
-    font-family: 'Kaoly', 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Crimson Text', Georgia, serif, sans-serif;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
@@ -211,7 +211,7 @@
     border-radius: 10px;
     font-size: 1rem;
     font-weight: 600;
-    font-family: 'Kaoly', 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Crimson Text', Georgia, serif, sans-serif;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(0, 168, 150, 0.3);
@@ -234,7 +234,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(198, 40, 40, 0.3);
-    font-family: 'Kaoly', 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Crimson Text', Georgia, serif, sans-serif;
 }
 
 .btn-delete-confirm:hover {
@@ -247,7 +247,7 @@
     padding: 12px 16px;
     border-radius: 8px;
     margin-bottom: 20px;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
 }
 
 .alert-success {

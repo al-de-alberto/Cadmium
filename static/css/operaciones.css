@@ -2,7 +2,7 @@
     padding: 12px 16px;
     border-radius: 8px;
     margin-bottom: 20px;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
 }
 
 .alert-success {
@@ -84,9 +84,9 @@
 
 .stat-content h3 {
     margin: 0 0 10px 0;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--text-primary);
-    font-family: 'Coolvetica', 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
     font-weight: 600;
 }
 
@@ -95,19 +95,19 @@
     font-size: 2rem;
     font-weight: 700;
     color: var(--text-primary);
-    font-family: 'Coolvetica', 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
 }
 
 .stat-promedio {
     margin: 0 0 5px 0;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     color: var(--text-secondary);
     font-weight: 500;
 }
 
 .stat-pendientes {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: var(--warning-color);
     font-weight: 600;
 }
@@ -148,8 +148,8 @@
 .table-header-section h2 {
     margin: 0;
     color: white;
-    font-size: 1.5rem;
-    font-family: 'Coolvetica', 'Space Grotesk', sans-serif, Georgia, serif;
+    font-size: 1.35rem;
+    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
     font-weight: 600;
 }
 
@@ -158,11 +158,33 @@
     overflow-x: auto;
 }
 
+/* Asegurar que las tablas en operaciones respeten el redondeo del contenedor */
+.operaciones-tables .table-section {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.operaciones-tables .table-container .data-table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border-radius: 0 !important;
+    margin: 0;
+}
+
+/* Remover cualquier border-radius de las esquinas de la tabla
+   ya que el contenedor .table-section tiene overflow: hidden */
+.operaciones-tables .table-container .data-table thead tr:first-child th:first-child,
+.operaciones-tables .table-container .data-table thead tr:first-child th:last-child,
+.operaciones-tables .table-container .data-table tbody tr:last-child td:first-child,
+.operaciones-tables .table-container .data-table tbody tr:last-child td:last-child {
+    border-radius: 0 !important;
+}
+
 .badge {
     display: inline-block;
     padding: 6px 12px;
     border-radius: 6px;
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: 600;
     text-transform: uppercase;
 }
@@ -208,7 +230,7 @@
     border-radius: 6px;
     text-decoration: none;
     transition: all 0.3s ease;
-    font-size: 18px;
+    font-size: 20px;
     border: none;
     cursor: pointer;
 }
@@ -240,7 +262,7 @@
 .icon-edit,
 .icon-delete {
     display: inline-block;
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1;
 }
 

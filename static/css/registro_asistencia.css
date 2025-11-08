@@ -28,7 +28,7 @@
 .registro-asistencia-card .card-header h1 {
     margin: 0;
     font-size: 2rem;
-    font-family: 'Coolvetica', 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
     font-weight: 600;
     color: white;
 }
@@ -36,7 +36,7 @@
 .registro-asistencia-card .card-header p {
     margin: 0;
     opacity: 0.9;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
 }
 
 .registro-asistencia-card .card-body {
@@ -69,12 +69,12 @@
 .info-label {
     font-weight: 600;
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: 1.1rem;
 }
 
 .info-value {
     color: var(--text-secondary);
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     font-weight: 500;
 }
 
@@ -125,11 +125,11 @@
 .turno-name {
     font-size: 1.1rem;
     margin-bottom: 5px;
-    font-family: 'Coolvetica', 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
 }
 
 .turno-time {
-    font-size: 0.9rem;
+    font-size: 1rem;
     opacity: 0.8;
 }
 
@@ -151,7 +151,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(0, 168, 150, 0.3);
-    font-family: 'Kaoly', 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Crimson Text', Georgia, serif, sans-serif;
 }
 
 .btn-registrar:hover {

@@ -15,7 +15,7 @@
     border-radius: 6px;
     text-decoration: none;
     transition: all 0.3s ease;
-    font-size: 18px;
+    font-size: 20px;
     border: none;
     cursor: pointer;
 }
@@ -46,7 +46,7 @@
 
 .icon-edit, .icon-delete {
     display: inline-block;
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1;
 }
 
@@ -68,7 +68,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(198, 40, 40, 0.3);
-    font-family: 'Kaoly', 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Crimson Text', Georgia, serif, sans-serif;
 }
 
 .btn-delete-confirm:hover {
@@ -88,7 +88,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(245, 203, 92, 0.3);
-    font-family: 'Kaoly', 'Crimson Text', Georgia, serif, sans-serif;
+    font-family: 'Crimson Text', Georgia, serif, sans-serif;
 }
 
 .btn-warning-confirm:hover {
