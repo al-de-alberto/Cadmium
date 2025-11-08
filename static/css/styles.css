@@ -1022,10 +1022,29 @@ body.login-page {
         margin-bottom: 20px;
     }
     
-    /* Panel dashboard: 1 columna en móviles */
+    /* Panel dashboard: 2 columnas en móviles también */
     .admin-container.panel-dashboard .actions-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    /* Ajustar tamaño de las action-cards en móviles para que quepan 2 */
+    .admin-container.panel-dashboard .action-card {
+        padding: 16px 12px;
+    }
+    
+    .admin-container.panel-dashboard .action-icon {
+        font-size: 2rem;
+    }
+    
+    .admin-container.panel-dashboard .action-card h3 {
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+    
+    .admin-container.panel-dashboard .action-card p {
+        font-size: 0.85rem;
+        line-height: 1.4;
     }
     
     .content-header {
@@ -1059,13 +1078,6 @@ body.login-page {
         gap: 16px;
     }
     
-    /* En el panel dashboard, mantener 2 columnas en tablets (si el ancho lo permite) */
-    @media (min-width: 600px) and (max-width: 768px) {
-        .admin-container.panel-dashboard .actions-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-    }
     
     .table-container {
         overflow-x: auto;
@@ -1212,10 +1224,29 @@ body.login-page {
         padding: 12px 14px;
     }
     
-    /* Panel dashboard en móviles: 1 columna */
+    /* Panel dashboard en móviles: 2 columnas con gap más pequeño */
     .admin-container.panel-dashboard .actions-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    /* Ajustar action-cards en pantallas muy pequeñas */
+    .admin-container.panel-dashboard .action-card {
+        padding: 14px 10px;
+    }
+    
+    .admin-container.panel-dashboard .action-icon {
+        font-size: 1.75rem;
+    }
+    
+    .admin-container.panel-dashboard .action-card h3 {
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+    }
+    
+    .admin-container.panel-dashboard .action-card p {
+        font-size: 0.8rem;
+        line-height: 1.3;
     }
 }
 
