@@ -69,6 +69,14 @@
                 {% for item in imagenes_carrusel %}
                     <div class="carousel-item {% if forloop.first %}active{% endif %}" data-slide-index="{{ forloop.counter0 }}">
                         <img src="{{ item.imagen.imagen.url }}" alt="Imagen {{ item.indice }}" class="carousel-image" loading="lazy">
+                        {% if item.titulo_barista or item.imagen.titulo_barista %}
+                            <div class="carousel-barista-overlay">
+                                <div class="barista-badge">
+                                    <span class="barista-icon">🏆</span>
+                                    <span class="barista-text">Barista del Mes: {{ item.titulo_barista|default:item.imagen.titulo_barista }}</span>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
