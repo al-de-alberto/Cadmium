@@ -778,6 +778,39 @@ body.login-page {
     gap: 20px;
 }
 
+/* Panel dashboard sin sidebar - solo paneles de acceso rápido */
+.admin-container.panel-dashboard {
+    display: block;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 2rem;
+}
+
+.admin-container.panel-dashboard .panel-main-content {
+    margin-left: 0;
+    width: 100%;
+    max-width: 100%;
+    padding: 30px 0;
+}
+
+.admin-container.panel-dashboard .actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+.admin-container.panel-dashboard .quick-actions {
+    margin-bottom: 40px;
+}
+
+.admin-container.panel-dashboard .quick-actions h2 {
+    font-size: 1.75rem;
+    margin-bottom: 24px;
+    color: var(--primary-color);
+    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-weight: 600;
+}
+
 .action-card {
     background: var(--bg-color);
     border-radius: 12px;
@@ -1002,6 +1035,20 @@ body.login-page {
         margin-top: 0;
     }
     
+    /* Panel dashboard en tablets/móviles */
+    .admin-container.panel-dashboard {
+        padding: 0 16px;
+    }
+    
+    .admin-container.panel-dashboard .panel-main-content {
+        padding: 24px 0;
+    }
+    
+    .admin-container.panel-dashboard .quick-actions h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+    
     .content-header {
         flex-direction: column;
         align-items: flex-start;
@@ -1028,10 +1075,15 @@ body.login-page {
         font-size: 1rem;
     }
     
-    .stats-grid,
-    .actions-grid {
+    .stats-grid {
         grid-template-columns: 1fr;
         gap: 16px;
+    }
+    
+    /* En el panel dashboard, mantener 2 columnas en tablets */
+    .admin-container.panel-dashboard .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
     }
     
     .table-container {
@@ -1177,6 +1229,12 @@ body.login-page {
     .form-group select,
     .form-group textarea {
         padding: 12px 14px;
+    }
+    
+    /* Panel dashboard en móviles: 1 columna */
+    .admin-container.panel-dashboard .actions-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
 }
 
