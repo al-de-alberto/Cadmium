@@ -66,20 +66,6 @@
                 {% for item in imagenes_carrusel %}
                     <div class="carousel-item {% if forloop.first %}active{% endif %}" data-slide-index="{{ forloop.counter0 }}">
                         <img src="{{ item.imagen.imagen.url }}" alt="Imagen {{ item.indice }}" class="carousel-image" loading="lazy">
-                        {% if item.indice == 1 %}
-                            <div class="carousel-barista-overlay">
-                                <div class="barista-badge">
-                                    <span class="barista-icon">☕</span>
-                                    <span class="barista-text">
-                                        {% if item.titulo_barista %}
-                                            {{ item.titulo_barista }}
-                                        {% else %}
-                                            Barista del Mes
-                                        {% endif %}
-                                    </span>
-                                </div>
-                            </div>
-                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
@@ -206,6 +192,8 @@
     let indicators = [];
     let totalSlides = 0;
     let carouselInterval = null;
+    let isTransitioning = false; // Flag para prevenir transiciones simultáneas
+    let transitionTimeout = null;
 
     function initCarousel() {
         slides = document.querySelectorAll('.carousel-item');
@@ -228,14 +216,8 @@
         slides.forEach((slide, index) => {
             if (index === 0) {
                 slide.classList.add('active');
-                slide.style.opacity = '1';
-                slide.style.zIndex = '2';
-                slide.style.visibility = 'visible';
             } else {
                 slide.classList.remove('active');
-                slide.style.opacity = '0';
-                slide.style.zIndex = '1';
-                slide.style.visibility = 'visible';
             }
         });
         
@@ -250,45 +232,62 @@
             const slideIndexAttr = indicator.getAttribute('data-slide-index');
             const slideIndex = slideIndexAttr !== null ? parseInt(slideIndexAttr) : index;
             indicator.addEventListener('click', () => {
-                currentSlide(slideIndex + 1); // currentSlide espera índice 1-based
+                goToSlide(slideIndex);
             });
         });
 
-        // Añadir event listeners a los botones de control
+        // Añadir event listeners a los botones de control con throttling
         const prevButton = document.querySelector('.carousel-prev');
         const nextButton = document.querySelector('.carousel-next');
         if (prevButton) {
-            prevButton.addEventListener('click', () => changeSlide(-1));
+            prevButton.addEventListener('click', () => {
+                if (!isTransitioning) {
+                    changeSlide(-1);
+                }
+            });
         }
         if (nextButton) {
-            nextButton.addEventListener('click', () => changeSlide(1));
+            nextButton.addEventListener('click', () => {
+                if (!isTransitioning) {
+                    changeSlide(1);
+                }
+            });
         }
 
         // Auto-play del carrusel cada 4 segundos (solo si hay más de una imagen)
-        if (totalSlides > 1) {
-            carouselInterval = setInterval(() => {
-                changeSlide(1);
-            }, 4000);
-        }
+        startAutoPlay();
 
         // Hacer funciones globales para compatibilidad
         window.changeSlide = changeSlide;
         window.currentSlide = currentSlide;
     }
 
-    function showSlide(index) {
-        // Recargar elementos por si el DOM cambió
-        if (slides.length === 0) {
-            slides = document.querySelectorAll('.carousel-item');
-            indicators = document.querySelectorAll('.carousel-indicator');
-            totalSlides = slides.length;
+    function startAutoPlay() {
+        if (carouselInterval) {
+            clearInterval(carouselInterval);
         }
+        if (totalSlides > 1) {
+            carouselInterval = setInterval(() => {
+                if (!isTransitioning) {
+                    changeSlide(1);
+                }
+            }, 4000);
+        }
+    }
 
-        if (totalSlides === 0) {
+    function stopAutoPlay() {
+        if (carouselInterval) {
+            clearInterval(carouselInterval);
+            carouselInterval = null;
+        }
+    }
+
+    function goToSlide(index) {
+        if (isTransitioning || index === currentSlideIndex) {
             return;
         }
-
-        // Asegurar que el índice esté en el rango válido
+        
+        // Calcular el nuevo índice
         if (index >= totalSlides) {
             currentSlideIndex = 0;
         } else if (index < 0) {
@@ -296,36 +295,79 @@
         } else {
             currentSlideIndex = index;
         }
+        
+        updateCarousel();
+        // Reiniciar auto-play cuando el usuario interactúa
+        startAutoPlay();
+    }
 
-        // Ocultar todas las slides
-        slides.forEach((slide, idx) => {
-            slide.classList.remove('active');
-            slide.style.opacity = '0';
-            slide.style.zIndex = '1';
-            slide.style.visibility = 'visible';
-            slide.style.display = 'block';
+    function updateCarousel() {
+        if (isTransitioning) {
+            return;
+        }
+        
+        isTransitioning = true;
+        
+        // Usar requestAnimationFrame para mejor rendimiento
+        requestAnimationFrame(() => {
+            // Ocultar todas las slides y mostrar solo la actual
+            for (let i = 0; i < slides.length; i++) {
+                if (i === currentSlideIndex) {
+                    slides[i].classList.add('active');
+                } else {
+                    slides[i].classList.remove('active');
+                }
+            }
+            
+            // Actualizar indicadores
+            for (let i = 0; i < indicators.length; i++) {
+                if (i === currentSlideIndex) {
+                    indicators[i].classList.add('active');
+                } else {
+                    indicators[i].classList.remove('active');
+                }
+            }
+            
+            // Permitir nueva transición después de un breve delay
+            if (transitionTimeout) {
+                clearTimeout(transitionTimeout);
+            }
+            transitionTimeout = setTimeout(() => {
+                isTransitioning = false;
+            }, 300); // Menor que la duración de la transición CSS (0.5s)
         });
-        indicators.forEach(indicator => indicator.classList.remove('active'));
-
-        // Mostrar la slide actual
-        if (slides[currentSlideIndex]) {
-            slides[currentSlideIndex].classList.add('active');
-            slides[currentSlideIndex].style.opacity = '1';
-            slides[currentSlideIndex].style.zIndex = '2';
-            slides[currentSlideIndex].style.visibility = 'visible';
-            slides[currentSlideIndex].style.display = 'block';
-        }
-        if (indicators[currentSlideIndex]) {
-            indicators[currentSlideIndex].classList.add('active');
-        }
     }
 
     function changeSlide(direction) {
-        showSlide(currentSlideIndex + direction);
+        if (isTransitioning) {
+            return;
+        }
+        
+        stopAutoPlay();
+        
+        let newIndex = currentSlideIndex + direction;
+        
+        if (newIndex >= totalSlides) {
+            newIndex = 0;
+        } else if (newIndex < 0) {
+            newIndex = totalSlides - 1;
+        }
+        
+        currentSlideIndex = newIndex;
+        updateCarousel();
+        
+        // Reiniciar auto-play después de un delay
+        setTimeout(() => {
+            startAutoPlay();
+        }, 500);
     }
 
     function currentSlide(index) {
-        showSlide(index - 1);
+        if (isTransitioning) {
+            return;
+        }
+        stopAutoPlay();
+        goToSlide(index - 1);
     }
 
     // Inicializar cuando el DOM esté listo
