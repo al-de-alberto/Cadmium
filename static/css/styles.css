@@ -749,10 +749,10 @@ body.login-page {
 }
 
 .welcome-text {
-    font-weight: 600;
+    font-weight: 400;
     font-size: 1.3rem;
     color: var(--text-primary);
-    font-family: 'Space Grotesk', sans-serif, Georgia, serif;
+    font-family: 'Marcellus SC', serif;
     letter-spacing: 0.3px;
     line-height: 1.5;
 }
