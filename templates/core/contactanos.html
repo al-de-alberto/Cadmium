@@ -11,7 +11,10 @@
 <!-- Navbar -->
 <nav class="navbar">
     <a href="{% url 'index' %}" class="navbar-brand">
-        <div class="navbar-logo">C</div>
+        <div class="navbar-logo">
+            <img src="{% static 'images/logo/logo.png' %}" alt="Cadmium Logo" class="navbar-logo-img" data-logo-svg="{% static 'images/logo/logo.svg' %}" onerror="handleLogoError(this)">
+            <span class="logo-fallback" style="display: none;">C</span>
+        </div>
         <div>
             <span>Cadmium</span>
             <span class="tagline">Crea tu mundo</span>

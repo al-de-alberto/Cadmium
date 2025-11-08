@@ -1,73 +1,5 @@
-/* Navbar Styles (same as index) */
-.navbar {
-    background-color: var(--sidebar-bg);
-    color: white;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.navbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    color: white;
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.navbar-logo {
-    width: 40px;
-    height: 40px;
-    background-color: var(--primary-color);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: white;
-}
-
-.navbar-nav {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.nav-link {
-    color: white;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.nav-link:hover {
-    background-color: var(--sidebar-hover);
-}
-
-.btn-contactanos {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-contactanos:hover {
-    background-color: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-}
+/* Navbar styles are inherited from styles.css */
+/* Only contact-specific styles below */
 
 /* Contact Section */
 .contact-section {
@@ -175,23 +107,53 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        gap: 15px;
-        padding: 1rem;
-    }
-
-    .navbar-nav {
-        width: 100%;
-        justify-content: center;
+    .contact-section {
+        padding: 40px 16px;
+        padding-top: 80px; /* Espacio para navbar fijo */
     }
 
     .contacts-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .page-header {
+        margin-bottom: 30px;
     }
 
     .page-header h1 {
         font-size: 2rem;
+    }
+
+    .page-header p {
+        font-size: 1rem;
+    }
+
+    .contact-card {
+        padding: 24px 20px;
+    }
+
+    .contact-card h3 {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-section {
+        padding: 32px 12px;
+        padding-top: 76px;
+    }
+
+    .page-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .contact-card {
+        padding: 20px 16px;
+    }
+
+    .contact-card h3 {
+        font-size: 1.2rem;
     }
 }
 
