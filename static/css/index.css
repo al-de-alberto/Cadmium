@@ -698,7 +698,19 @@
     
     .barista-badge {
         padding: 10px 18px;
+        font-size: 0.85rem;
+    }
+    
+    .barista-text {
         font-size: 0.9rem;
+    }
+    
+    .barista-icon {
+        font-size: 1.2rem;
+    }
+    
+    .carousel-barista-overlay {
+        bottom: 20px;
     }
 
     /* App icon section con mejor espaciado */
@@ -832,6 +844,23 @@
     
     .carousel {
         height: 220px;
+    }
+    
+    .barista-badge {
+        padding: 8px 14px;
+        font-size: 0.75rem;
+    }
+    
+    .barista-text {
+        font-size: 0.8rem;
+    }
+    
+    .barista-icon {
+        font-size: 1rem;
+    }
+    
+    .carousel-barista-overlay {
+        bottom: 15px;
     }
     
     /* App icon más pequeño */
