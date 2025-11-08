@@ -85,6 +85,7 @@
     max-width: 1200px;
     margin: 40px auto;
     padding: 0 20px;
+    padding-top: 90px; /* Espacio para navbar fijo */
 }
 
 .carousel-container {
@@ -624,53 +625,257 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    /* Navbar más compacta */
     .navbar {
-        flex-direction: column;
-        gap: 15px;
-        padding: 1rem;
+        padding: 0.75rem 1rem;
+        min-height: 60px;
+    }
+    
+    .navbar-brand {
+        font-size: 1.25rem;
+        gap: 10px;
+    }
+    
+    .navbar-logo {
+        width: 36px;
+        height: 36px;
+    }
+    
+    /* Ocultar tagline en móviles pequeños */
+    .navbar-brand .tagline {
+        display: none;
+    }
+    
+    /* Mostrar tagline en tablets */
+    @media (min-width: 480px) and (max-width: 768px) {
+        .navbar-brand .tagline {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding-left: 8px;
+        }
     }
 
     .navbar-nav {
-        width: 100%;
-        justify-content: center;
+        width: auto;
+        justify-content: flex-end;
+    }
+    
+    /* Hero section con mejor espaciado */
+    .hero-section {
+        margin: 0 auto 24px;
+        padding: 0 16px;
+        padding-top: 80px; /* Espacio para navbar fijo más pequeño en móviles */
     }
 
     .carousel {
-        height: 300px;
+        height: 250px;
+        border-radius: 12px;
+    }
+    
+    .carousel-controls {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .carousel-prev {
+        left: 10px;
+    }
+    
+    .carousel-next {
+        right: 10px;
+    }
+    
+    .carousel-indicators {
+        bottom: 15px;
+        gap: 8px;
+    }
+    
+    .carousel-indicator {
+        width: 10px;
+        height: 10px;
+    }
+    
+    .barista-badge {
+        padding: 10px 18px;
+        font-size: 0.9rem;
+    }
+
+    /* App icon section con mejor espaciado */
+    .app-icon-section {
+        margin: 40px auto;
+        padding: 0 16px;
+    }
+    
+    .app-icon {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 16px;
+    }
+    
+    .app-title {
+        font-size: 1.75rem;
+        margin-top: 16px;
+        margin-bottom: 8px;
+    }
+    
+    .app-subtitle {
+        font-size: 1.25rem;
+    }
+
+    /* News section con mejor espaciado */
+    .news-section {
+        padding: 40px 16px;
+        margin-top: 40px;
+    }
+    
+    .section-title {
+        font-size: 1.75rem;
+        margin-bottom: 32px;
+        padding: 0 16px;
     }
 
     .news-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0 8px;
+    }
+    
+    .news-card {
+        margin-bottom: 0;
+    }
+    
+    .news-card-content {
+        padding: 20px 16px;
+    }
+    
+    .news-card-title {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+    }
+    
+    .news-description {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    .news-date {
+        font-size: 0.9rem;
+        padding-top: 10px;
+        margin-top: 12px;
     }
 
+    /* Footer con mejor espaciado */
+    .footer {
+        padding: 32px 16px;
+    }
+    
+    .footer p {
+        font-size: 0.9rem;
+        margin-top: 12px;
+    }
+
+    /* Social float button */
     .social-float-btn {
-        right: 15px;
-        bottom: 15px;
+        right: 16px;
+        bottom: 16px;
     }
 
     .social-btn-main {
-        width: 50px;
-        height: 50px;
+        width: 52px;
+        height: 52px;
     }
 
     .social-btn-main svg {
-        width: 25px;
-        height: 25px;
+        width: 26px;
+        height: 26px;
     }
     
     .social-btn-main img {
-        width: 25px;
-        height: 25px;
+        width: 26px;
+        height: 26px;
     }
 
     .social-link {
-        width: 35px;
-        height: 35px;
+        width: 36px;
+        height: 36px;
     }
 
     .social-link svg {
         width: 18px;
         height: 18px;
+    }
+}
+
+/* Mejoras para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    /* Navbar aún más compacta */
+    .navbar {
+        padding: 0.6rem 0.75rem;
+        min-height: 56px;
+    }
+    
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+    
+    .navbar-logo {
+        width: 32px;
+        height: 32px;
+    }
+    
+    /* Hero section ajustado */
+    .hero-section {
+        padding-top: 76px;
+        margin-bottom: 20px;
+    }
+    
+    .carousel {
+        height: 220px;
+    }
+    
+    /* App icon más pequeño */
+    .app-icon {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .app-title {
+        font-size: 1.5rem;
+    }
+    
+    .app-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    /* News section más compacta */
+    .news-section {
+        padding: 32px 12px;
+        margin-top: 32px;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 24px;
+        padding: 0 8px;
+    }
+    
+    .news-grid {
+        gap: 16px;
+        padding: 0 4px;
+    }
+    
+    .news-card-content {
+        padding: 16px 12px;
+    }
+    
+    .news-card-title {
+        font-size: 1.2rem;
+    }
+    
+    /* Footer más compacto */
+    .footer {
+        padding: 24px 12px;
     }
 }
 
