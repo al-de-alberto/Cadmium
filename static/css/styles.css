@@ -12,37 +12,75 @@
 }
 
 :root {
-    /* Paleta de colores inspirada en café - Especial para PopUp Nescafe */
-    --primary-color: #2E2A27; /* Marrón espresso - base / fondo oscuro */
-    --primary-dark: #1F1C1A; /* Marrón espresso más oscuro */
-    --secondary-color: #B08968; /* Café con leche - detalles suaves, bordes, iconos */
-    --success-color: #00A896; /* Verde turquesa tecnológico - botones o acentos */
-    --danger-color: #C62828; /* Rojo suave para errores */
-    --warning-color: #F5CB5C; /* Amarillo cálido / energía - hover o notificaciones */
-    --info-color: #B08968; /* Café con leche */
-    --bg-color: #F8EDEB; /* Crema clara - fondo de tarjetas o paneles */
-    --card-bg: #FFFFFF; /* Blanco puro para tarjetas */
-    --text-primary: #2E2A27; /* Marrón espresso para texto principal */
-    --text-secondary: #6B5D52; /* Marrón medio para texto secundario */
-    --border-color: #D4C4B8; /* Beige claro para bordes */
-    --sidebar-bg: #2E2A27; /* Marrón espresso - sidebar */
-    --sidebar-hover: #3D3834; /* Marrón espresso más claro para hover */
+    /* Paleta de colores inspirada en cafetería - Cálida y acogedora */
+    --coffee-dark: #3E2723; /* Marrón espresso oscuro - principal */
+    --coffee-medium: #5D4037; /* Marrón café medio */
+    --coffee-light: #8D6E63; /* Marrón café claro */
+    --coffee-cream: #D7CCC8; /* Crema de café */
+    --coffee-latte: #EFEBE9; /* Latte claro */
+    --coffee-gold: #D4A574; /* Dorado café - acentos */
+    --coffee-caramel: #A67C52; /* Caramelo - detalles */
+    
+    /* Colores principales */
+    --primary-color: var(--coffee-dark);
+    --primary-dark: #2C1810;
+    --secondary-color: var(--coffee-caramel);
+    --accent-color: var(--coffee-gold);
+    
+    /* Colores de estado */
+    --success-color: #6B8E23; /* Verde oliva suave */
+    --danger-color: #C85A4F; /* Rojo terracota */
+    --warning-color: var(--coffee-gold);
+    --info-color: var(--coffee-medium);
+    
+    /* Fondos */
+    --bg-color: #FFF8F5; /* Crema muy clara */
+    --bg-gradient: linear-gradient(135deg, #FFF8F5 0%, #F5E6D3 100%);
+    --card-bg: #FFFFFF;
+    --card-shadow: 0 4px 20px rgba(62, 39, 35, 0.08);
+    --card-shadow-hover: 0 8px 30px rgba(62, 39, 35, 0.15);
+    
+    /* Texto */
+    --text-primary: var(--coffee-dark);
+    --text-secondary: #6B5D52;
+    --text-light: #8D6E63;
+    
+    /* Bordes y separadores */
+    --border-color: #E8DDD4;
+    --border-light: #F5E6D3;
+    
+    /* Navbar y sidebar */
+    --sidebar-bg: var(--coffee-dark);
+    --sidebar-hover: var(--coffee-medium);
+    --navbar-gradient: linear-gradient(135deg, var(--coffee-dark) 0%, var(--coffee-medium) 100%);
 }
 
 body {
-    font-family: 'Raleway', sans-serif;
-    background-color: var(--bg-color);
+    font-family: 'Kaoly', 'Crimson Text', Georgia, serif;
+    background: var(--bg-gradient);
+    background-attachment: fixed;
     color: var(--text-primary);
-    line-height: 1.7;
+    line-height: 1.8;
     font-weight: 400;
-    font-size: 18px; /* Aumentado de 16px (default) a 18px para mejor legibilidad */
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Marcellus SC', serif;
-    font-weight: 400;
-    letter-spacing: 0.5px;
+    font-family: 'Coolvetica', 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: var(--coffee-dark);
+    line-height: 1.3;
 }
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; }
+h6 { font-size: 1rem; }
 
 /* Navbar Styles */
 .navbar {
