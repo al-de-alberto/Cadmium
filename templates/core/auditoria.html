@@ -136,17 +136,24 @@
         {% endif %}
         
         <!-- Filtros -->
-        <div class="filters-container" style="margin-bottom: 40px;">
+        <div class="filters-container">
             <form method="get" class="filters-form">
                 <div class="filter-row">
                     <div class="filter-group">
-                        <label for="search">Buscar:</label>
-                        <input type="text" name="search" id="search" value="{{ search_query }}" placeholder="Buscar por descripción, usuario...">
+                        <label for="search" class="filter-label">🔍 Buscar:</label>
+                        <input 
+                            type="text" 
+                            name="search" 
+                            id="search" 
+                            value="{{ search_query }}" 
+                            placeholder="Buscar por descripción, usuario..."
+                            class="filter-input"
+                        >
                     </div>
                     
                     <div class="filter-group">
-                        <label for="modulo">Módulo:</label>
-                        <select name="modulo" id="modulo">
+                        <label for="modulo" class="filter-label">📦 Módulo:</label>
+                        <select name="modulo" id="modulo" class="filter-select">
                             <option value="">Todos</option>
                             {% for value, label in modulos %}
                                 <option value="{{ value }}" {% if modulo_filter == value %}selected{% endif %}>{{ label }}</option>
@@ -155,8 +162,8 @@
                     </div>
                     
                     <div class="filter-group">
-                        <label for="accion">Acción:</label>
-                        <select name="accion" id="accion">
+                        <label for="accion" class="filter-label">⚡ Acción:</label>
+                        <select name="accion" id="accion" class="filter-select">
                             <option value="">Todas</option>
                             {% for value, label in acciones %}
                                 <option value="{{ value }}" {% if accion_filter == value %}selected{% endif %}>{{ label }}</option>
@@ -165,8 +172,8 @@
                     </div>
                     
                     <div class="filter-group">
-                        <label for="usuario">Usuario:</label>
-                        <select name="usuario" id="usuario">
+                        <label for="usuario" class="filter-label">👤 Usuario:</label>
+                        <select name="usuario" id="usuario" class="filter-select">
                             <option value="">Todos</option>
                             {% for usuario in usuarios %}
                                 <option value="{{ usuario.id }}" {% if usuario_filter == usuario.id|stringformat:"s" %}selected{% endif %}>{{ usuario.get_nombre_completo }}</option>
@@ -175,21 +182,33 @@
                     </div>
                 </div>
                 
-                <div class="filter-row">
+                <div class="filter-row filter-row-dates">
                     <div class="filter-group">
-                        <label for="fecha_desde">Fecha Desde:</label>
-                        <input type="date" name="fecha_desde" id="fecha_desde" value="{{ fecha_desde }}">
+                        <label for="fecha_desde" class="filter-label">📅 Fecha Desde:</label>
+                        <input 
+                            type="date" 
+                            name="fecha_desde" 
+                            id="fecha_desde" 
+                            value="{{ fecha_desde }}"
+                            class="filter-input"
+                        >
                     </div>
                     
                     <div class="filter-group">
-                        <label for="fecha_hasta">Fecha Hasta:</label>
-                        <input type="date" name="fecha_hasta" id="fecha_hasta" value="{{ fecha_hasta }}">
+                        <label for="fecha_hasta" class="filter-label">📅 Fecha Hasta:</label>
+                        <input 
+                            type="date" 
+                            name="fecha_hasta" 
+                            id="fecha_hasta" 
+                            value="{{ fecha_hasta }}"
+                            class="filter-input"
+                        >
                     </div>
-                    
-                    <div class="filter-group" style="display: flex; align-items: flex-end; gap: 10px;">
-                        <button type="submit" class="btn btn-primary">Filtrar</button>
-                        <a href="{% url 'auditoria' %}" class="btn btn-secondary">Limpiar</a>
-                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="submit" class="btn-filter">Filtrar</button>
+                    <a href="{% url 'auditoria' %}" class="btn-filter-clear">Limpiar</a>
                 </div>
             </form>
         </div>
@@ -316,6 +335,162 @@
 .badge-accion-otro {
     background-color: #E3F2FD;
     color: #1976D2;
+}
+
+/* Estilos para filtros (igual que asistencia) */
+.filters-container {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    margin-top: 20px;
+    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.1);
+}
+
+.filters-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    align-items: end;
+}
+
+.filter-row-dates {
+    grid-template-columns: repeat(2, 1fr) !important;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: 'Raleway', sans-serif;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Raleway', sans-serif;
+    transition: all 0.3s ease;
+    background: var(--bg-color);
+    color: var(--text-primary);
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.1);
+    background: white;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Raleway', sans-serif;
+    transition: all 0.3s ease;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.1);
+    background: white;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px solid var(--border-color);
+}
+
+.btn-filter {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--success-color) 0%, #00C5A4 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Raleway', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 168, 150, 0.3);
+    min-width: 120px;
+    text-align: center;
+}
+
+.btn-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 168, 150, 0.4);
+}
+
+.btn-filter-clear {
+    padding: 12px 24px;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Raleway', sans-serif;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    text-align: center;
+}
+
+.btn-filter-clear:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.15);
+}
+
+@media (max-width: 768px) {
+    .filters-form {
+        gap: 15px;
+    }
+    
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-row-dates {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .filter-actions {
+        flex-direction: column;
+    }
+    
+    .btn-filter,
+    .btn-filter-clear {
+        width: 100%;
+    }
 }
 </style>
 {% endblock %}
