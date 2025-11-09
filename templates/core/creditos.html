@@ -1,0 +1,205 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Créditos - Cadmium{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/contactanos.css' %}">
+<style>
+    body {
+        background: linear-gradient(135deg, #F8EDEB 0%, #D8C3A5 100%);
+        min-height: 100vh;
+    }
+
+    .navbar {
+        background-color: var(--sidebar-bg) !important;
+        color: white !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .navbar-brand {
+        color: white !important;
+    }
+
+    .navbar-brand span {
+        color: white !important;
+    }
+
+    .credits-section {
+        min-height: calc(100vh - 200px);
+        padding: 80px 20px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .credits-container {
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .thanks-card {
+        background: white;
+        border-radius: 16px;
+        padding: 50px 40px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .thanks-title {
+        font-family: 'Playfair Display', Georgia, serif;
+        color: var(--primary-color);
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+        font-weight: 700;
+    }
+
+    .thanks-text {
+        color: var(--text-color);
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 25px;
+        text-align: justify;
+    }
+
+    .thanks-text p {
+        margin-bottom: 15px;
+    }
+
+    .thanks-signature {
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 2px solid var(--primary-color);
+    }
+
+    .thanks-signature-text {
+        font-family: 'Playfair Display', Georgia, serif;
+        color: var(--primary-color);
+        font-size: 1.3rem;
+        font-weight: 600;
+        font-style: italic;
+    }
+
+    .highlight-name {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    @media (max-width: 768px) {
+        .thanks-card {
+            padding: 40px 25px;
+        }
+
+        .thanks-title {
+            font-size: 2rem;
+        }
+
+        .thanks-text {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{% url 'index' %}" class="navbar-brand">
+        <div class="navbar-logo">
+            <img src="{% static 'images/logo/logo.png' %}" alt="Cadmium Logo" class="navbar-logo-img" data-logo-svg="{% static 'images/logo/logo.svg' %}" onerror="handleLogoError(this)">
+            <span class="logo-fallback" style="display: none;">C</span>
+        </div>
+        <div>
+            <span>Cadmium</span>
+            <span class="tagline">Crea tu mundo</span>
+        </div>
+    </a>
+    <div class="navbar-nav">
+        <div class="dropdown">
+            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
+                <span class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </a>
+            <div class="dropdown-menu">
+                {% if user.is_authenticated %}
+                    <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                    {% if user.es_administrador or user.is_superuser %}
+                        <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
+                    {% elif user.es_empleado %}
+                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}" class="dropdown-item">🔐 Iniciar Sesión</a>
+                {% endif %}
+                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
+                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Credits Section -->
+<div class="credits-section">
+    <div class="credits-container">
+        <div class="thanks-card">
+            <h1 class="thanks-title">Créditos</h1>
+            
+            <div class="thanks-text">
+                <p>
+                    Agradecemos sinceramente a nuestra institución, al cuerpo docente, a la directiva y al equipo PopUp por su colaboración. En especial, expresamos nuestro profundo agradecimiento a <span class="highlight-name">Nayara Parra</span>, gerente general del proyecto durante el segundo semestre del año 2025, quien nos brindó su apoyo, orientación y confianza en todo momento. Gracias a su compromiso y constante interés, este proyecto pudo hacerse realidad.
+                </p>
+            </div>
+
+            <div class="thanks-signature">
+                <p class="thanks-signature-text">Muchas gracias</p>
+                <div style="display: flex; justify-content: center; margin: 20px 0;">
+                    <img src="{% static 'images/logo/logo.png' %}" alt="Cadmium Logo" style="max-width: 150px; height: auto; object-fit: contain;" data-logo-svg="{% static 'images/logo/logo.svg' %}" onerror="handleLogoError(this)">
+                    <span class="logo-fallback" style="display: none; font-size: 4rem; font-weight: bold; color: var(--primary-color);">C</span>
+                </div>
+                <p class="thanks-signature-text">Equipo Cadmium</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <p>&copy; 2025 Cadmium. Todos los derechos reservados.</p>
+        <p style="margin-top: 5px;">Desarrollado por: Tania Vilches, Annais Galvez, Alberto San Juan</p>
+        <p style="margin-top: 10px;">
+            <a href="{% url 'equipo' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: underline; transition: color 0.3s ease; margin-right: 15px;">Conoce al Equipo</a>
+            <a href="{% url 'creditos' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: underline; transition: color 0.3s ease;">Créditos</a>
+        </p>
+    </div>
+</footer>
+
+<script>
+    // Función para el menú desplegable
+    function toggleDropdown(event) {
+        event.preventDefault();
+        const dropdown = event.currentTarget.closest('.dropdown');
+        dropdown.classList.toggle('active');
+    }
+
+    // Cerrar el menú al hacer clic fuera
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+</script>
+{% endblock %}

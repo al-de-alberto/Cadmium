@@ -1644,6 +1644,16 @@ def contactanos_view(request):
     })
 
 
+def equipo_view(request):
+    """Vista para la página de conoce al equipo"""
+    return render(request, 'core/equipo.html')
+
+
+def creditos_view(request):
+    """Vista para la página de créditos y agradecimientos"""
+    return render(request, 'core/creditos.html')
+
+
 @login_required
 def gestionar_contactos_view(request):
     """Vista para gestionar contactos"""

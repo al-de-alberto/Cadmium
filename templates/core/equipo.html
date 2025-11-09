@@ -1,0 +1,400 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Conoce al Equipo - Cadmium{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/contactanos.css' %}">
+<style>
+    body {
+        background: linear-gradient(135deg, #F8EDEB 0%, #D8C3A5 100%);
+        min-height: 100vh;
+    }
+
+    .navbar {
+        background-color: var(--sidebar-bg) !important;
+        color: white !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .navbar-brand {
+        color: white !important;
+    }
+
+    .navbar-brand span {
+        color: white !important;
+    }
+
+    .credits-section {
+        min-height: calc(100vh - 200px);
+        padding: 80px 20px 40px;
+    }
+
+    .credits-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .page-header h1 {
+        font-family: 'Playfair Display', Georgia, serif;
+        color: var(--primary-color);
+        font-size: 3rem;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+
+    .page-header p {
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+    }
+
+    .credits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin-bottom: 50px;
+    }
+
+    .credit-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-align: center;
+    }
+
+    .credit-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .credit-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
+
+    .credit-name {
+        font-family: 'Playfair Display', Georgia, serif;
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .credit-role {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        margin-bottom: 15px;
+        font-style: italic;
+    }
+
+    .credit-description {
+        color: var(--text-color);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+
+    .social-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary-color);
+        text-decoration: none;
+        padding: 8px 16px;
+        border: 2px solid var(--primary-color);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .social-link:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .social-link svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
+    
+    .social-link img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+    }
+
+    .social-link.unavailable {
+        color: var(--text-secondary);
+        border-color: var(--text-secondary);
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .social-link.unavailable:hover {
+        background: transparent;
+        color: var(--text-secondary);
+        transform: none;
+        box-shadow: none;
+    }
+
+    .info-section {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+    }
+
+    .info-section h2 {
+        font-family: 'Playfair Display', Georgia, serif;
+        color: var(--primary-color);
+        font-size: 2rem;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .info-section p {
+        color: var(--text-color);
+        font-size: 1rem;
+        line-height: 1.8;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .tech-stack {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .tech-badge {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #D8C3A5 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .credits-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .credit-card {
+            padding: 25px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="navbar">
+    <a href="{% url 'index' %}" class="navbar-brand">
+        <div class="navbar-logo">
+            <img src="{% static 'images/logo/logo.png' %}" alt="Cadmium Logo" class="navbar-logo-img" data-logo-svg="{% static 'images/logo/logo.svg' %}" onerror="handleLogoError(this)">
+            <span class="logo-fallback" style="display: none;">C</span>
+        </div>
+        <div>
+            <span>Cadmium</span>
+            <span class="tagline">Crea tu mundo</span>
+        </div>
+    </a>
+    <div class="navbar-nav">
+        <div class="dropdown">
+            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
+                <span class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </a>
+            <div class="dropdown-menu">
+                {% if user.is_authenticated %}
+                    <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
+                    {% if user.es_administrador or user.is_superuser %}
+                        <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
+                    {% elif user.es_empleado %}
+                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}" class="dropdown-item">🔐 Iniciar Sesión</a>
+                {% endif %}
+                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
+                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Team Section -->
+<div class="credits-section">
+    <div class="credits-container">
+        <div class="page-header">
+            <h1>Conoce al Equipo</h1>
+            <p>El equipo detrás de Cadmium</p>
+        </div>
+
+        <div class="credits-grid">
+            <div class="credit-card">
+                <div class="credit-icon">👩‍💻</div>
+                <div class="credit-name">Tania Vilches</div>
+                <div class="credit-role">Diseñadora de Marca y Desarrolladora</div>
+                <div class="credit-description">
+                    Encargada del diseño de marca, apasionada por el desarrollo web y la creación de identidades visuales sólidas. Se destaca por su creatividad, adaptabilidad y visión estética, logrando conectar la esencia del proyecto con una imagen coherente y atractiva que refuerza su presencia digital.
+                </div>
+                <div class="social-links">
+                    <a href="https://www.linkedin.com/in/tania-vilches-fuentes-6577032b0/" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn
+                    </a>
+                    <a href="https://github.com/99milo" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+            </div>
+
+            <div class="credit-card">
+                <div class="credit-icon">👩‍💻</div>
+                <div class="credit-name">Annais Galvez</div>
+                <div class="credit-role">QA y Control de Calidad</div>
+                <div class="credit-description">
+                    Encargada de QA del equipo, comprometida con la mejora continua y la optimización de procesos. Posee una fuerte orientación al detalle y una destacada capacidad analítica, lo que le permite identificar brechas y asegurar la estabilidad, funcionalidad y calidad del software en cada etapa de desarrollo.
+                </div>
+                <div class="social-links">
+                    <span class="social-link unavailable">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn: No disponible
+                    </span>
+                    <span class="social-link unavailable">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub: No disponible
+                    </span>
+                </div>
+            </div>
+
+            <div class="credit-card">
+                <div class="credit-icon">👨‍💻</div>
+                <div class="credit-name">Alberto San Juan</div>
+                <div class="credit-role">Product Owner</div>
+                <div class="credit-description">
+                    Product Owner y principal responsable de la comunicación entre los stakeholders y el equipo de desarrollo. Destaca por su liderazgo, organización y enfoque estratégico, manteniendo el equilibrio entre las necesidades del usuario y los objetivos técnicos para garantizar resultados coherentes y eficientes.
+                </div>
+                <div class="social-links">
+                    <a href="https://www.linkedin.com/in/alberto-san-juan-ossul-5a8920332/" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                        LinkedIn
+                    </a>
+                    <a href="https://github.com/al-de-alberto/" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>Acerca del Proyecto</h2>
+            <p>
+                <strong>Cadmium</strong> es un sistema de gestión integral desarrollado para PopUp Nescafe. 
+                Este sistema permite gestionar usuarios, inventario, asistencias, pedidos, operaciones y contenido 
+                de manera eficiente y segura.
+            </p>
+            <p>
+                El proyecto fue desarrollado utilizando tecnologías modernas y mejores prácticas de desarrollo web, 
+                garantizando seguridad, escalabilidad y una excelente experiencia de usuario.
+            </p>
+            
+            <h2 style="margin-top: 30px; font-size: 1.5rem;">Tecnologías Utilizadas</h2>
+            <div class="tech-stack">
+                <span class="tech-badge">Django</span>
+                <span class="tech-badge">Python</span>
+                <span class="tech-badge">PostgreSQL</span>
+                <span class="tech-badge">HTML5</span>
+                <span class="tech-badge">CSS3</span>
+                <span class="tech-badge">JavaScript</span>
+                <span class="tech-badge">Cloudinary</span>
+                <span class="tech-badge">Render</span>
+                <span class="tech-badge">Git</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <p>&copy; 2025 Cadmium. Todos los derechos reservados.</p>
+        <p style="margin-top: 5px;">Desarrollado por: Tania Vilches, Annais Galvez, Alberto San Juan</p>
+        <p style="margin-top: 10px;">
+            <a href="{% url 'equipo' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: underline; transition: color 0.3s ease; margin-right: 15px;">Conoce al Equipo</a>
+            <a href="{% url 'creditos' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: underline; transition: color 0.3s ease;">Créditos</a>
+        </p>
+    </div>
+</footer>
+
+<script>
+    // Función para el menú desplegable
+    function toggleDropdown(event) {
+        event.preventDefault();
+        const dropdown = event.currentTarget.closest('.dropdown');
+        dropdown.classList.toggle('active');
+    }
+
+    // Cerrar el menú al hacer clic fuera
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+</script>
+{% endblock %}
+
