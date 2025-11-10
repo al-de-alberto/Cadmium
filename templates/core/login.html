@@ -12,7 +12,10 @@
 <div class="login-container" style="margin-top: 0; padding-top: 80px; min-height: 100vh;">
     <div class="login-card">
         <div class="login-header">
-            <h1>Cadmium</h1>
+            <div class="login-logo">
+                <img src="{% static 'images/logo/logo.png' %}" alt="Cadmium Logo" class="login-logo-img" data-logo-svg="{% static 'images/logo/logo.svg' %}" onerror="handleLogoError(this)">
+                <span class="logo-fallback" style="display: none; font-size: 4rem; font-weight: bold;">☕</span>
+            </div>
         </div>
         
         {% if messages %}
