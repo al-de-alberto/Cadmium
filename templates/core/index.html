@@ -8,47 +8,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Navbar -->
-<nav class="navbar">
-    <a href="{% url 'index' %}" class="navbar-brand">
-        <div class="navbar-logo">
-            <img src="{% static 'images/logo/logo.png' %}" alt="Cadmium Logo" class="navbar-logo-img" data-logo-svg="{% static 'images/logo/logo.svg' %}" onerror="handleLogoError(this)">
-            <span class="logo-fallback" style="display: none;">C</span>
-        </div>
-        <div>
-            <span>Cadmium</span>
-            <span class="tagline">Crea tu mundo</span>
-        </div>
-    </a>
-    <div class="navbar-nav">
-        <div class="dropdown">
-            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
-                <span class="hamburger-icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
-            </a>
-            <div class="dropdown-menu">
-                {% if user.is_authenticated %}
-                    <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
-                    {% if user.es_administrador or user.is_superuser %}
-                        <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
-                    {% elif user.es_empleado %}
-                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
-                    {% endif %}
-                {% else %}
-                    <a href="{% url 'login' %}" class="dropdown-item">🔐 Iniciar Sesión</a>
-                {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
-                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</nav>
 
 <!-- Mensajes -->
 {% if messages %}
@@ -98,7 +57,7 @@
         <span class="logo-fallback" style="display: none; font-size: 4.5rem; font-weight: bold;">☕</span>
     </div>
     <h2 class="app-title">Cadmium</h2>
-    <p class="app-subtitle">PopUp Nescafe</p>
+    <p class="app-subtitle">PopUp Nescafé</p>
 </div>
 
 <!-- News and Events Section -->
@@ -131,7 +90,7 @@
                     <div class="news-card-content">
                         <div class="news-category">📅 Eventos PopUp</div>
                         <h3 class="news-card-title">Eventos PopUp</h3>
-                        <p class="news-description">Mantente al día con las últimas noticias y eventos importantes del PopUp Nescafe. Aquí encontrarás información relevante sobre actividades, anuncios y comunicados.</p>
+                        <p class="news-description">Mantente al día con las últimas noticias y eventos importantes del PopUp Nescafé. Aquí encontrarás información relevante sobre actividades, anuncios y comunicados.</p>
                         <div class="news-date">Fecha: Próximamente</div>
                     </div>
                 </div>
@@ -162,7 +121,7 @@
                     <div class="news-card-content">
                         <div class="news-category">📰 Noticias y Actualizaciones</div>
                         <h3 class="news-card-title">Noticias y Actualizaciones</h3>
-                        <p class="news-description">Información actualizada sobre el funcionamiento del sistema y las actividades del PopUp Nescafe. Consulta regularmente para estar informado.</p>
+                        <p class="news-description">Información actualizada sobre el funcionamiento del sistema y las actividades del PopUp Nescafé. Consulta regularmente para estar informado.</p>
                         <div class="news-date">Fecha: Próximamente</div>
                     </div>
                 </div>

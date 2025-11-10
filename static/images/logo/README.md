@@ -42,3 +42,11 @@ Si el logo no existe, el sistema mostrará:
 
 Consulta `GUIA_APLICAR_LOGO.md` en la raíz del proyecto.
 
+
+
+
+
+
+
+
+

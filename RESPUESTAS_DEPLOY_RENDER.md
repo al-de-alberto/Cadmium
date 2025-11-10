@@ -282,3 +282,11 @@ Una vez que hayas hecho el commit final y verificado todo, estás listo para:
 
 - **Actualizaciones:** Cada vez que hagas `git push` a la rama que Render está monitoreando, se hará un redeploy automático.
 
+
+
+
+
+
+
+
+

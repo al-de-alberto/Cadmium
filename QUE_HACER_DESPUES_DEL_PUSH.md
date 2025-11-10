@@ -187,3 +187,11 @@ Una vez completados estos pasos, tu aplicación estará lista para usar en produ
 - Verifica la guía `CREAR_USUARIOS_SIN_SHELL.md`
 - Revisa la documentación de Django y Render
 
+
+
+
+
+
+
+
+

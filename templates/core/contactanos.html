@@ -8,47 +8,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Navbar -->
-<nav class="navbar">
-    <a href="{% url 'index' %}" class="navbar-brand">
-        <div class="navbar-logo">
-            <img src="{% static 'images/logo/logo.png' %}" alt="Cadmium Logo" class="navbar-logo-img" data-logo-svg="{% static 'images/logo/logo.svg' %}" onerror="handleLogoError(this)">
-            <span class="logo-fallback" style="display: none;">C</span>
-        </div>
-        <div>
-            <span>Cadmium</span>
-            <span class="tagline">Crea tu mundo</span>
-        </div>
-    </a>
-    <div class="navbar-nav">
-        <div class="dropdown">
-            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
-                <span class="hamburger-icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
-            </a>
-            <div class="dropdown-menu">
-                {% if user.is_authenticated %}
-                    <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
-                    {% if user.es_administrador or user.is_superuser %}
-                        <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
-                    {% elif user.es_empleado %}
-                        <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
-                    {% endif %}
-                {% else %}
-                    <a href="{% url 'login' %}" class="dropdown-item">🔐 Iniciar Sesión</a>
-                {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
-                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</nav>
 
 <!-- Contact Section -->
 <div class="contact-section">

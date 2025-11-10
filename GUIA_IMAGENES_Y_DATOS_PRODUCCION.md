@@ -207,3 +207,11 @@ Dime qué opción prefieres y te ayudo a implementarla:
 
 **Por eso necesitas Cloudinary u otro servicio de almacenamiento para las imágenes.**
 
+
+
+
+
+
+
+
+

@@ -3,57 +3,6 @@
 {% block title %}Panel Administrador - Cadmium{% endblock %}
 
 {% block content %}
-<!-- Navbar -->
-<nav class="navbar">
-    <a href="{% url 'index' %}" class="navbar-brand">
-        <div class="navbar-logo">C</div>
-        <div>
-            <span>Cadmium</span>
-            <span class="tagline">Crea tu mundo</span>
-        </div>
-    </a>
-    <div class="navbar-nav">
-        <div class="dropdown">
-            <a href="#" class="dropdown-toggle nav-link" onclick="toggleDropdown(event)">
-                <span class="hamburger-icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
-            </a>
-            <div class="dropdown-menu">
-                <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
-                {% if user.es_administrador or user.is_superuser %}
-                    <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
-                {% elif user.es_empleado %}
-                    <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
-                {% endif %}
-                <a href="{% url 'contactanos' %}" class="dropdown-item">📞 Contáctanos</a>
-                <a href="{% url 'documentacion' %}" class="dropdown-item">📚 Documentación</a>
-                <a href="{% url 'logout' %}" class="dropdown-item">🚪 Cerrar Sesión</a>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-        // Función para el menú desplegable
-        function toggleDropdown(event) {
-            event.preventDefault();
-            const dropdown = event.currentTarget.closest('.dropdown');
-            dropdown.classList.toggle('active');
-        }
-
-        // Cerrar el menú al hacer clic fuera
-        document.addEventListener('click', function(event) {
-            const dropdowns = document.querySelectorAll('.dropdown');
-            dropdowns.forEach(dropdown => {
-                if (!dropdown.contains(event.target)) {
-                    dropdown.classList.remove('active');
-                }
-            });
-        });
-    </script>
-</nav>
 
 <div class="admin-container panel-dashboard">
     <aside class="sidebar">

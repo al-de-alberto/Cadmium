@@ -154,3 +154,11 @@ Una vez que coloques los archivos del logo en `static/images/logo/`, el sistema 
 
 **¿Necesitas ayuda?** Consulta `GUIA_APLICAR_LOGO.md` para más detalles.
 
+
+
+
+
+
+
+
+

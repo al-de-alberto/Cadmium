@@ -192,3 +192,11 @@ El código ya está preparado para usar Cloudinary. Solo necesitas:
 
 **¿Necesitas ayuda?** Revisa los logs de Render o contacta con soporte.
 
+
+
+
+
+
+
+
+

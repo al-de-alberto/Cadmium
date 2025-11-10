@@ -53,6 +53,9 @@
     --sidebar-bg: var(--coffee-dark);
     --sidebar-hover: var(--coffee-medium);
     --navbar-gradient: linear-gradient(135deg, var(--coffee-dark) 0%, var(--coffee-medium) 100%);
+
+    /* Layout */
+    --navbar-height: 88px;
 }
 
 body {
@@ -84,31 +87,52 @@ h6 { font-size: 1rem; }
 
 /* Navbar Styles */
 .navbar {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-    color: #FFFFFF;
-    padding: 1rem 2rem;
+    background: #5D4037;
+    color: white;
+    padding: 1.4rem 2.5rem;
+    height: var(--navbar-height);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 12px rgba(46, 42, 39, 0.25);
-    position: fixed;
+    box-shadow: 0 8px 32px rgba(62, 39, 35, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
     top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1001;
-    width: 100%;
-    backdrop-filter: blur(10px);
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    box-sizing: border-box;
 }
 
 .navbar-brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     text-decoration: none;
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.7rem;
     font-weight: 700;
-    font-family: 'Marcellus SC', serif;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.navbar-brand::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--coffee-gold), var(--coffee-caramel));
+    transition: width 0.4s ease;
+}
+
+.navbar-brand:hover::after {
+    width: 100%;
+}
+
+.navbar-brand:hover {
+    transform: translateY(-3px);
+    text-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
 }
 
 .navbar-brand > div {
@@ -119,46 +143,75 @@ h6 { font-size: 1rem; }
     line-height: 1.2;
 }
 
-.navbar-brand > div > span:first-child {
+.brand-name-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    line-height: 1.2;
+}
+
+.brand-name-container > span:first-child {
     font-size: 1.5rem;
     font-weight: 700;
     color: white;
     line-height: 1.2;
-    display: inline-block;
+    display: block;
 }
 
 .navbar-logo {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
-    border-radius: 8px;
+    width: 64px;
+    height: 64px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
     color: white;
-    box-shadow: 0 2px 8px rgba(46, 42, 39, 0.2);
-    transition: transform 0.3s ease;
-    font-family: 'Marcellus SC', serif;
-    overflow: hidden;
+    box-shadow: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Coolvetica', 'Space Grotesk', sans-serif;
+    overflow: visible;
     position: relative;
+}
+
+.navbar-logo::before {
+    display: none;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
 }
 
 .navbar-logo-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    padding: 4px;
+    padding: 0;
 }
 
-.navbar-brand:hover .navbar-logo {
+.navbar-logo:hover {
     transform: scale(1.05);
+    box-shadow: none;
 }
 
 .navbar-nav {
     display: flex;
     align-items: center;
     gap: 20px;
+}
+
+.navbar-brand .storage-text {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: 'Raleway', sans-serif;
+    letter-spacing: 0.5px;
+    display: block;
+    line-height: 1;
 }
 
 .navbar-brand .tagline {
@@ -305,7 +358,9 @@ h6 { font-size: 1rem; }
 }
 
 .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .welcome-name {
@@ -646,8 +701,8 @@ body.login-page {
 /* Admin Panel Styles */
 .admin-container {
     display: flex;
-    min-height: calc(100vh - 80px);
-    margin-top: 80px;
+    min-height: calc(100vh - var(--navbar-height));
+    margin-top: 0;
     padding-top: 0;
     position: relative;
 }
@@ -659,12 +714,12 @@ body.login-page {
     display: flex;
     flex-direction: column;
     position: fixed;
-    height: 100vh;
+    height: calc(100vh - var(--navbar-height));
     overflow-y: auto;
-    top: 0;
+    top: var(--navbar-height);
     left: 0;
-    z-index: 1000;
-    padding-top: 80px;
+    z-index: 999;
+    padding-top: 0;
 }
 
 .sidebar-header {
@@ -751,7 +806,7 @@ body.login-page {
     padding: 30px;
     background-color: var(--bg-color);
     margin-top: 0;
-    min-height: calc(100vh - 80px);
+    min-height: calc(100vh - var(--navbar-height));
 }
 
 .content-header {
@@ -1060,10 +1115,14 @@ body.login-page {
         line-height: 1.6;
     }
     
+    :root {
+        --navbar-height: 60px;
+    }
+    
     /* Navbar más compacta pero con mejor espaciado */
     .navbar {
         padding: 0.75rem 1rem;
-        min-height: 60px;
+        min-height: var(--navbar-height);
     }
     
     .navbar-brand {
@@ -1076,8 +1135,13 @@ body.login-page {
         height: 36px;
     }
     
-    .navbar-brand > div > span:first-child {
+    .brand-name-container > span:first-child {
         font-size: 1.25rem;
+    }
+    
+    .navbar-brand .storage-text {
+        font-size: 0.75rem;
+        font-weight: 700;
     }
     
     /* Ocultar tagline en móviles muy pequeños o hacerlo más pequeño */
@@ -1110,8 +1174,8 @@ body.login-page {
     
     /* Admin container con mejor espaciado */
     .admin-container {
-        margin-top: 60px;
-        min-height: calc(100vh - 60px);
+        margin-top: 0;
+        min-height: calc(100vh - var(--navbar-height));
         padding-bottom: 20px;
     }
     
@@ -1283,8 +1347,13 @@ body.login-page {
         height: 32px;
     }
     
-    .navbar-brand > div > span:first-child {
+    .brand-name-container > span:first-child {
         font-size: 1.1rem;
+    }
+    
+    .navbar-brand .storage-text {
+        font-size: 0.7rem;
+        font-weight: 700;
     }
     
     /* Admin container ajustado */
