@@ -58,7 +58,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'core.middleware.SessionTimeoutMiddleware',  # Timeout de sesión para gerencia
+    # Temporalmente deshabilitado - usa campo 'rol' deprecated
+    # 'core.middleware.SessionTimeoutMiddleware',  # Timeout de sesión para gerencia
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
