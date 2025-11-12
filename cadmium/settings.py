@@ -51,8 +51,9 @@ except ImportError:
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'core.admin_security.AdminSecurityMiddleware',  # Protección del admin (fuerza bruta, rate limiting)
-    'core.admin_security.AdminAccessLoggingMiddleware',  # Logging de accesos al admin
+    # Temporalmente deshabilitado para diagnosticar error 500
+    # 'core.admin_security.AdminSecurityMiddleware',  # Protección del admin (fuerza bruta, rate limiting)
+    # 'core.admin_security.AdminAccessLoggingMiddleware',  # Logging de accesos al admin
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
