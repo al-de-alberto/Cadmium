@@ -124,8 +124,10 @@
             <div class="thanks-signature">
                 <p class="thanks-signature-text">Muchas gracias</p>
                 <div style="display: flex; justify-content: center; margin: 20px 0;">
-                    <img src="{% static 'images/logo/logo.png' %}" alt="Cadmium Logo" style="max-width: 150px; height: auto; object-fit: contain;" data-logo-svg="{% static 'images/logo/logo.svg' %}" onerror="handleLogoError(this)">
-                    <span class="logo-fallback" style="display: none; font-size: 4rem; font-weight: bold; color: var(--primary-color);">C</span>
+                    <div style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                        <img src="{% static 'images/logo/logo.png' %}" alt="Cadmium Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" data-logo-svg="{% static 'images/logo/logo.svg' %}" onerror="handleLogoError(this)">
+                        <span class="logo-fallback" style="display: none; font-size: 4rem; font-weight: bold; color: var(--primary-color);">C</span>
+                    </div>
                 </div>
                 <p class="thanks-signature-text">Equipo Cadmium</p>
             </div>

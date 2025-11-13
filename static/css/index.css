@@ -333,7 +333,7 @@
     margin: 0 auto 32px;
     background: transparent;
     border: none;
-    border-radius: 0;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -344,11 +344,19 @@
     font-family: 'Coolvetica', 'Space Grotesk', sans-serif;
     transition: all 0.3s ease;
     position: relative;
-    overflow: visible;
+    overflow: hidden;
 }
 
 .app-icon::before {
     display: none;
+}
+
+.app-icon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    padding: 0;
+    border-radius: 50%;
 }
 
 .app-icon:hover {
