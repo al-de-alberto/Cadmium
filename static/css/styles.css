@@ -192,6 +192,7 @@ h6 { font-size: 1rem; }
     object-fit: cover;
     padding: 0;
     border-radius: 50%;
+    border: 3px solid var(--coffee-medium);
 }
 
 .navbar-logo:hover {
@@ -480,6 +481,7 @@ body.login-page {
     object-fit: cover;
     padding: 0;
     border-radius: 50%;
+    border: 3px solid var(--coffee-medium);
 }
 
 .login-header h1 {
