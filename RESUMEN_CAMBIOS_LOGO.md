@@ -162,3 +162,7 @@ Una vez que coloques los archivos del logo en `static/images/logo/`, el sistema 
 
 
 
+
+
+
+
