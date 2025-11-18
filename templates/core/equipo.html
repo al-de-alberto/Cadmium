@@ -84,6 +84,17 @@
         margin-bottom: 20px;
     }
 
+    .credit-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 20px;
+        display: block;
+        border: 4px solid var(--primary-color);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
     .credit-name {
         font-family: 'Playfair Display', Georgia, serif;
         color: var(--primary-color);
@@ -230,7 +241,8 @@
 
         <div class="credits-grid">
             <div class="credit-card">
-                <div class="credit-icon">👩‍💻</div>
+                <img src="{% static 'images/team/tania.jpeg' %}" alt="Tania Vilches" class="credit-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="credit-icon" style="display: none;">👩‍💻</div>
                 <div class="credit-name">Tania Vilches</div>
                 <div class="credit-role">Diseñadora de Marca y Desarrolladora</div>
                 <div class="credit-description">
@@ -253,7 +265,8 @@
             </div>
 
             <div class="credit-card">
-                <div class="credit-icon">👩‍💻</div>
+                <img src="{% static 'images/team/annais.jpeg' %}" alt="Annais Galvez" class="credit-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="credit-icon" style="display: none;">👩‍💻</div>
                 <div class="credit-name">Annais Galvez</div>
                 <div class="credit-role">QA y Control de Calidad</div>
                 <div class="credit-description">
@@ -276,7 +289,8 @@
             </div>
 
             <div class="credit-card">
-                <div class="credit-icon">👨‍💻</div>
+                <img src="{% static 'images/team/alberto.jpeg' %}" alt="Alberto San Juan" class="credit-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="credit-icon" style="display: none;">👨‍💻</div>
                 <div class="credit-name">Alberto San Juan</div>
                 <div class="credit-role">Product Owner</div>
                 <div class="credit-description">
