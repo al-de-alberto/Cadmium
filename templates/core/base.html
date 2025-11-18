@@ -48,8 +48,8 @@
                         <span class="dropdown-item welcome-item">👋 Bienvenido/a {{ user.nombre|default:user.username }}</span>
                         {% if user.es_administrador or user.is_superuser %}
                             <a href="{% url 'panel' %}" class="dropdown-item">📊 Mi Panel</a>
-                        {% elif user.es_empleado %}
-                            <a href="{% url 'trabajador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
+                        {% elif user.es_colaborador %}
+                            <a href="{% url 'colaborador_dashboard' %}" class="dropdown-item">📊 Mi Panel</a>
                         {% endif %}
                     {% else %}
                         <a href="{% url 'login' %}" class="dropdown-item">🔐 Iniciar Sesión</a>

@@ -28,9 +28,9 @@ def login_view(request):
         # Si es admin, ir al panel
         if request.user._es_administrador or request.user.is_superuser:
             return redirect('panel')
-        # Si es usuario trabajador, redirigir a dashboard trabajador
-        if request.user.es_empleado:
-            return redirect('trabajador_dashboard')
+        # Si es usuario colaborador, redirigir a dashboard colaborador
+        if request.user.es_colaborador:
+            return redirect('colaborador_dashboard')
         # Fallback al panel
         return redirect('panel')
     
@@ -60,16 +60,16 @@ def login_view(request):
             
             # Validar que el tipo de cuenta seleccionado coincida con los roles del usuario
             is_gerencia = account_type == 'gerencia'
-            is_empleado = account_type == 'empleado'
+            is_colaborador = account_type == 'colaborador'
             
             # Verificar permisos según el tipo de cuenta seleccionado
             puede_acceder = False
             if is_gerencia and (user._es_administrador or user.is_superuser):
                 puede_acceder = True
-            elif is_empleado and user.es_empleado:
+            elif is_colaborador and user.es_colaborador:
                 puede_acceder = True
             # Si el usuario tiene ambos roles, puede acceder con cualquier tipo
-            elif (user._es_administrador or user.is_superuser) and user.es_empleado:
+            elif (user._es_administrador or user.is_superuser) and user.es_colaborador:
                 puede_acceder = True
             
             if puede_acceder:
@@ -88,16 +88,16 @@ def login_view(request):
                 if is_gerencia:
                     # Si seleccionó Gerencia, ir al panel de administrador
                     return redirect('panel')
-                elif is_empleado:
-                    # Si seleccionó Empleado, ir al dashboard de trabajador
-                    return redirect('trabajador_dashboard')
+                elif is_colaborador:
+                    # Si seleccionó Colaborador, ir al dashboard de colaborador
+                    return redirect('colaborador_dashboard')
                 
                 # Fallback: Si tiene solo permisos de admin, ir al panel
-                if (user._es_administrador or user.is_superuser) and not user.es_empleado:
+                if (user._es_administrador or user.is_superuser) and not user.es_colaborador:
                     return redirect('panel')
-                # Si tiene solo permisos de empleado, ir al dashboard trabajador
-                elif user.es_empleado and not (user._es_administrador or user.is_superuser):
-                    return redirect('trabajador_dashboard')
+                # Si tiene solo permisos de colaborador, ir al dashboard colaborador
+                elif user.es_colaborador and not (user._es_administrador or user.is_superuser):
+                    return redirect('colaborador_dashboard')
                 
                 # Fallback al panel si tiene ambos roles y no se seleccionó tipo específico
                 return redirect('panel')
@@ -212,9 +212,9 @@ def cambiar_password_view(request):
     if not request.user.cambio_password_requerido:
         return redirect('panel')
     
-    # Para usuarios trabajadores, permitir cambiar contraseña
+    # Para usuarios colaboradores, permitir cambiar contraseña
     # Para administradores, también permitir si se restableció su contraseña
-    if request.user.es_empleado or (request.user._es_administrador and request.user.cambio_password_requerido):
+    if request.user.es_colaborador or (request.user._es_administrador and request.user.cambio_password_requerido):
         pass  # Continuar con el proceso
     else:
         return redirect('panel')
@@ -348,7 +348,7 @@ def editar_usuario_view(request, usuario_id):
                     'rut': usuario.rut,
                     'correo_institucional': usuario.correo_institucional,
                     'es_administrador': usuario._es_administrador if hasattr(usuario, '_es_administrador') else (usuario.rol == 'admin' if usuario.rol else False),
-                    'es_empleado': usuario.es_empleado if hasattr(usuario, 'es_empleado') else (usuario.rol == 'usuario' if usuario.rol else True),
+                    'es_colaborador': usuario.es_colaborador if hasattr(usuario, 'es_colaborador') else (usuario.rol == 'usuario' if usuario.rol else True),
                     'activo': usuario.activo,
                 }
                 
@@ -375,7 +375,7 @@ def editar_usuario_view(request, usuario_id):
                         'rut': usuario.rut,
                         'correo_institucional': usuario.correo_institucional,
                         'es_administrador': usuario._es_administrador if hasattr(usuario, '_es_administrador') else False,
-                        'es_empleado': usuario.es_empleado if hasattr(usuario, 'es_empleado') else False,
+                        'es_colaborador': usuario.es_colaborador if hasattr(usuario, 'es_colaborador') else False,
                         'activo': usuario.activo,
                     }
                 }
@@ -532,7 +532,7 @@ def inventario_view(request):
 @login_required
 def crear_inventario_view(request):
     """Vista para crear productos de inventario"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -558,7 +558,7 @@ def crear_inventario_view(request):
 @login_required
 def editar_inventario_view(request, producto_id):
     """Vista para editar un producto de inventario"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -615,7 +615,7 @@ def editar_inventario_view(request, producto_id):
 @login_required
 def eliminar_inventario_view(request, producto_id):
     """Vista para eliminar un producto de inventario"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -704,7 +704,7 @@ def pedidos_view(request):
 @login_required
 def editar_precio_producto_view(request, producto_id):
     """Vista para editar solo el precio de un producto"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -744,7 +744,7 @@ def editar_precio_producto_view(request, producto_id):
 @login_required
 def agregar_al_carrito_view(request, producto_id):
     """Vista para agregar un producto al carrito"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -784,7 +784,7 @@ def agregar_al_carrito_view(request, producto_id):
 @login_required
 def ver_carrito_view(request):
     """Vista para ver el carrito de compras"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -821,7 +821,7 @@ def ver_carrito_view(request):
 @login_required
 def eliminar_del_carrito_view(request, producto_id):
     """Vista para eliminar un producto del carrito"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -841,7 +841,7 @@ def eliminar_del_carrito_view(request, producto_id):
 @login_required
 def modificar_cantidad_carrito_view(request, producto_id):
     """Vista para modificar la cantidad de un producto en el carrito"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -867,7 +867,7 @@ def modificar_cantidad_carrito_view(request, producto_id):
 @login_required
 def crear_pedido_view(request):
     """Vista para crear un nuevo pedido desde el carrito"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -945,7 +945,7 @@ def crear_pedido_view(request):
 @login_required
 def exportar_pedido_excel(request, pedido_id):
     """Vista para exportar un pedido a Excel"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1035,7 +1035,7 @@ def exportar_pedido_excel(request, pedido_id):
 @login_required
 def eliminar_pedido_view(request, pedido_id):
     """Vista para eliminar un pedido"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1124,7 +1124,7 @@ def operaciones_view(request):
 @login_required
 def crear_falla_view(request):
     """Vista para crear un nuevo registro de falla"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1165,7 +1165,7 @@ def crear_falla_view(request):
 @login_required
 def crear_llamada_view(request):
     """Vista para crear un nuevo registro de llamada"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1207,7 +1207,7 @@ def crear_llamada_view(request):
 @login_required
 def editar_falla_view(request, falla_id):
     """Vista para editar un registro de falla"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1244,7 +1244,7 @@ def editar_falla_view(request, falla_id):
 @login_required
 def eliminar_falla_view(request, falla_id):
     """Vista para eliminar un registro de falla"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1280,7 +1280,7 @@ def eliminar_falla_view(request, falla_id):
 @login_required
 def editar_llamada_view(request, llamada_id):
     """Vista para editar un registro de llamada"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1318,7 +1318,7 @@ def editar_llamada_view(request, llamada_id):
 @login_required
 def eliminar_llamada_view(request, llamada_id):
     """Vista para eliminar un registro de llamada"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1657,7 +1657,7 @@ def creditos_view(request):
 @login_required
 def gestionar_contactos_view(request):
     """Vista para gestionar contactos"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1673,7 +1673,7 @@ def gestionar_contactos_view(request):
 @login_required
 def editar_contacto_view(request, contacto_id):
     """Vista para editar un contacto"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1730,7 +1730,7 @@ def editar_contacto_view(request, contacto_id):
 @login_required
 def crear_contacto_view(request):
     """Vista para crear un nuevo contacto"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1766,7 +1766,7 @@ def crear_contacto_view(request):
 @login_required
 def eliminar_contacto_view(request, contacto_id):
     """Vista para eliminar un contacto"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1802,7 +1802,7 @@ def eliminar_contacto_view(request, contacto_id):
 @login_required
 def gestionar_manual_interno_view(request):
     """Vista para gestionar documentación"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1825,7 +1825,7 @@ def gestionar_manual_interno_view(request):
 @login_required
 def crear_manual_interno_view(request):
     """Vista para crear un nuevo manual interno"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1861,7 +1861,7 @@ def crear_manual_interno_view(request):
 @login_required
 def editar_manual_interno_view(request, manual_id):
     """Vista para editar un manual interno"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1910,7 +1910,7 @@ def editar_manual_interno_view(request, manual_id):
 @login_required
 def eliminar_manual_interno_view(request, manual_id):
     """Vista para eliminar un manual interno"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -1947,10 +1947,10 @@ def eliminar_manual_interno_view(request, manual_id):
 
 
 @login_required
-def trabajador_dashboard_view(request):
-    """Dashboard principal para usuarios empleados"""
-    # Solo usuarios empleados pueden acceder (pero si es admin también puede acceder)
-    if not request.user.es_empleado and not (request.user._es_administrador or request.user.is_superuser):
+def colaborador_dashboard_view(request):
+    """Dashboard principal para usuarios colaboradores"""
+    # Solo usuarios colaboradores pueden acceder (pero si es admin también puede acceder)
+    if not request.user.es_colaborador and not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
         return redirect('panel')
     
@@ -1958,17 +1958,17 @@ def trabajador_dashboard_view(request):
     if request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     
-    return render(request, 'core/trabajador_dashboard.html', {
+    return render(request, 'core/colaborador_dashboard.html', {
         'usuario': request.user
     })
 
 
 @login_required
 def registro_asistencia_view(request):
-    """Vista para registro de asistencia (solo usuarios empleados)"""
-    # Solo usuarios empleados pueden registrar asistencia
-    if not request.user.es_empleado:
-        messages.error(request, 'Solo los usuarios empleados pueden registrar asistencia')
+    """Vista para registro de asistencia (solo usuarios colaboradores)"""
+    # Solo usuarios colaboradores pueden registrar asistencia
+    if not request.user.es_colaborador:
+        messages.error(request, 'Solo los usuarios colaboradores pueden registrar asistencia')
         return redirect('panel')
     
     # Si el usuario necesita cambiar su contraseña, redirigir primero
@@ -2006,8 +2006,8 @@ def registro_asistencia_view(request):
                 
                 if asistencia_existente:
                     messages.warning(request, f'Ya se registró asistencia para hoy. Tu turno registrado es: {asistencia_existente.get_turno_display()}')
-                    # Redirigir al dashboard del trabajador
-                    return redirect('trabajador_dashboard')
+                    # Redirigir al dashboard del colaborador
+                    return redirect('colaborador_dashboard')
                 else:
                     # Crear nuevo registro de asistencia
                     # fecha_registro se guarda automáticamente con la fecha y hora exacta del registro (GMT-3 Chile)
@@ -2022,8 +2022,8 @@ def registro_asistencia_view(request):
                         fecha_registro=fecha_registro_chile  # Fecha y hora exacta del registro en horario chileno GMT-3
                     )
                     messages.success(request, f'Asistencia registrada exitosamente. Turno: {asistencia.get_turno_display()}')
-                    # Redirigir al dashboard del trabajador
-                    return redirect('trabajador_dashboard')
+                    # Redirigir al dashboard del colaborador
+                    return redirect('colaborador_dashboard')
                 
             except Exception as e:
                 messages.error(request, f'Error al registrar asistencia: {str(e)}')
@@ -2040,10 +2040,10 @@ def registro_asistencia_view(request):
 
 @login_required
 def cambiar_stock_view(request):
-    """Vista para que trabajadores cambien el stock de productos"""
-    # Solo usuarios empleados pueden cambiar stock
-    if not request.user.es_empleado:
-        messages.error(request, 'Solo los usuarios empleados pueden cambiar el stock')
+    """Vista para que colaboradores cambien el stock de productos"""
+    # Solo usuarios colaboradores pueden cambiar stock
+    if not request.user.es_colaborador:
+        messages.error(request, 'Solo los usuarios colaboradores pueden cambiar el stock')
         return redirect('panel')
     
     # Si el usuario necesita cambiar su contraseña, redirigir primero
@@ -2068,10 +2068,10 @@ def cambiar_stock_view(request):
 
 @login_required
 def actualizar_stock_view(request, producto_id):
-    """Vista para actualizar el stock de un producto específico (solo trabajadores)"""
-    # Solo usuarios empleados pueden cambiar stock
-    if not request.user.es_empleado:
-        messages.error(request, 'Solo los usuarios empleados pueden cambiar el stock')
+    """Vista para actualizar el stock de un producto específico (solo colaboradores)"""
+    # Solo usuarios colaboradores pueden cambiar stock
+    if not request.user.es_colaborador:
+        messages.error(request, 'Solo los usuarios colaboradores pueden cambiar el stock')
         return redirect('panel')
     
     # Si el usuario necesita cambiar su contraseña, redirigir primero
@@ -2187,7 +2187,7 @@ def auditoria_view(request):
 @login_required
 def gestionar_carrusel_view(request):
     """Vista para gestionar las imágenes del carrusel"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -2200,7 +2200,7 @@ def gestionar_carrusel_view(request):
 @login_required
 def crear_imagen_carrusel_view(request):
     """Vista para crear una nueva imagen del carrusel"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -2236,7 +2236,7 @@ def crear_imagen_carrusel_view(request):
 @login_required
 def editar_imagen_carrusel_view(request, imagen_id):
     """Vista para editar una imagen del carrusel"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -2283,7 +2283,7 @@ def editar_imagen_carrusel_view(request, imagen_id):
 @login_required
 def eliminar_imagen_carrusel_view(request, imagen_id):
     """Vista para eliminar una imagen del carrusel"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -2320,7 +2320,7 @@ def eliminar_imagen_carrusel_view(request, imagen_id):
 @login_required
 def gestionar_eventos_view(request):
     """Vista para gestionar eventos"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -2333,7 +2333,7 @@ def gestionar_eventos_view(request):
 @login_required
 def crear_evento_view(request):
     """Vista para crear un nuevo evento"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -2369,7 +2369,7 @@ def crear_evento_view(request):
 @login_required
 def editar_evento_view(request, evento_id):
     """Vista para editar un evento"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -2454,7 +2454,7 @@ def editar_evento_view(request, evento_id):
 @login_required
 def eliminar_evento_view(request, evento_id):
     """Vista para eliminar un evento"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -2492,7 +2492,7 @@ def eliminar_evento_view(request, evento_id):
 @login_required
 def gestionar_noticias_view(request):
     """Vista para gestionar noticias"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -2505,7 +2505,7 @@ def gestionar_noticias_view(request):
 @login_required
 def crear_noticia_view(request):
     """Vista para crear una nueva noticia"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -2541,7 +2541,7 @@ def crear_noticia_view(request):
 @login_required
 def editar_noticia_view(request, noticia_id):
     """Vista para editar una noticia"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')
@@ -2626,7 +2626,7 @@ def editar_noticia_view(request, noticia_id):
 @login_required
 def eliminar_noticia_view(request, noticia_id):
     """Vista para eliminar una noticia"""
-    if request.user.es_empleado and request.user.cambio_password_requerido:
+    if request.user.es_colaborador and request.user.cambio_password_requerido:
         return redirect('cambiar_password')
     if not (request.user._es_administrador or request.user.is_superuser):
         messages.error(request, 'No tienes permisos para acceder a esta sección')

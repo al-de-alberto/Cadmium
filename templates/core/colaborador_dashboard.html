@@ -1,12 +1,12 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block title %}Panel Trabajador - Cadmium{% endblock %}
+{% block title %}Panel Colaborador - Cadmium{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 <style>
-.trabajador-dashboard-container {
+.colaborador-dashboard-container {
     min-height: calc(100vh - 80px);
     padding: 40px 20px;
     margin-top: 80px;
@@ -110,7 +110,7 @@
 }
 
 @media (max-width: 768px) {
-    .trabajador-dashboard-container {
+    .colaborador-dashboard-container {
         padding: 20px 15px;
     }
     
@@ -141,10 +141,10 @@
 
 {% block content %}
 
-<div class="trabajador-dashboard-container">
+<div class="colaborador-dashboard-container">
     <div class="dashboard-card">
         <div class="dashboard-header">
-            <h1>Panel de Trabajador</h1>
+            <h1>Panel de Colaborador</h1>
             <p>Gestiona tu asistencia y el stock de productos</p>
         </div>
         

@@ -170,14 +170,14 @@ class CrearUsuarioForm(forms.ModelForm):
         help_text='Marcar si el usuario es Administrador'
     )
     
-    es_empleado = forms.BooleanField(
+    es_colaborador = forms.BooleanField(
         required=False,
         initial=True,
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input'
         }),
-        label='Es Empleado',
-        help_text='Marcar si el usuario es Empleado'
+        label='Es Colaborador',
+        help_text='Marcar si el usuario es Colaborador'
     )
     
     def clean_nombre(self):
@@ -199,16 +199,16 @@ class CrearUsuarioForm(forms.ModelForm):
     
     class Meta:
         model = Usuario
-        fields = ['nombre', 'apellido', 'rut', 'correo_institucional', 'es_administrador', 'es_empleado']
+        fields = ['nombre', 'apellido', 'rut', 'correo_institucional', 'es_administrador', 'es_colaborador']
     
     def clean(self):
         cleaned_data = super().clean()
         es_administrador = cleaned_data.get('es_administrador', False)
-        es_empleado = cleaned_data.get('es_empleado', False)
+        es_colaborador = cleaned_data.get('es_colaborador', False)
         
         # Validar que el usuario tenga al menos un rol
-        if not es_administrador and not es_empleado:
-            raise ValidationError('El usuario debe tener al menos un rol asignado (Administrador o Empleado).')
+        if not es_administrador and not es_colaborador:
+            raise ValidationError('El usuario debe tener al menos un rol asignado (Administrador o Colaborador).')
         
         return cleaned_data
     
@@ -255,7 +255,7 @@ class CrearUsuarioForm(forms.ModelForm):
         usuario = super().save(commit=False)
         # Asignar roles
         usuario._es_administrador = self.cleaned_data.get('es_administrador', False)
-        usuario.es_empleado = self.cleaned_data.get('es_empleado', True)
+        usuario.es_colaborador = self.cleaned_data.get('es_colaborador', True)
         usuario.email = self.cleaned_data['correo_institucional']
         
         # Todos los usuarios deben cambiar su contraseña en el primer login
@@ -355,12 +355,12 @@ class EditarUsuarioForm(forms.ModelForm):
         help_text='El usuario tendrá acceso al panel de administración'
     )
     
-    es_empleado = forms.BooleanField(
+    es_colaborador = forms.BooleanField(
         required=False,
         widget=forms.CheckboxInput(attrs={
             'class': 'form-check-input'
         }),
-        label='Es Empleado',
+        label='Es Colaborador',
         help_text='El usuario podrá registrar asistencia y gestionar stock'
     )
     
@@ -374,7 +374,7 @@ class EditarUsuarioForm(forms.ModelForm):
     
     class Meta:
         model = Usuario
-        fields = ['nombre', 'apellido', 'rut', 'correo_institucional', 'es_administrador', 'es_empleado', 'activo']
+        fields = ['nombre', 'apellido', 'rut', 'correo_institucional', 'es_administrador', 'es_colaborador', 'activo']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -389,10 +389,10 @@ class EditarUsuarioForm(forms.ModelForm):
                 self.fields['es_administrador'].initial = self.instance._es_administrador or (self.instance.rol == 'admin' if self.instance.rol else False)
             else:
                 self.fields['es_administrador'].initial = self.instance.rol == 'admin' if self.instance.rol else False
-            if hasattr(self.instance, 'es_empleado'):
-                self.fields['es_empleado'].initial = self.instance.es_empleado or (self.instance.rol == 'usuario' if self.instance.rol else True)
+            if hasattr(self.instance, 'es_colaborador'):
+                self.fields['es_colaborador'].initial = self.instance.es_colaborador or (self.instance.rol == 'usuario' if self.instance.rol else True)
             else:
-                self.fields['es_empleado'].initial = self.instance.rol == 'usuario' if self.instance.rol else True
+                self.fields['es_colaborador'].initial = self.instance.rol == 'usuario' if self.instance.rol else True
             self.fields['activo'].initial = self.instance.activo
     
     def clean_nombre(self):
@@ -433,11 +433,11 @@ class EditarUsuarioForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         es_administrador = cleaned_data.get('es_administrador', False)
-        es_empleado = cleaned_data.get('es_empleado', False)
+        es_colaborador = cleaned_data.get('es_colaborador', False)
         
         # Validar que el usuario tenga al menos un rol
-        if not es_administrador and not es_empleado:
-            raise ValidationError('El usuario debe tener al menos un rol asignado (Administrador o Empleado).')
+        if not es_administrador and not es_colaborador:
+            raise ValidationError('El usuario debe tener al menos un rol asignado (Administrador o Colaborador).')
         
         return cleaned_data
     
@@ -445,7 +445,7 @@ class EditarUsuarioForm(forms.ModelForm):
         usuario = super().save(commit=False)
         # Asignar roles desde los campos del formulario
         usuario._es_administrador = self.cleaned_data.get('es_administrador', False)
-        usuario.es_empleado = self.cleaned_data.get('es_empleado', False)
+        usuario.es_colaborador = self.cleaned_data.get('es_colaborador', False)
         usuario.email = self.cleaned_data['correo_institucional']
         
         # Todos los usuarios deben cambiar su contraseña en el primer login
@@ -761,7 +761,7 @@ class EditarInventarioForm(forms.ModelForm):
 
 
 class CambiarStockForm(forms.Form):
-    """Formulario simple para que trabajadores cambien solo la cantidad de stock"""
+    """Formulario simple para que colaboradores cambien solo la cantidad de stock"""
     cantidad = forms.IntegerField(
         label='Nueva Cantidad',
         required=True,

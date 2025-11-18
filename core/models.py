@@ -50,9 +50,9 @@ class Usuario(AbstractUser):
     correo_institucional = models.EmailField(blank=True, null=True, verbose_name='Correo Institucional')
     cambio_password_requerido = models.BooleanField(default=True, verbose_name='Cambio de Contraseña Requerido')
     
-    # Roles múltiples - un usuario puede ser Administrador y/o Empleado
+    # Roles múltiples - un usuario puede ser Administrador y/o Colaborador
     _es_administrador = models.BooleanField(default=False, verbose_name='Es Administrador', db_column='es_administrador')
-    es_empleado = models.BooleanField(default=True, verbose_name='Es Empleado')
+    es_colaborador = models.BooleanField(default=True, verbose_name='Es Colaborador')
     
     # Mantener el campo 'rol' para compatibilidad con migraciones existentes (deprecated)
     rol = models.CharField(max_length=20, blank=True, null=True, verbose_name='Rol (deprecated)')
@@ -79,8 +79,8 @@ class Usuario(AbstractUser):
         roles = []
         if self._es_administrador or self.is_superuser:
             roles.append('Administrador')
-        if self.es_empleado:
-            roles.append('Empleado')
+        if self.es_colaborador:
+            roles.append('Colaborador')
         return ', '.join(roles) if roles else 'Sin rol asignado'
     
     def get_nombre_completo(self):

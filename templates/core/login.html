@@ -35,9 +35,9 @@
                     <h3>Gerencia</h3>
                     <p>Acceso administrativo completo</p>
                 </button>
-                <button type="button" class="account-type-btn" onclick="selectAccountType('empleado')">
+                <button type="button" class="account-type-btn" onclick="selectAccountType('colaborador')">
                     <div class="account-icon">👤</div>
-                    <h3>Empleado</h3>
+                    <h3>Colaborador</h3>
                     <p>Acceso de usuario estándar</p>
                 </button>
             </div>
@@ -46,7 +46,7 @@
         <!-- Paso 2: Formulario de credenciales -->
         <div id="step2" class="login-step" {% if not account_type %}style="display: none;"{% endif %}>
             <h2 style="text-align: center; margin-bottom: 20px; color: var(--text-primary);">
-                <span id="account-type-label">Iniciar Sesión{% if account_type == 'gerencia' %} - Gerencia{% elif account_type == 'empleado' %} - Empleado{% endif %}</span>
+                <span id="account-type-label">Iniciar Sesión{% if account_type == 'gerencia' %} - Gerencia{% elif account_type == 'colaborador' %} - Colaborador{% endif %}</span>
             </h2>
             <form method="POST" class="login-form" id="login-form">
                 {% csrf_token %}
@@ -88,7 +88,7 @@
         document.getElementById('step1').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
         
-        const label = type === 'gerencia' ? 'Iniciar Sesión - Gerencia' : 'Iniciar Sesión - Empleado';
+        const label = type === 'gerencia' ? 'Iniciar Sesión - Gerencia' : 'Iniciar Sesión - Colaborador';
         document.getElementById('account-type-label').textContent = label;
         document.getElementById('username').focus();
     }

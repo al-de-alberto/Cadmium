@@ -6,9 +6,9 @@ from .models import Usuario, Inventario, Asistencia, Pedido, DetallePedido, Audi
 @admin.register(Usuario)
 class UsuarioAdmin(BaseUserAdmin):
     list_display = ['username', 'email', 'get_roles_display', 'activo', 'fecha_creacion']
-    list_filter = ['_es_administrador', 'es_empleado', 'activo', 'is_superuser']
+    list_filter = ['_es_administrador', 'es_colaborador', 'activo', 'is_superuser']
     fieldsets = BaseUserAdmin.fieldsets + (
-        ('Información Adicional', {'fields': ('_es_administrador', 'es_empleado', 'activo', 'fecha_creacion')}),
+        ('Información Adicional', {'fields': ('_es_administrador', 'es_colaborador', 'activo', 'fecha_creacion')}),
     )
     readonly_fields = ['fecha_creacion']
 

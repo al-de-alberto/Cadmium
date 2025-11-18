@@ -1,5 +1,5 @@
-/* Estilos para el dashboard del trabajador */
-.trabajador-dashboard-container {
+/* Estilos para el dashboard del colaborador */
+.colaborador-dashboard-container {
     min-height: calc(100vh - 80px);
     padding: 40px 20px;
     margin-top: 80px;
